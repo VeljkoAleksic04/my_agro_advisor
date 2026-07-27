@@ -1,0 +1,28 @@
+# Dependencies
+**/node_modules/
+.pnp
+.pnp.js
+
+# Output / Builds
+**/dist/
+**/out-tsc/
+/client/.angular/
+
+# Environment files (NIKADA ne slikati tajne na Github)
+**/.env
+**/.env.*
+!.env.example
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+
+# Logs
+**/logs
+*.log
+npm-debug.log*
+
+# OS Specific
+.DS_Store
+Thumbs.db
