@@ -26,3 +26,139 @@ npm-debug.log*
 # OS Specific
 .DS_Store
 Thumbs.db
+# ============================================
+# Node.js / npm
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ============================================
+# Angular / Client
+# ============================================
+client/dist/
+client/.angular/
+client/.nx/
+*.js.map
+*.js
+
+# ============================================
+# NestJS / Server
+# ============================================
+server/dist/
+server/.nestjs/
+
+# ============================================
+# Environment varijable
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+server/.env
+client/src/environments/environment.ts
+client/src/environments/environment.prod.ts
+
+# ============================================
+# Docker
+# ============================================
+docker-compose.override.yml
+.docker/
+
+# ============================================
+# Prisma
+# ============================================
+server/prisma/migrations/
+server/prisma/*.db
+server/prisma/*.db-journal
+
+# ============================================
+# IDE / Editor
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.settings/
+.project
+.classpath
+*.sublime-workspace
+*.sublime-project
+
+# ============================================
+# OS fajlovi
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# Logovi
+# ============================================
+logs/
+*.log
+log/
+tmp/
+temp/
+
+# ============================================
+# Testovi / Coverage
+# ============================================
+coverage/
+*.lcov
+.nyc_output/
+client/coverage/
+server/coverage/
+test-results/
+.junit/
+
+# ============================================
+# Angular specifično
+# ============================================
+client/.browserslistrc
+client/karma.conf.js
+
+# ============================================
+# Build outputi
+# ============================================
+build/
+out/
+*.tsbuildinfo
+
+# ============================================
+# Privremeni fajlovi
+# ============================================
+*.tmp
+*.temp
+.cache/
+
+# ============================================
+# Certifikati i ključevi
+# ============================================
+*.pem
+*.key
+*.crt
+*.csr
+ssl/
+
+# ============================================
+# Debug
+# ============================================
+debug.log
+error.log
+
+# ============================================
+# TypeScript
+# ============================================
+*.tsbuildinfo
+tsconfig.tsbuildinfo

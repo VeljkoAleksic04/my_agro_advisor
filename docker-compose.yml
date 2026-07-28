@@ -2,17 +2,21 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:16-alpine
-    container_name: app_postgres_db
+    image: postgres:15-alpine
+    container_name: my_agro_advisor
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: my_project_db
+      POSTGRES_USER: veljko
+      POSTGRES_PASSWORD: veljkoboss
+      POSTGRES_DB: my_agro_advisor
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    stop_grace_period: 10s  # Dodaće timeout za zaustavljanje
+    # Dodaj i ovo ako problem i dalje postoji
+    security_opt:
+      - apparmor:unconfined
 
 volumes:
-  postgres_data:
+  pgdata:
