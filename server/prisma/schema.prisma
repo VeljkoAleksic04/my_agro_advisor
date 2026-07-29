@@ -8,6 +8,43 @@ generator client {
   output   = "../generated/prisma"
 }
 
+enum JedinicaPovrsine {
+  A
+  HA
+  M2
+}
+
+enum JedinicaKarence {
+  DAN
+  NEDELJA
+  MESEC
+}
+
+enum TipPreparata {
+  PESTICID
+  DJUBRIVO
+  FOLIJALNO_DJUBRIVO
+}
+
+enum Tezina {
+  mg
+  G
+  KG
+  T
+}
+
+enum StatusZasadjeneKulture {
+  ZASADJENA
+  AKTIVNA
+  OBRANA
+  PROPALA
+}
+
+enum UlogaKorisnika {
+  GOST
+  FARMER
+}
+
 model Poljoprivrednik {
   id Int @id @default(autoincrement())
   Ime String
@@ -17,8 +54,13 @@ model Poljoprivrednik {
   username String @unique
   password String
   parcele Parcela[]
+  sadnje Sadnja[]
   kreiranDana DateTime @default(now())
   izmenjenDana DateTime @updatedAt
+  transakcijePoena TransakcijaPoena[]
+  UkupnoPoena Int
+  Uloga UlogaKorisnika @default(GOST)
+  pokrenuteTeme TemaForuma[]
 }
 
 model Parcela {
@@ -27,27 +69,122 @@ model Parcela {
   vlasnik Poljoprivrednik @relation(fields: [vlasnikId], references: [id])
   Naziv String
   Povrsina Int
-  JedinicaMerePovrsine String @default("a")
+  JedinicaMere JedinicaPovrsine @default(A)
   Klasa Int
   DatumUpisa DateTime @default(now())
   biljke Biljka[]
+  tretmani Tretman[]
+  sadnje Sadnja[]
 }
+
 
 model Biljka {
   id Int @id @default(autoincrement())
   naziv String
+  vrsta String @unique
   pocetakSadnje DateTime
   krajSadnje DateTime
   pocetakBerbe DateTime
   krajBerbe DateTime
   idPreporucenogDjubriva Int
-  trenutnoPreporucenoDubrivo Djubrivo
+  trenutnoPreporucenoDubrivo Tretman[]
   preporicenaTemperaturaC Int
+  parcelaId Int
+  parcela Parcela @relation(fields: [parcelaId], references: [id])
+  sadnje Sadnja[]
 }
 
+model Tretman {
+  id Int @id @default(autoincrement())
+  idParcele Int
+  parcela Parcela @relation(fields: [idParcele], references: [id])
+  idBiljke Int?
+  biljka Biljka? @relation(fields: [idBiljke], references: [id])
+  idPreparata Int
+  preparat Preparat @relation(fields: [idPreparata], references: [id])
+  Doza String
+  DatumTretmana DateTime @default(now())
 
+  @@unique([idParcele, idBiljke, idPreparata, DatumTretmana])
+}
 
-// kasnije
-model Djubrivo {
+model Preparat {
+  id Int @id @default(autoincrement())
+  tretmani Tretman[]
+  Naziv String
+  Proizvodjac String
+  TrajanjeKarence Int
+  JedinicaKarence JedinicaKarence
+  TipPreparata TipPreparata
+  sastojci Sastojak[] // Ovde se NPK i Magnezijum kombinuju
+}
+
+model Sastojak { // Ovde se dobija NPK i Magnezijum ili samo N, pa magnezijum
+  id Int @id @default(autoincrement())
+  idPreparata Int
+  preparat Preparat @relation(fields: [idPreparata], references: [id])
+  idElementa Int
+  elementi Element @relation(fields: [idElementa], references: [id])
+  Kolicina Int
+  Jedinica Tezina @default(mg)
+
+  @@unique([idPreparata, idElementa])
+}
+
+model Element {
+  id Int @id @default(autoincrement())
+  Naziv String
+  sastojci Sastojak[]
+}
+
+model Sadnja {
+  id Int @id @default(autoincrement())
+  idFarmera Int
+  farmer Poljoprivrednik @relation(fields: [idFarmera], references: [id])
+  Datum DateTime @default(now())
+  idParcele Int
+  parcela Parcela @relation(fields: [idParcele], references: [id])
+  idBiljke Int
+  kultura Biljka @relation(fields: [idBiljke], references: [id])
+  KolicinaPosadjeneKulture Int
+  OcekivaniDatumBerbe DateTime
+  Prinos Int @default(0)
+  Jedinica Tezina @default(KG)
+  Status StatusZasadjeneKulture @default(ZASADJENA)
+}
+
+model TransakcijaPoena {
+  id Int @id @default(autoincrement())
+  idFarmera Int
+  farmer Poljoprivrednik @relation(fields: [idFarmera], references: [id])
+  DatumTransakcije DateTime @default(now())
+  OstvareniPoeni Int
+  Razlog String
+}
+
+model TemaForuma {
+  id Int @id @default(autoincrement())
+  Naslov String
+  Opis String
+  DatumKreiranja DateTime
+  DatumIzmene DateTime?
+  farmerId Int
+  farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
+  poruke PorukaForuma[]
+}
+
+model PorukaForuma {
+  id              Int      @id @default(autoincrement())
+  Sadrzaj         String
+  DatumKreiranja  DateTime @default(now())
+  DatumIzmene     DateTime?
+  autorId         Int
+  temaId          Int
+
+  tema            TemaForuma @relation(fields: [temaId], references: [id])
+  
+  parentId        Int?
+  parent          PorukaForuma? @relation("Odgovor", fields: [parentId], references: [id])
+  odgovori         PorukaForuma[] @relation("Odgovor") 
 
 }
