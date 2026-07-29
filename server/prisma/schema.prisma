@@ -10,4 +10,44 @@ generator client {
 
 model Poljoprivrednik {
   id Int @id @default(autoincrement())
+  Ime String
+  Prezime String
+  email String @unique
+  DatumRodjenja DateTime
+  username String @unique
+  password String
+  parcele Parcela[]
+  kreiranDana DateTime @default(now())
+  izmenjenDana DateTime @updatedAt
+}
+
+model Parcela {
+  id Int @id @default(autoincrement())
+  vlasnikId Int
+  vlasnik Poljoprivrednik @relation(fields: [vlasnikId], references: [id])
+  Naziv String
+  Povrsina Int
+  JedinicaMerePovrsine String @default("a")
+  Klasa Int
+  DatumUpisa DateTime @default(now())
+  biljke Biljka[]
+}
+
+model Biljka {
+  id Int @id @default(autoincrement())
+  naziv String
+  pocetakSadnje DateTime
+  krajSadnje DateTime
+  pocetakBerbe DateTime
+  krajBerbe DateTime
+  idPreporucenogDjubriva Int
+  trenutnoPreporucenoDubrivo Djubrivo
+  preporicenaTemperaturaC Int
+}
+
+
+
+// kasnije
+model Djubrivo {
+
 }
