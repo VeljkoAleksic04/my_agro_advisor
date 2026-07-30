@@ -23,7 +23,18 @@ enum JedinicaKarence {
 enum TipPreparata {
   PESTICID
   DJUBRIVO
-  FOLIJALNO_DJUBRIVO
+}
+
+enum TipPesticida {
+  INSEKTICID
+  HERBICID
+  FUNGICID
+}
+
+enum TipDjubriva {
+  ZEMLJANO
+  FOLIJALNO
+  FERTILIGACIONO
 }
 
 enum Tezina {
@@ -43,6 +54,30 @@ enum StatusZasadjeneKulture {
 enum UlogaKorisnika {
   GOST
   FARMER
+}
+
+enum StatusPoruke {
+  POSLATA
+  PRIMLJENA
+  PROCITANA
+  NEUSPESNO_SLANJE
+}
+
+enum Elementi {
+  Mg
+  Ca
+  S
+  Cu
+  NH4NO3
+  SO4
+  Cl
+  Natrijum_hipohlorih
+  Limunska_kiselina
+  Fosforna_kiselina
+  Aluminijum_fosfid
+  Organofosfati
+  Xilen
+  Toulen
 }
 
 model Poljoprivrednik {
@@ -75,6 +110,7 @@ model Parcela {
   biljke Biljka[]
   tretmani Tretman[]
   sadnje Sadnja[]
+  navodnjavanja Navodnjavanje[]
 }
 
 
@@ -116,6 +152,8 @@ model Preparat {
   TrajanjeKarence Int
   JedinicaKarence JedinicaKarence
   TipPreparata TipPreparata
+  TipPesticida TipPesticida?
+  TipDjubriva TipDjubriva?
   sastojci Sastojak[] // Ovde se NPK i Magnezijum kombinuju
 }
 
@@ -133,7 +171,7 @@ model Sastojak { // Ovde se dobija NPK i Magnezijum ili samo N, pa magnezijum
 
 model Element {
   id Int @id @default(autoincrement())
-  Naziv String
+  element Elementi
   sastojci Sastojak[]
 }
 
@@ -186,5 +224,11 @@ model PorukaForuma {
   parentId        Int?
   parent          PorukaForuma? @relation("Odgovor", fields: [parentId], references: [id])
   odgovori         PorukaForuma[] @relation("Odgovor") 
+}
 
+model Navodnjavanje {
+  id Int @id @default(autoincrement())
+  DatumNavodnjavanja DateTime @default(now())
+  idParcele Int
+  parcela Parcela? @relation(fields: [idParcele], references: [id])
 }
