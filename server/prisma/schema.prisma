@@ -209,6 +209,7 @@ model TemaForuma {
   farmerId Int
   farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
   poruke PorukaForuma[]
+  reakcije Reakcija[]
 }
 
 model PorukaForuma {
@@ -223,7 +224,8 @@ model PorukaForuma {
   
   parentId        Int?
   parent          PorukaForuma? @relation("Odgovor", fields: [parentId], references: [id])
-  odgovori         PorukaForuma[] @relation("Odgovor") 
+  odgovori        PorukaForuma[] @relation("Odgovor") 
+  reakcije        Reakcija[]
 }
 
 model Navodnjavanje {
@@ -231,4 +233,13 @@ model Navodnjavanje {
   DatumNavodnjavanja DateTime @default(now())
   idParcele Int
   parcela Parcela? @relation(fields: [idParcele], references: [id])
+}
+
+model Reakcija {
+  id Int @id @default(autoincrement())
+  DatumReakcije DateTime @default(now())
+  idParentPost Int
+  ParentPost TemaForuma @relation(fields: [idParentPost], references: [id])
+  idParentMessage Int?
+  ParentMessage PorukaForuma? @relation(fields: [idParentMessage], references: [id])
 }
