@@ -82,10 +82,10 @@ enum Elementi {
 
 model Poljoprivrednik {
   id Int @id @default(autoincrement())
-  Ime String
-  Prezime String
+  ime String
+  orezime String
   email String @unique
-  DatumRodjenja DateTime
+  datumRodjenja DateTime
   username String @unique
   password String
   parcele Parcela[]
@@ -93,20 +93,23 @@ model Poljoprivrednik {
   kreiranDana DateTime @default(now())
   izmenjenDana DateTime @updatedAt
   transakcijePoena TransakcijaPoena[]
-  UkupnoPoena Int
-  Uloga UlogaKorisnika @default(GOST)
+  ukupnoPoena Int
+  uloga UlogaKorisnika @default(GOST)
   pokrenuteTeme TemaForuma[]
+  navodnjavanja Navodnjavanje[]
+  reakcijeNaTemu ReakcijaNaTemu[]
+  reakcijeNaPoruku ReakcijaNaPoruku[]
 }
 
 model Parcela {
   id Int @id @default(autoincrement())
   vlasnikId Int
   vlasnik Poljoprivrednik @relation(fields: [vlasnikId], references: [id])
-  Naziv String
-  Povrsina Int
-  JedinicaMere JedinicaPovrsine @default(A)
-  Klasa Int
-  DatumUpisa DateTime @default(now())
+  naziv String
+  povrsina Int
+  jedinicaMere JedinicaPovrsine @default(A)
+  klasa Int
+  datumUpisa DateTime @default(now())
   biljke Biljka[]
   tretmani Tretman[]
   sadnje Sadnja[]
@@ -138,23 +141,24 @@ model Tretman {
   biljka Biljka? @relation(fields: [biljkaId], references: [id])
   preparatId Int
   preparat Preparat @relation(fields: [preparatId], references: [id])
-  Doza String
-  DatumTretmana DateTime @default(now())
+  doza String
+  datumTretmana DateTime @default(now())
 
-  @@unique([parcelaId, biljkaId, preparatId, DatumTretmana])
+  @@unique([parcelaId, biljkaId, preparatId, datumTretmana])
 }
 
 model Preparat {
   id Int @id @default(autoincrement())
   tretmani Tretman[]
-  Naziv String
-  Proizvodjac String
-  TrajanjeKarence Int
-  JedinicaKarence JedinicaKarence
-  TipPreparata TipPreparata
-  TipPesticida TipPesticida?
-  TipDjubriva TipDjubriva?
+  naziv String
+  proizvodjac String
+  trajanjeKarence Int
+  jedinicaKarence JedinicaKarence
+  tipPreparata TipPreparata
+  tipPesticida TipPesticida?
+  tipDjubriva TipDjubriva?
   sastojci Sastojak[] // Ovde se NPK i Magnezijum kombinuju
+  opis String
 }
 
 model Sastojak { // Ovde se dobija NPK i Magnezijum ili samo N, pa magnezijum
@@ -163,8 +167,8 @@ model Sastojak { // Ovde se dobija NPK i Magnezijum ili samo N, pa magnezijum
   preparat Preparat @relation(fields: [preparatId], references: [id])
   elementId Int
   elementi Element @relation(fields: [elementId], references: [id])
-  Kolicina Int
-  Jedinica Tezina @default(mg)
+  kolicina Int
+  jedinica Tezina @default(mg)
 
   @@unique([preparatId, elementId])
 }
@@ -179,37 +183,37 @@ model Sadnja {
   id Int @id @default(autoincrement())
   farmerId Int
   farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
-  Datum DateTime @default(now())
+  datum DateTime @default(now())
   parcelaId Int
   parcela Parcela @relation(fields: [parcelaId], references: [id])
   biljkaId Int
   kultura Biljka @relation(fields: [biljkaId], references: [id])
-  KolicinaPosadjeneKulture Int
-  OcekivaniDatumBerbe DateTime
-  Prinos Int @default(0)
-  Jedinica Tezina @default(KG)
-  Status StatusZasadjeneKulture @default(ZASADJENA)
+  kolicinaPosadjeneKulture Int
+  ocekivaniDatumBerbe DateTime
+  prinos Int @default(0)
+  jedinica Tezina @default(KG)
+  status StatusZasadjeneKulture @default(ZASADJENA)
 }
 
 model TransakcijaPoena {
   id Int @id @default(autoincrement())
   farmerId Int
   farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
-  DatumTransakcije DateTime @default(now())
-  OstvareniPoeni Int
-  Razlog String
+  datumTransakcije DateTime @default(now())
+  ostvareniPoeni Int
+  razlog String
 }
 
 model TemaForuma {
   id Int @id @default(autoincrement())
-  Naslov String
-  Opis String
-  DatumKreiranja DateTime
-  DatumIzmene DateTime?
+  naslov String
+  opis String
+  datumKreiranja DateTime
+  datumIzmene DateTime?
   farmerId Int
   farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
   poruke PorukaForuma[]
-  reakcije Reakcija[]
+  reakcije ReakcijaNaTemu[]
 }
 
 model PorukaForuma {
@@ -225,21 +229,33 @@ model PorukaForuma {
   parentId        Int?
   parent          PorukaForuma? @relation("Odgovor", fields: [parentId], references: [id])
   odgovori        PorukaForuma[] @relation("Odgovor") 
-  reakcije        Reakcija[]
+  reakcije        ReakcijaNaPoruku[]
 }
 
 model Navodnjavanje {
   id Int @id @default(autoincrement())
-  DatumNavodnjavanja DateTime @default(now())
+  datumNavodnjavanja DateTime @default(now())
   parcelaId Int?
   parcela Parcela? @relation(fields: [parcelaId], references: [id])
+  farmerId Int
+  farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
+  napomena String
 }
 
-model Reakcija {
+model ReakcijaNaTemu {
   id Int @id @default(autoincrement())
-  DatumReakcije DateTime @default(now())
-  idParentPost Int
-  ParentPost TemaForuma @relation(fields: [idParentPost], references: [id])
-  idParentMessage Int?
-  ParentMessage PorukaForuma? @relation(fields: [idParentMessage], references: [id])
+  datumReakcije DateTime @default(now())
+  idPost Int
+  post TemaForuma @relation(fields: [idPost], references: [id])
+  idFarmera Int
+  farmer Poljoprivrednik @relation(fields: [idFarmera], references: [id])
+}
+
+model ReakcijaNaPoruku {
+  id Int @id @default(autoincrement())
+  datumReakcije DateTime @default(now())
+  idFarmera Int
+  farmer Poljoprivrednik @relation(fields: [idFarmera], references: [id])
+  idMessage Int
+  message PorukaForuma @relation(fields: [idMessage], references: [id])
 }
