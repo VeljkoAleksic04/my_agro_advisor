@@ -122,7 +122,7 @@ model Biljka {
   krajSadnje DateTime
   pocetakBerbe DateTime
   krajBerbe DateTime
-  idPreporucenogDjubriva Int
+  preporucenoDjubrivoId Int
   trenutnoPreporucenoDubrivo Tretman[]
   preporicenaTemperaturaC Int
   parcelaId Int
@@ -132,16 +132,16 @@ model Biljka {
 
 model Tretman {
   id Int @id @default(autoincrement())
-  idParcele Int
-  parcela Parcela @relation(fields: [idParcele], references: [id])
-  idBiljke Int?
-  biljka Biljka? @relation(fields: [idBiljke], references: [id])
-  idPreparata Int
-  preparat Preparat @relation(fields: [idPreparata], references: [id])
+  parcelaId Int
+  parcela Parcela @relation(fields: [parcelaId], references: [id])
+  biljkaId Int?
+  biljka Biljka? @relation(fields: [biljkaId], references: [id])
+  preparatId Int
+  preparat Preparat @relation(fields: [preparatId], references: [id])
   Doza String
   DatumTretmana DateTime @default(now())
 
-  @@unique([idParcele, idBiljke, idPreparata, DatumTretmana])
+  @@unique([parcelaId, biljkaId, preparatId, DatumTretmana])
 }
 
 model Preparat {
@@ -159,14 +159,14 @@ model Preparat {
 
 model Sastojak { // Ovde se dobija NPK i Magnezijum ili samo N, pa magnezijum
   id Int @id @default(autoincrement())
-  idPreparata Int
-  preparat Preparat @relation(fields: [idPreparata], references: [id])
-  idElementa Int
-  elementi Element @relation(fields: [idElementa], references: [id])
+  preparatId Int
+  preparat Preparat @relation(fields: [preparatId], references: [id])
+  elementId Int
+  elementi Element @relation(fields: [elementId], references: [id])
   Kolicina Int
   Jedinica Tezina @default(mg)
 
-  @@unique([idPreparata, idElementa])
+  @@unique([preparatId, elementId])
 }
 
 model Element {
@@ -177,13 +177,13 @@ model Element {
 
 model Sadnja {
   id Int @id @default(autoincrement())
-  idFarmera Int
-  farmer Poljoprivrednik @relation(fields: [idFarmera], references: [id])
+  farmerId Int
+  farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
   Datum DateTime @default(now())
-  idParcele Int
-  parcela Parcela @relation(fields: [idParcele], references: [id])
-  idBiljke Int
-  kultura Biljka @relation(fields: [idBiljke], references: [id])
+  parcelaId Int
+  parcela Parcela @relation(fields: [parcelaId], references: [id])
+  biljkaId Int
+  kultura Biljka @relation(fields: [biljkaId], references: [id])
   KolicinaPosadjeneKulture Int
   OcekivaniDatumBerbe DateTime
   Prinos Int @default(0)
@@ -193,8 +193,8 @@ model Sadnja {
 
 model TransakcijaPoena {
   id Int @id @default(autoincrement())
-  idFarmera Int
-  farmer Poljoprivrednik @relation(fields: [idFarmera], references: [id])
+  farmerId Int
+  farmer Poljoprivrednik @relation(fields: [farmerId], references: [id])
   DatumTransakcije DateTime @default(now())
   OstvareniPoeni Int
   Razlog String
@@ -231,8 +231,8 @@ model PorukaForuma {
 model Navodnjavanje {
   id Int @id @default(autoincrement())
   DatumNavodnjavanja DateTime @default(now())
-  idParcele Int
-  parcela Parcela? @relation(fields: [idParcele], references: [id])
+  parcelaId Int?
+  parcela Parcela? @relation(fields: [parcelaId], references: [id])
 }
 
 model Reakcija {
