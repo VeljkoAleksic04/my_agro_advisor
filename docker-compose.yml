@@ -1,22 +1,21 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:15-alpine
-    container_name: rwa_container
-    restart: always
+    image: postgres:16-alpine
+    container_name: agroplatforma-db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: veljko
-      POSTGRES_PASSWORD: veljkoboss
-      POSTGRES_DB: my_agro_advisor
+      POSTGRES_USER: agro_user
+      POSTGRES_PASSWORD: agro_pass
+      POSTGRES_DB: agroplatforma
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    stop_grace_period: 10s  # Dodaće timeout za zaustavljanje
-    # Dodaj i ovo ako problem i dalje postoji
-    security_opt:
-      - apparmor:unconfined
+      - agroplatforma_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agro_user -d agroplatforma"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
-  pgdata:
+  agroplatforma_pgdata:
