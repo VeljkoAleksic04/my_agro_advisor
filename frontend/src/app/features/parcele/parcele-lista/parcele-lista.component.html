@@ -1,0 +1,56 @@
+<section class="stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Moje parcele</h1>
+      <p class="podnaslov">
+        {{ filtriraneParcele().length }} parcela &middot; ukupna površina {{ ukupnaPovrsina() }} a
+      </p>
+    </div>
+    <button type="button" class="dugme dugme-primarni" (click)="prikaziFormu = !prikaziFormu">
+      {{ prikaziFormu ? 'Zatvori formu' : '+ Nova parcela' }}
+    </button>
+  </header>
+
+  @if (prikaziFormu) {
+    <div class="karta">
+      <app-parcela-forma (sacuvano)="dodajParcelu($event)" (otkazano)="prikaziFormu = false" />
+    </div>
+  }
+
+  @if (greska()) {
+    <p class="poruka-greske">{{ greska() }}</p>
+  }
+
+  <div class="traka-pretrage">
+    <input
+      #unosPretrage
+      type="search"
+      placeholder="Pretraži parcele po nazivu..."
+      (input)="pretraziPo(unosPretrage.value)"
+    />
+    <button type="button" class="dugme dugme-tekst" (click)="obrisiPretragu(unosPretrage)">Obriši</button>
+  </div>
+
+  @if (ucitavanje()) {
+    <p class="stanje-ucitavanja">Učitavanje parcela...</p>
+  } @else if (filtriraneParcele().length === 0) {
+    <p class="stanje-prazno">Nema parcela za prikaz.</p>
+  } @else {
+    <div class="mreza-kartica">
+      @for (parcela of filtriraneParcele(); track parcela.id) {
+        <article class="karta karta-stavka">
+          <h3>{{ parcela.naziv }}</h3>
+          <dl>
+            <dt>Površina</dt>
+            <dd>{{ parcela.povrsina }} {{ parcela.jedinicaMere }}</dd>
+            <dt>Klasa zemljišta</dt>
+            <dd>{{ parcela.klasa }}</dd>
+            <dt>Datum upisa</dt>
+            <dd>{{ parcela.datumUpisa | date: 'dd.MM.yyyy' }}</dd>
+          </dl>
+          <button type="button" class="dugme dugme-opasnost" (click)="obrisiParcelu(parcela.id)">Obriši</button>
+        </article>
+      }
+    </div>
+  }
+</section>

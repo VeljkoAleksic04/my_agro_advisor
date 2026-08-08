@@ -1,0 +1,58 @@
+<form [formGroup]="forma" (ngSubmit)="posalji()" class="forma">
+  <div class="polje-red">
+    <div class="polje">
+      <label for="naziv">Naziv biljke</label>
+      <input id="naziv" type="text" formControlName="naziv" placeholder="npr. Paprika red 1" autocomplete="off" />
+      @if (forma.controls.naziv.invalid && forma.controls.naziv.touched) {
+        <span class="greska-polja">Naziv mora imati najmanje 2 karaktera.</span>
+      }
+    </div>
+
+    <div class="polje">
+      <label for="vrsta">Sorta paprike</label>
+      <select id="vrsta" formControlName="vrsta">
+        @for (sorta of sorteOpcije; track sorta) {
+          <option [value]="sorta">{{ sorta }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="polje-red">
+    <div class="polje">
+      <label for="pocetakSadnje">Početak sadnje</label>
+      <input id="pocetakSadnje" type="date" formControlName="pocetakSadnje" />
+    </div>
+    <div class="polje">
+      <label for="krajSadnje">Kraj sadnje</label>
+      <input id="krajSadnje" type="date" formControlName="krajSadnje" />
+    </div>
+  </div>
+
+  <div class="polje-red">
+    <div class="polje">
+      <label for="pocetakBerbe">Početak berbe</label>
+      <input id="pocetakBerbe" type="date" formControlName="pocetakBerbe" />
+    </div>
+    <div class="polje">
+      <label for="krajBerbe">Kraj berbe</label>
+      <input id="krajBerbe" type="date" formControlName="krajBerbe" />
+    </div>
+  </div>
+
+  <div class="polje-red">
+    <div class="polje">
+      <label for="preporucenaTemperaturaC">Preporučena temperatura (°C)</label>
+      <input id="preporucenaTemperaturaC" type="number" formControlName="preporucenaTemperaturaC" />
+    </div>
+    <div class="polje">
+      <label for="preporucenoDjubrivoId">ID preporučenog đubriva (opciono)</label>
+      <input id="preporucenoDjubrivoId" type="number" formControlName="preporucenoDjubrivoId" />
+    </div>
+  </div>
+
+  <div class="akcije-forme">
+    <button type="submit" class="dugme dugme-primarni">Sačuvaj biljku</button>
+    <button type="button" class="dugme dugme-sekundarni" (click)="otkazano.emit()">Otkaži</button>
+  </div>
+</form>

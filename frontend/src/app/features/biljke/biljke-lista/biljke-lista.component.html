@@ -1,0 +1,62 @@
+<section class="stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Biljke</h1>
+      <p class="podnaslov">Izaberite parcelu da vidite i dodate biljke zasađene na njoj.</p>
+    </div>
+    @if (odabranaParcelaId) {
+      <button type="button" class="dugme dugme-primarni" (click)="prikaziFormu = !prikaziFormu">
+        {{ prikaziFormu ? 'Zatvori formu' : '+ Nova biljka' }}
+      </button>
+    }
+  </header>
+
+  <div class="polje">
+    <label for="parcela">Parcela</label>
+    <select id="parcela" (change)="odaberiParcelu($any($event.target).value)">
+      <option value="">-- izaberite parcelu --</option>
+      @for (parcela of sveParcele(); track parcela.id) {
+        <option [value]="parcela.id">{{ parcela.naziv }}</option>
+      }
+    </select>
+  </div>
+
+  @if (greska()) {
+    <p class="poruka-greske">{{ greska() }}</p>
+  }
+
+  @if (!odabranaParcelaId) {
+    <p class="stanje-prazno">Izaberite parcelu iznad da biste videli njene biljke.</p>
+  } @else if (prikaziFormu) {
+    <div class="karta">
+      <app-biljka-forma [parcelaId]="odabranaParcelaId" (sacuvano)="dodajBiljku($event)" (otkazano)="prikaziFormu = false" />
+    </div>
+  }
+
+  @if (odabranaParcelaId) {
+    @if (ucitavanje()) {
+      <p class="stanje-ucitavanja">Učitavanje biljaka...</p>
+    } @else if (biljke().length === 0) {
+      <p class="stanje-prazno">Nema biljaka na ovoj parceli.</p>
+    } @else {
+      <div class="mreza-kartica">
+        @for (biljka of biljke(); track biljka.id) {
+          <article class="karta karta-stavka">
+            <h3>{{ biljka.naziv }}</h3>
+            <dl>
+              <dt>Sorta</dt>
+              <dd>{{ biljka.vrsta }}</dd>
+              <dt>Sadnja</dt>
+              <dd>{{ biljka.pocetakSadnje | date: 'dd.MM.yyyy' }} – {{ biljka.krajSadnje | date: 'dd.MM.yyyy' }}</dd>
+              <dt>Berba</dt>
+              <dd>{{ biljka.pocetakBerbe | date: 'dd.MM.yyyy' }} – {{ biljka.krajBerbe | date: 'dd.MM.yyyy' }}</dd>
+              <dt>Preporučena temp.</dt>
+              <dd>{{ biljka.preporucenaTemperaturaC }}°C</dd>
+            </dl>
+            <button type="button" class="dugme dugme-opasnost" (click)="obrisiBiljku(biljka.id)">Obriši</button>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>

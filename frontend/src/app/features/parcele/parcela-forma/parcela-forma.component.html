@@ -1,0 +1,41 @@
+<form [formGroup]="forma" (ngSubmit)="posalji()" class="forma">
+  <div class="polje">
+    <label for="naziv">Naziv parcele</label>
+    <input id="naziv" type="text" formControlName="naziv" placeholder="npr. Njiva kraj reke" autocomplete="off" />
+    @if (forma.controls.naziv.invalid && forma.controls.naziv.touched) {
+      <span class="greska-polja">Naziv mora imati najmanje 2 karaktera.</span>
+    }
+  </div>
+
+  <div class="polje-red">
+    <div class="polje">
+      <label for="povrsina">Površina</label>
+      <input id="povrsina" type="number" formControlName="povrsina" min="1" />
+      @if (forma.controls.povrsina.invalid && forma.controls.povrsina.touched) {
+        <span class="greska-polja">Površina mora biti veća od 0.</span>
+      }
+    </div>
+
+    <div class="polje">
+      <label for="jedinicaMere">Jedinica mere</label>
+      <select id="jedinicaMere" formControlName="jedinicaMere">
+        @for (jedinica of jediniceOpcije; track jedinica) {
+          <option [value]="jedinica">{{ jedinica }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="polje">
+      <label for="klasa">Klasa zemljišta</label>
+      <input id="klasa" type="number" formControlName="klasa" min="1" max="8" />
+      @if (forma.controls.klasa.invalid && forma.controls.klasa.touched) {
+        <span class="greska-polja">Klasa mora biti između 1 i 8.</span>
+      }
+    </div>
+  </div>
+
+  <div class="akcije-forme">
+    <button type="submit" class="dugme dugme-primarni">Sačuvaj parcelu</button>
+    <button type="button" class="dugme dugme-sekundarni" (click)="otkazano.emit()">Otkaži</button>
+  </div>
+</form>
