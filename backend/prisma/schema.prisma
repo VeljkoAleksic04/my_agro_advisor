@@ -1,0 +1,297 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum JedinicaPovrsine {
+  A
+  HA
+  M2
+}
+
+enum JedinicaKarence {
+  DAN
+  NEDELJA
+  MESEC
+}
+
+enum TipPreparata {
+  PESTICID
+  DJUBRIVO
+}
+
+enum TipPesticida {
+  INSEKTICID
+  HERBICID
+  FUNGICID
+}
+
+enum TipDjubriva {
+  ZEMLJANO
+  FOLIJALNO
+  FERTILIGACIONO
+}
+
+enum Tezina {
+  mg
+  G
+  KG
+  T
+}
+
+enum StatusZasadjeneKulture {
+  ZASADJENA
+  AKTIVNA
+  OBRANA
+  PROPALA
+}
+
+enum UlogaKorisnika {
+  GOST
+  FARMER
+}
+
+enum StatusPoruke {
+  POSLATA
+  PRIMLJENA
+  PROCITANA
+  NEUSPESNO_SLANJE
+}
+
+// Tacka 5: Elementi kao pravi enum koriscen direktno u Sastojak,
+// model Element je uklonjen jer je bio nepotreban join (tacka 5/ispravka 5)
+enum Elementi {
+  Mg
+  Ca
+  S
+  Cu
+  NH4NO3
+  SO4
+  Cl
+  NATRIJUM_HIPOHLORIT
+  LIMUNSKA_KISELINA
+  FOSFORNA_KISELINA
+  ALUMINIJUM_FOSFID
+  ORGANOFOSFATI
+  XILEN
+  TOLUEN
+}
+
+// Tacka 4: enum sorti paprike sa CHECK-like ogranicenjem preko @@unique
+// da ne mogu 2 ista reda (ista vrsta) postojati na istoj parceli
+enum SortaPaprike {
+  BABURA
+  SILJA
+  AJVARKA
+  TURSIJA
+  SOMBORKA
+}
+
+model Poljoprivrednik {
+  id               Int      @id @default(autoincrement())
+  ime              String
+  prezime          String // tacka 1: ispravljeno sa "orezime"
+  email            String   @unique
+  datumRodjenja    DateTime
+  username         String   @unique
+  password         String
+  parcele          Parcela[]
+  sadnje           Sadnja[]
+  kreiranDana      DateTime @default(now())
+  izmenjenDana     DateTime @updatedAt
+  transakcijePoena TransakcijaPoena[]
+  ukupnoPoena      Int      @default(0) // tacka 8: dodat default
+  uloga            UlogaKorisnika @default(GOST)
+  pokrenuteTeme    TemaForuma[]
+  navodnjavanja    Navodnjavanje[]
+  reakcijeNaTemu   ReakcijaNaTemu[]
+  reakcijeNaPoruku ReakcijaNaPoruku[]
+  porukeForuma     PorukaForuma[] // tacka 10: relacija autora poruke
+
+  @@map("poljoprivrednici")
+}
+
+model Parcela {
+  id            Int      @id @default(autoincrement())
+  vlasnikId     Int
+  vlasnik       Poljoprivrednik @relation(fields: [vlasnikId], references: [id], onDelete: Cascade) // tacka 7
+  naziv         String
+  povrsina      Int
+  jedinicaMere  JedinicaPovrsine @default(A)
+  klasa         Int
+  datumUpisa    DateTime @default(now())
+  biljke        Biljka[]
+  tretmani      Tretman[]
+  sadnje        Sadnja[]
+  navodnjavanja Navodnjavanje[]
+
+  @@map("parcele")
+}
+
+model Biljka {
+  id                         Int      @id @default(autoincrement())
+  naziv                      String
+  vrsta                      SortaPaprike // tacka 4: enum umesto slobodnog stringa
+  pocetakSadnje              DateTime
+  krajSadnje                 DateTime
+  pocetakBerbe               DateTime
+  krajBerbe                  DateTime
+  preporucenoDjubrivoId      Int?
+  preporucenoDjubrivo        Preparat? @relation(fields: [preporucenoDjubrivoId], references: [id]) // tacka 3: dodata relacija
+  preporucenaTemperaturaC    Int // tacka 1: ispravljeno "preporicenaTemperaturaC"
+  parcelaId                  Int
+  parcela                    Parcela  @relation(fields: [parcelaId], references: [id], onDelete: Cascade) // tacka 7
+  sadnje                     Sadnja[]
+  tretmani                   Tretman[]
+
+  // tacka 4: ne mogu 2 ista reda (ista sorta) da postoje na istoj parceli
+  @@unique([parcelaId, vrsta])
+  @@map("biljke")
+}
+
+model Tretman {
+  id            Int      @id @default(autoincrement())
+  parcelaId     Int
+  parcela       Parcela  @relation(fields: [parcelaId], references: [id], onDelete: Cascade) // tacka 7
+  biljkaId      Int?
+  biljka        Biljka?  @relation(fields: [biljkaId], references: [id], onDelete: SetNull) // tacka 7
+  preparatId    Int
+  preparat      Preparat @relation(fields: [preparatId], references: [id], onDelete: Restrict) // tacka 7
+  doza          String
+  datumTretmana DateTime @default(now())
+
+  @@unique([parcelaId, biljkaId, preparatId, datumTretmana])
+  @@map("tretmani")
+}
+
+model Preparat {
+  id              Int      @id @default(autoincrement())
+  tretmani        Tretman[]
+  biljkePreporuka Biljka[]
+  naziv           String
+  proizvodjac     String
+  trajanjeKarence Int
+  jedinicaKarence JedinicaKarence
+  tipPreparata    TipPreparata
+  tipPesticida    TipPesticida?
+  tipDjubriva     TipDjubriva?
+  sastojci        Sastojak[]
+  opis            String
+
+  @@map("preparati")
+}
+
+// tacka 5: Sastojak sada koristi Elementi enum direktno, bez posrednog Element modela
+model Sastojak {
+  id          Int      @id @default(autoincrement())
+  preparatId  Int
+  preparat    Preparat @relation(fields: [preparatId], references: [id], onDelete: Cascade) // tacka 7
+  element     Elementi
+  kolicina    Int
+  jedinica    Tezina   @default(mg)
+
+  @@unique([preparatId, element])
+  @@map("sastojci")
+}
+
+model Sadnja {
+  id                       Int      @id @default(autoincrement())
+  farmerId                 Int
+  farmer                   Poljoprivrednik @relation(fields: [farmerId], references: [id], onDelete: Cascade) // tacka 7
+  datum                    DateTime @default(now())
+  parcelaId                Int
+  parcela                  Parcela  @relation(fields: [parcelaId], references: [id], onDelete: Cascade) // tacka 7
+  biljkaId                 Int
+  biljka                   Biljka   @relation(fields: [biljkaId], references: [id], onDelete: Restrict) // tacka 9: relacija sad "biljka" umesto "kultura"
+  kolicinaPosadjeneKulture Int
+  ocekivaniDatumBerbe      DateTime
+  prinos                   Int      @default(0)
+  jedinica                 Tezina   @default(KG)
+  status                   StatusZasadjeneKulture @default(ZASADJENA)
+
+  @@map("sadnje")
+}
+
+model TransakcijaPoena {
+  id               Int      @id @default(autoincrement())
+  farmerId         Int
+  farmer           Poljoprivrednik @relation(fields: [farmerId], references: [id], onDelete: Cascade) // tacka 7
+  datumTransakcije DateTime @default(now())
+  ostvareniPoeni   Int
+  razlog           String
+
+  @@map("transakcije_poena")
+}
+
+model TemaForuma {
+  id              Int      @id @default(autoincrement())
+  naslov          String
+  opis            String
+  datumKreiranja  DateTime @default(now())
+  datumIzmene     DateTime? @updatedAt
+  farmerId        Int
+  farmer          Poljoprivrednik @relation(fields: [farmerId], references: [id], onDelete: Cascade) // tacka 7
+  poruke          PorukaForuma[]
+  reakcije        ReakcijaNaTemu[]
+
+  @@map("teme_foruma")
+}
+
+model PorukaForuma {
+  id             Int      @id @default(autoincrement())
+  sadrzaj        String // tacka 2: ispravljeno na camelCase
+  datumKreiranja DateTime @default(now())
+  datumIzmene    DateTime? @updatedAt
+  autorId        Int
+  autor          Poljoprivrednik @relation(fields: [autorId], references: [id], onDelete: Cascade) // tacka 10: dodata relacija
+  temaId         Int
+  tema           TemaForuma @relation(fields: [temaId], references: [id], onDelete: Cascade) // tacka 7
+
+  parentId Int?
+  parent   PorukaForuma?  @relation("Odgovor", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  odgovori PorukaForuma[] @relation("Odgovor")
+  reakcije ReakcijaNaPoruku[]
+
+  @@map("poruke_foruma")
+}
+
+model Navodnjavanje {
+  id                 Int      @id @default(autoincrement())
+  datumNavodnjavanja DateTime @default(now())
+  // tacka 6: opciono jer njive pod zitom/kukuruzom cesto nemaju navodnjavanje
+  parcelaId          Int?
+  parcela            Parcela? @relation(fields: [parcelaId], references: [id], onDelete: SetNull) // tacka 7
+  farmerId           Int
+  farmer             Poljoprivrednik @relation(fields: [farmerId], references: [id], onDelete: Cascade) // tacka 7
+  napomena           String
+
+  @@map("navodnjavanja")
+}
+
+model ReakcijaNaTemu {
+  id            Int      @id @default(autoincrement())
+  datumReakcije DateTime @default(now())
+  idPost        Int
+  post          TemaForuma @relation(fields: [idPost], references: [id], onDelete: Cascade) // tacka 7
+  idFarmera     Int
+  farmer        Poljoprivrednik @relation(fields: [idFarmera], references: [id], onDelete: Cascade) // tacka 7
+
+  @@unique([idPost, idFarmera])
+  @@map("reakcije_na_temu")
+}
+
+model ReakcijaNaPoruku {
+  id            Int      @id @default(autoincrement())
+  datumReakcije DateTime @default(now())
+  idFarmera     Int
+  farmer        Poljoprivrednik @relation(fields: [idFarmera], references: [id], onDelete: Cascade) // tacka 7
+  idMessage     Int
+  message       PorukaForuma @relation(fields: [idMessage], references: [id], onDelete: Cascade) // tacka 7
+
+  @@unique([idMessage, idFarmera])
+  @@map("reakcije_na_poruku")
+}
