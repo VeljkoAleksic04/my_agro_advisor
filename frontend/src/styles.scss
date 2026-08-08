@@ -1,0 +1,240 @@
+// ==========================================================================
+// AgroPlatforma — globalni stilovi i CSS promenljive za svetlu/tamnu temu
+// ==========================================================================
+
+:root {
+  --boja-pozadina: #f4f7f2;
+  --boja-povrsina: #ffffff;
+  --boja-povrsina-hover: #eef3ec;
+  --boja-ivica: #dbe3d7;
+  --boja-tekst: #1c2a1f;
+  --boja-tekst-suptilan: #5c6b5e;
+  --boja-primarna: #2e7d32;
+  --boja-primarna-tamnija: #1f5722;
+  --boja-primarna-blaga: #e3f2e4;
+  --boja-opasnost: #c62828;
+  --boja-opasnost-blaga: #fdecea;
+
+  --radijus: 0.6rem;
+  --senka: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-tema='tamna'] {
+  --boja-pozadina: #12160f;
+  --boja-povrsina: #1b2118;
+  --boja-povrsina-hover: #232b1f;
+  --boja-ivica: #303b2b;
+  --boja-tekst: #e9efe6;
+  --boja-tekst-suptilan: #a3b2a0;
+  --boja-primarna: #66bb6a;
+  --boja-primarna-tamnija: #81c784;
+  --boja-primarna-blaga: #22301f;
+  --boja-opasnost: #ef5350;
+  --boja-opasnost-blaga: #3a2020;
+
+  --senka: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--boja-pozadina);
+  color: var(--boja-tekst);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.25rem;
+}
+
+// ---- Zajedničke komponente ------------------------------------------------
+
+.stranica {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stranica-auth {
+  display: flex;
+  justify-content: center;
+}
+
+.stranica-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.podnaslov {
+  color: var(--boja-tekst-suptilan);
+  margin: 0;
+}
+
+.karta {
+  background: var(--boja-povrsina);
+  border: 1px solid var(--boja-ivica);
+  border-radius: var(--radijus);
+  box-shadow: var(--senka);
+  padding: 1.25rem;
+}
+
+.karta-stavka {
+  display: flex;
+  flex-direction: column;
+}
+
+// ---- Forme ------------------------------------------------------------
+
+.forma {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.polje {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--boja-tekst-suptilan);
+  }
+
+  input,
+  select {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--boja-ivica);
+    border-radius: 0.4rem;
+    background: var(--boja-povrsina);
+    color: var(--boja-tekst);
+    font-size: 0.95rem;
+
+    &:focus {
+      outline: none;
+      border-color: var(--boja-primarna);
+      box-shadow: 0 0 0 3px var(--boja-primarna-blaga);
+    }
+  }
+}
+
+.greska-polja {
+  color: var(--boja-opasnost);
+  font-size: 0.8rem;
+}
+
+.akcije-forme {
+  display: flex;
+  gap: 0.75rem;
+}
+
+// ---- Dugmad -------------------------------------------------------------
+
+.dugme {
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.dugme-primarni {
+  background: var(--boja-primarna);
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    background: var(--boja-primarna-tamnija);
+  }
+}
+
+.dugme-sekundarni {
+  background: transparent;
+  color: var(--boja-tekst);
+  border: 1px solid var(--boja-ivica);
+
+  &:hover:not(:disabled) {
+    background: var(--boja-povrsina-hover);
+  }
+}
+
+.dugme-opasnost {
+  background: var(--boja-opasnost-blaga);
+  color: var(--boja-opasnost);
+  align-self: flex-start;
+  margin-top: auto;
+
+  &:hover:not(:disabled) {
+    background: var(--boja-opasnost);
+    color: #ffffff;
+  }
+}
+
+.dugme-tekst {
+  background: transparent;
+  color: var(--boja-tekst-suptilan);
+
+  &:hover:not(:disabled) {
+    color: var(--boja-tekst);
+  }
+}
+
+// ---- Poruke i stanja ------------------------------------------------------
+
+.poruka-greske {
+  background: var(--boja-opasnost-blaga);
+  color: var(--boja-opasnost);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radijus);
+  margin: 0;
+}
+
+.stanje-ucitavanja,
+.stanje-prazno {
+  color: var(--boja-tekst-suptilan);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.traka-pretrage {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  input[type='search'] {
+    flex: 1;
+    max-width: 320px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--boja-ivica);
+    border-radius: 0.4rem;
+    background: var(--boja-povrsina);
+    color: var(--boja-tekst);
+
+    &:focus {
+      outline: none;
+      border-color: var(--boja-primarna);
+      box-shadow: 0 0 0 3px var(--boja-primarna-blaga);
+    }
+  }
+}
