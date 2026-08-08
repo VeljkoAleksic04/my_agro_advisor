@@ -1,0 +1,29 @@
+<div class="lejaut">
+  <header class="zaglavlje">
+    <a routerLink="/" class="logo">🌱 AgroPlatforma</a>
+
+    <nav class="navigacija">
+      @if (korisnik()) {
+        <a routerLink="/parcele" routerLinkActive="aktivan">Parcele</a>
+        <a routerLink="/biljke" routerLinkActive="aktivan">Biljke</a>
+      } @else {
+        <a routerLink="/prijava" routerLinkActive="aktivan">Prijava</a>
+        <a routerLink="/registracija" routerLinkActive="aktivan">Registracija</a>
+      }
+    </nav>
+
+    <div class="zaglavlje-akcije">
+      <button type="button" class="dugme-tema" (click)="promeniTemu()" title="Promeni temu">
+        {{ temaServis.tema() === 'tamna' ? '☀️' : '🌙' }}
+      </button>
+      @if (korisnik(); as k) {
+        <span class="korisnik-oznaka">{{ k.username }}</span>
+        <button type="button" class="dugme dugme-sekundarni" (click)="odjaviSe()">Odjava</button>
+      }
+    </div>
+  </header>
+
+  <main class="glavni-sadrzaj">
+    <router-outlet />
+  </main>
+</div>
