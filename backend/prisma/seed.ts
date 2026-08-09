@@ -1,4 +1,4 @@
-import { PrismaClient, JedinicaKarence, TipPreparata, TipPesticida, TipDjubriva, Elementi, Tezina, SortaPaprike, JedinicaPovrsine, UlogaKorisnika } from '@prisma/client';
+import { PrismaClient, JedinicaKarence, TipPreparata, TipPesticida, TipDjubriva, Elementi, Tezina, VrstaBiljke, JedinicaPovrsine, UlogaKorisnika } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -69,11 +69,11 @@ async function main() {
   });
 
   const biljka = await prisma.biljka.upsert({
-    where: { parcelaId_vrsta: { parcelaId: parcela.id, vrsta: SortaPaprike.BABURA } },
+    where: { parcelaId_vrsta: { parcelaId: parcela.id, vrsta: VrstaBiljke.PAPRIKA } },
     update: {},
     create: {
       naziv: 'Paprika Babura',
-      vrsta: SortaPaprike.BABURA,
+      vrsta: VrstaBiljke.PAPRIKA,
       pocetakSadnje: new Date('2026-04-01'),
       krajSadnje: new Date('2026-04-20'),
       pocetakBerbe: new Date('2026-07-15'),
