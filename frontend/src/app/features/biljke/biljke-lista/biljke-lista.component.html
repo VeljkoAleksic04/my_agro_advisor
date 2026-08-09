@@ -44,8 +44,8 @@
           <article class="karta karta-stavka">
             <h3>{{ biljka.naziv }}</h3>
             <dl>
-              <dt>Sorta</dt>
-              <dd>{{ biljka.vrsta }}</dd>
+              <dt>Vrsta</dt>
+              <dd>{{ nazivVrste[biljka.vrsta] }}</dd>
               <dt>Sadnja</dt>
               <dd>{{ biljka.pocetakSadnje | date: 'dd.MM.yyyy' }} – {{ biljka.krajSadnje | date: 'dd.MM.yyyy' }}</dd>
               <dt>Berba</dt>

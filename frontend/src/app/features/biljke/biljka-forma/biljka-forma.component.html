@@ -9,10 +9,10 @@
     </div>
 
     <div class="polje">
-      <label for="vrsta">Sorta paprike</label>
+      <label for="vrsta">Vrsta biljke</label>
       <select id="vrsta" formControlName="vrsta">
-        @for (sorta of sorteOpcije; track sorta) {
-          <option [value]="sorta">{{ sorta }}</option>
+        @for (vrsta of vrsteOpcije; track vrsta) {
+          <option [value]="vrsta">{{ nazivVrste[vrsta] }}</option>
         }
       </select>
     </div>

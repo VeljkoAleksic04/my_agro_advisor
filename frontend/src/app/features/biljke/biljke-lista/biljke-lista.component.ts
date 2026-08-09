@@ -9,6 +9,7 @@ import { selectGreska, selectUcitavanje } from '../store/biljke.reducer';
 import { selectSveBiljke } from '../store/biljke.selectors';
 import { BiljkaFormaComponent } from '../biljka-forma/biljka-forma.component';
 import type { NovaBiljka } from '../biljke-api.service';
+import { NAZIVI_VRSTA_BILJAKA } from '../../../core/models/domain.models';
 
 @Component({
   selector: 'app-biljke-lista',
@@ -19,6 +20,8 @@ import type { NovaBiljka } from '../biljke-api.service';
 })
 export class BiljkeListaComponent implements OnInit {
   private readonly store = inject(Store);
+
+  protected readonly nazivVrste = NAZIVI_VRSTA_BILJAKA;
 
   protected readonly sveParcele = toSignal(this.store.select(selectSveParcele), { initialValue: [] });
   protected readonly biljke = toSignal(this.store.select(selectSveBiljke), { initialValue: [] });
