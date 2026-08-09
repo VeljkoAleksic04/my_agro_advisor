@@ -1,0 +1,142 @@
+.profil-lejaut {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profil-zaglavlje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.75rem;
+  background: linear-gradient(90deg, var(--boja-primarna-tamnija), var(--boja-primarna));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  .logo {
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.zaglavlje-akcije {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.dugme-tema {
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.korisnik-oznaka {
+  color: #fff;
+  font-weight: 500;
+}
+
+.dugme-avatar {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+
+  .avatar-inicijal {
+    font-weight: 700;
+    color: var(--boja-primarna-tamnija);
+  }
+
+  &:hover {
+    background: #fff;
+  }
+}
+
+.profil-telo {
+  flex: 1;
+  display: flex;
+  gap: 1.5rem;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+
+  @media (max-width: 820px) {
+    flex-direction: column;
+  }
+}
+
+.bocna-traka {
+  flex: 0 0 220px;
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--boja-povrsina);
+    border: 1px solid var(--boja-ivica);
+    border-radius: 1rem;
+    padding: 1rem;
+    position: sticky;
+    top: 5.5rem;
+
+    a {
+      padding: 0.75rem 1rem;
+      border-radius: 0.65rem;
+      background: var(--boja-pozadina);
+      color: var(--boja-tekst);
+      text-decoration: none;
+      font-weight: 600;
+      text-align: center;
+
+      &:hover {
+        background: var(--boja-povrsina-hover);
+      }
+
+      &.aktivan {
+        background: var(--boja-primarna);
+        color: #fff;
+      }
+    }
+  }
+
+  @media (max-width: 820px) {
+    flex: 0 0 auto;
+
+    nav {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      a {
+        flex: 1 1 auto;
+      }
+    }
+  }
+}
+
+.profil-sadrzaj {
+  flex: 1;
+  min-width: 0;
+}
