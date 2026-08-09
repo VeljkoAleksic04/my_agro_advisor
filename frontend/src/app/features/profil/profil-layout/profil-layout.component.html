@@ -1,0 +1,37 @@
+<div class="profil-lejaut">
+  <header class="profil-zaglavlje">
+    <a routerLink="/" class="logo">🌾 <span>MAS</span></a>
+
+    <div class="zaglavlje-akcije">
+      <button type="button" class="dugme-tema" (click)="promeniTemu()">
+        {{ temaServis.tema() === 'tamna' ? 'Light theme' : 'Dark theme' }}
+      </button>
+      @if (korisnik(); as k) {
+        <span class="korisnik-oznaka">{{ k.username }}</span>
+      }
+      <button type="button" class="dugme-avatar" (click)="odjaviSe()" title="Odjava">
+        @if (korisnik(); as k) {
+          <span class="avatar-inicijal">{{ k.username.charAt(0).toUpperCase() }}</span>
+        } @else {
+          👤
+        }
+      </button>
+    </div>
+  </header>
+
+  <div class="profil-telo">
+    <aside class="bocna-traka">
+      <nav>
+        <a routerLink="/profil/dashboard" routerLinkActive="aktivan">Dashboard</a>
+        <a routerLink="/profil/biljke" routerLinkActive="aktivan">Biljke</a>
+        <a routerLink="/profil/istorija" routerLinkActive="aktivan">History</a>
+        <a routerLink="/profil/statistika" routerLinkActive="aktivan">Statistics</a>
+        <a routerLink="/profil/chatovi" routerLinkActive="aktivan">Chats</a>
+      </nav>
+    </aside>
+
+    <main class="profil-sadrzaj">
+      <router-outlet />
+    </main>
+  </div>
+</div>
