@@ -1,0 +1,84 @@
+<div class="pocetna">
+  <header class="pocetna-zaglavlje">
+    <a routerLink="/" class="logo">🌾 <span>MAS</span></a>
+
+    <div class="zaglavlje-akcije">
+      <button type="button" class="dugme-tema" (click)="promeniTemu()">
+        {{ temaServis.tema() === 'tamna' ? 'Light theme' : 'Dark theme' }}
+      </button>
+      <button
+        type="button"
+        class="dugme-avatar"
+        (click)="otvoriProfil()"
+        [title]="korisnik() ? 'Otvori profil' : 'Prijavi se'"
+      >
+        @if (korisnik()) {
+          <span class="avatar-inicijal">{{ korisnik()!.username.charAt(0).toUpperCase() }}</span>
+        } @else {
+          👤
+        }
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-slika">
+        <span class="hero-emoji">🌱</span>
+      </div>
+      <div class="hero-tekst">
+        <h1>MOJ AGRO SAVETNIK</h1>
+        <p class="hero-podnaslov">Pametna poljoprivreda počinje ovde!</p>
+        <button type="button" class="dugme dugme-primarni dugme-veliko" (click)="otvoriProfil()">
+          {{ korisnik() ? 'Otvori profil' : 'Pridruži se' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="traka-poruke">
+      <div class="karta karta-naglasak">
+        <h2>Svaki rod počinje dobrom odlukom!</h2>
+      </div>
+      <div class="karta karta-opis">
+        <p>
+          <strong>Moj agro savetnik</strong> je onlajn platforma gde poljoprivrednici mogu da prate stanje svojih
+          useva, dobijaju preporuke o tretmanima i daljim koracima. Takođe, ova platforma pruža mogućnost razmene
+          znanja sa ostalim poljoprivrednicima koji koriste ovu platformu i na taj način povećaju svoj prinos. Sve
+          na jednom mestu!
+        </p>
+      </div>
+    </section>
+
+    <section class="prednosti">
+      <div class="prednost">
+        <h3>Deljenje znanja</h3>
+        <p><strong>Razmena znanja</strong> je neophodna da bi poljoprivrednici mogli da uče jedni od drugih, razmene iskustva i unaprede svoje prakse.</p>
+      </div>
+      <div class="prednost">
+        <h3>Mogućnost umrežavanja</h3>
+        <p><strong>Mogućnosti umrežavanja</strong> omogućavaju poljoprivrednicima da se povežu sa vršnjacima, negujući odnose koji vode ka saradnji i podršci.</p>
+      </div>
+      <div class="prednost">
+        <h3>Pristup resursima</h3>
+        <p><strong>Pristup resursima</strong> pruža članovima vredne alate, informacije i uvide prilagođene poboljšanju poljoprivrednog uspeha.</p>
+      </div>
+    </section>
+
+    <section class="poziv-na-akciju">
+      <h2>Spremni da počnete?</h2>
+      <p>Prijavite se ili napravite nalog i počnite da vodite evidenciju svojih parcela i useva.</p>
+      <div class="poziv-dugmici">
+        @if (korisnik()) {
+          <button type="button" class="dugme dugme-primarni" (click)="otvoriProfil()">Idi na profil</button>
+        } @else {
+          <a routerLink="/prijava" class="dugme dugme-primarni">Prijava</a>
+          <a routerLink="/registracija" class="dugme dugme-sekundarni">Registracija</a>
+        }
+      </div>
+    </section>
+  </main>
+
+  <footer class="podnozje">
+    <p>© {{ 2026 }} Moj Agro Savetnik. Sva prava zadržana.</p>
+  </footer>
+</div>
