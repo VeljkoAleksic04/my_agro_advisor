@@ -1,13 +1,13 @@
 import { IsDateString, IsEnum, IsInt, IsOptional, IsString, MinLength } from 'class-validator';
-import { SortaPaprike } from '@prisma/client';
+import { VrstaBiljke } from '@prisma/client';
 
 export class CreateBiljkaDto {
   @IsString()
   @MinLength(2)
   naziv: string;
 
-  @IsEnum(SortaPaprike)
-  vrsta: SortaPaprike;
+  @IsEnum(VrstaBiljke)
+  vrsta: VrstaBiljke;
 
   @IsDateString()
   pocetakSadnje: string;
