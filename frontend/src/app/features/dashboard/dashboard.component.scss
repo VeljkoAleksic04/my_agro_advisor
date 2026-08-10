@@ -1,0 +1,246 @@
+.dashboard-mreza {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ---- Profil kartica -------------------------------------------------------
+
+.karta-profil {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.profil-slika {
+  flex: 0 0 auto;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--boja-primarna-blaga);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profil-inicijali {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--boja-primarna-tamnija);
+  }
+}
+
+.profil-podaci {
+  flex: 1;
+  min-width: 0;
+
+  h2 {
+    margin: 0 0 0.5rem;
+    color: var(--boja-tekst);
+  }
+
+  dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.75rem;
+  }
+
+  dt {
+    color: var(--boja-tekst-suptilan);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--boja-tekst);
+    font-size: 0.9rem;
+  }
+}
+
+// ---- Broj parcela -----------------------------------------------------
+
+.karta-broj-parcela {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.25rem;
+}
+
+.broj-parcela-vrednost {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--boja-primarna);
+  line-height: 1;
+}
+
+.broj-parcela-oznaka {
+  color: var(--boja-tekst-suptilan);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+// ---- Kalendar (demo) ----------------------------------------------------
+
+.karta-kalendar {
+  h3 {
+    margin: 0 0 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--boja-tekst);
+  }
+}
+
+.oznaka-demo {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--boja-primarna-tamnija);
+  background: var(--boja-primarna-blaga);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.kalendar-mesec {
+  margin: 0 0 0.75rem;
+  color: var(--boja-tekst-suptilan);
+  text-transform: capitalize;
+}
+
+.kalendar-mreza {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+}
+
+.kalendar-header-dan {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--boja-tekst-suptilan);
+  padding-bottom: 0.25rem;
+}
+
+.kalendar-dan {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--boja-tekst);
+  background: var(--boja-povrsina-hover);
+
+  &--prazan {
+    background: transparent;
+  }
+
+  &--danas {
+    outline: 2px solid var(--boja-primarna);
+    font-weight: 700;
+  }
+
+  &--dogadjaj {
+    background: var(--boja-primarna-blaga);
+    color: var(--boja-primarna-tamnija);
+    font-weight: 700;
+    cursor: help;
+  }
+}
+
+.kalendar-legenda {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--boja-tekst-suptilan);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.tacka-dogadjaja {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--boja-primarna);
+  flex: 0 0 auto;
+}
+
+// ---- Kružni prinosi -------------------------------------------------------
+
+.karta-prinosi {
+  h3 {
+    margin: 0 0 1rem;
+    color: var(--boja-tekst);
+  }
+}
+
+.prinosi-red {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.prinos-stavka {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prinos-svg {
+  width: 110px;
+  height: 110px;
+  transform: rotate(-90deg);
+}
+
+.prinos-pozadina {
+  fill: none;
+  stroke: var(--boja-ivica);
+  stroke-width: 8;
+}
+
+.prinos-vrednost {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.prinos-tekst {
+  transform: rotate(90deg);
+  transform-origin: center;
+  fill: var(--boja-tekst);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.prinos-naziv {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--boja-tekst-suptilan);
+}
