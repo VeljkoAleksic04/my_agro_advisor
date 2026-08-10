@@ -9,11 +9,12 @@ import { selectSveParcele, selectUkupnaPovrsina } from '../store/parcele.selecto
 import { ParcelaFormaComponent } from '../parcela-forma/parcela-forma.component';
 import type { NovaParcela } from '../parcele-api.service';
 import type { Parcela } from '../../../core/models/domain.models';
+import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
 
 @Component({
   selector: 'app-parcele-lista',
   standalone: true,
-  imports: [DatePipe, ParcelaFormaComponent],
+  imports: [DatePipe, ParcelaFormaComponent, PotvrdaModalComponent],
   templateUrl: './parcele-lista.component.html',
   styleUrl: './parcele-lista.component.scss',
 })
@@ -44,6 +45,7 @@ export class ParceleListaComponent implements OnInit {
   );
 
   protected prikaziFormu = false;
+  protected parcelaZaBrisanjeId: number | null = null;
 
   ngOnInit(): void {
     this.store.dispatch(ParceleActions.ucitajParcele());
@@ -63,9 +65,18 @@ export class ParceleListaComponent implements OnInit {
     this.prikaziFormu = false;
   }
 
-  obrisiParcelu(id: number): void {
-    if (confirm('Da li ste sigurni da želite da obrišete ovu parcelu?')) {
-      this.store.dispatch(ParceleActions.obrisiParcelu({ id }));
+  zatraziBrisanje(id: number): void {
+    this.parcelaZaBrisanjeId = id;
+  }
+
+  potvrdiBrisanje(): void {
+    if (this.parcelaZaBrisanjeId !== null) {
+      this.store.dispatch(ParceleActions.obrisiParcelu({ id: this.parcelaZaBrisanjeId }));
     }
+    this.parcelaZaBrisanjeId = null;
+  }
+
+  otkaziBrisanje(): void {
+    this.parcelaZaBrisanjeId = null;
   }
 }

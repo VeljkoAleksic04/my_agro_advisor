@@ -48,9 +48,17 @@
             <dt>Datum upisa</dt>
             <dd>{{ parcela.datumUpisa | date: 'dd.MM.yyyy' }}</dd>
           </dl>
-          <button type="button" class="dugme dugme-opasnost" (click)="obrisiParcelu(parcela.id)">Obriši</button>
+          <button type="button" class="dugme dugme-opasnost" (click)="zatraziBrisanje(parcela.id)">Obriši</button>
         </article>
       }
     </div>
   }
+
+  <app-potvrda-modal
+    [otvoren]="parcelaZaBrisanjeId !== null"
+    naslov="Brisanje parcele"
+    poruka="Da li ste sigurni da želite da obrišete ovu parcelu? Ova akcija je nepovratna."
+    (potvrdjeno)="potvrdiBrisanje()"
+    (otkazano)="otkaziBrisanje()"
+  />
 </section>
