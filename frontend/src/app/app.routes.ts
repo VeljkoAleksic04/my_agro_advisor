@@ -28,12 +28,22 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+      },
+      {
+        path: 'places',
+        loadComponent: () =>
           import('./features/parcele/parcele-lista/parcele-lista.component').then((m) => m.ParceleListaComponent),
       },
       {
         path: 'biljke',
         loadComponent: () =>
           import('./features/biljke/biljke-lista/biljke-lista.component').then((m) => m.BiljkeListaComponent),
+      },
+      {
+        path: 'sejanje',
+        loadComponent: () =>
+          import('./features/sadnja/sadnje-lista/sadnje-lista.component').then((m) => m.SadnjeListaComponent),
       },
       {
         path: 'istorija',

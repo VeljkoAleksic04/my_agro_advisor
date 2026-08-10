@@ -1,0 +1,98 @@
+<section class="stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="podnaslov">Pregled vašeg profila, parcela i prinosa.</p>
+    </div>
+  </header>
+
+  <div class="dashboard-mreza">
+    <!-- Profil -->
+    <article class="karta karta-profil">
+      <div class="profil-slika">
+        @if (korisnik()?.slika) {
+          <img [src]="korisnik()!.slika" alt="Profilna slika" />
+        } @else {
+          <span class="profil-inicijali">
+            {{ (korisnik()?.ime ?? korisnik()?.username ?? '?').charAt(0).toUpperCase() }}
+          </span>
+        }
+      </div>
+      <div class="profil-podaci">
+        <h2>{{ korisnik()?.ime }} {{ korisnik()?.prezime }}</h2>
+        <dl>
+          <dt>Korisničko ime</dt>
+          <dd>{{ korisnik()?.username }}</dd>
+          @if (korisnik()?.datumRodjenja) {
+            <dt>Datum rođenja</dt>
+            <dd>{{ korisnik()!.datumRodjenja | date: 'dd.MM.yyyy' }}</dd>
+          }
+          <dt>Broj telefona</dt>
+          <dd>{{ korisnik()?.brojTelefona || '—' }}</dd>
+          <dt>Email</dt>
+          <dd>{{ korisnik()?.email || '—' }}</dd>
+        </dl>
+      </div>
+    </article>
+
+    <!-- Broj parcela -->
+    <article class="karta karta-broj-parcela">
+      <span class="broj-parcela-vrednost">{{ brojParcela() }}</span>
+      <span class="broj-parcela-oznaka">{{ brojParcela() === 1 ? 'parcela' : 'parcela ukupno' }}</span>
+    </article>
+
+    <!-- Kalendar predviđenih vremena setve (demo) -->
+    <article class="karta karta-kalendar">
+      <h3>Kalendar setve <span class="oznaka-demo">demo</span></h3>
+      <p class="kalendar-mesec">{{ nazivMeseca }}</p>
+      <div class="kalendar-mreza">
+        @for (dan of daniUNedelji; track dan) {
+          <span class="kalendar-header-dan">{{ dan }}</span>
+        }
+        @for (prazno of praznaPolja; track $index) {
+          <span class="kalendar-dan kalendar-dan--prazan"></span>
+        }
+        @for (dan of danaUMesecu; track dan) {
+          <span
+            class="kalendar-dan"
+            [class.kalendar-dan--danas]="dan === danasnjiDan"
+            [class.kalendar-dan--dogadjaj]="dogadjajZaDan(dan)"
+            [title]="dogadjajZaDan(dan)?.naziv ?? ''"
+          >
+            {{ dan }}
+          </span>
+        }
+      </div>
+      <ul class="kalendar-legenda">
+        @for (dogadjaj of demoDogadjaji; track dogadjaj.dan) {
+          <li><span class="tacka-dogadjaja"></span>{{ dogadjaj.dan }}. — {{ dogadjaj.naziv }}</li>
+        }
+      </ul>
+    </article>
+
+    <!-- Kružni prikazi ukupnog prinosa ove godine -->
+    <article class="karta karta-prinosi">
+      <h3>Ukupan prinos ove godine</h3>
+      <div class="prinosi-red">
+        @for (k of kategorijePrinosa(); track k.kategorija) {
+          <div class="prinos-stavka">
+            <svg viewBox="0 0 100 100" class="prinos-svg">
+              <circle cx="50" cy="50" r="42" class="prinos-pozadina" />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                class="prinos-vrednost"
+                [style.stroke]="k.boja"
+                [style.stroke-dasharray]="obimKruga(42)"
+                [style.stroke-dashoffset]="obimKruga(42) * (1 - k.procenat / 100)"
+              />
+              <text x="50" y="55" text-anchor="middle" class="prinos-tekst">{{ k.vrednost }}</text>
+            </svg>
+            <span class="prinos-naziv">{{ k.naziv }}</span>
+          </div>
+        }
+      </div>
+    </article>
+  </div>
+</section>
