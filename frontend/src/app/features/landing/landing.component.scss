@@ -118,7 +118,7 @@
 }
 
 .traka-poruke {
-  background: linear-gradient(120deg, #fdf3d8, #f7e6b0);
+  background: var(--boja-traka-poruke-pozadina);
   padding: 3rem 2rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -134,7 +134,7 @@
 }
 
 .karta-naglasak {
-  background: var(--boja-primarna-tamnija);
+  background: var(--boja-naglasak-pozadina);
   color: #fff;
   display: flex;
   align-items: center;
@@ -144,7 +144,7 @@
 
   h2 {
     font-size: 1.6rem;
-    color: #f4a825;
+    color: var(--boja-naglasak-tekst);
     margin: 0;
   }
 }
