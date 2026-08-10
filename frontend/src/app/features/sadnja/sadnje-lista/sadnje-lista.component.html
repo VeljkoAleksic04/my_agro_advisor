@@ -1,0 +1,70 @@
+<section class="stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Sejanje kultura</h1>
+      <p class="podnaslov">Izaberite parcelu da vidite zasejane kulture i zasejete novu, bez unosa datuma.</p>
+    </div>
+    @if (odabranaParcelaId) {
+      <button type="button" class="dugme dugme-primarni" (click)="prikaziFormu = !prikaziFormu">
+        {{ prikaziFormu ? 'Zatvori formu' : '+ Zasej kulturu' }}
+      </button>
+    }
+  </header>
+
+  <div class="polje">
+    <label for="parcela">Parcela</label>
+    <select id="parcela" (change)="odaberiParcelu($any($event.target).value)">
+      <option value="">-- izaberite parcelu --</option>
+      @for (parcela of sveParcele(); track parcela.id) {
+        <option [value]="parcela.id">{{ parcela.naziv }}</option>
+      }
+    </select>
+  </div>
+
+  @if (greska()) {
+    <p class="poruka-greske">{{ greska() }}</p>
+  }
+
+  @if (!odabranaParcelaId) {
+    <p class="stanje-prazno">Izaberite parcelu iznad da biste videli njene zasejane kulture.</p>
+  } @else if (prikaziFormu) {
+    <div class="karta">
+      <app-sadnja-forma [parcelaId]="odabranaParcelaId" (sacuvano)="zasejKulturu($event)" (otkazano)="prikaziFormu = false" />
+    </div>
+  }
+
+  @if (odabranaParcelaId) {
+    @if (ucitavanje()) {
+      <p class="stanje-ucitavanja">Učitavanje...</p>
+    } @else if (sadnjeZaOdabranuParcelu().length === 0) {
+      <p class="stanje-prazno">Na ovoj parceli još nije zasejana nijedna kultura.</p>
+    } @else {
+      <div class="mreza-kartica">
+        @for (sadnja of sadnjeZaOdabranuParcelu(); track sadnja.id) {
+          <article class="karta karta-stavka">
+            <h3>{{ sadnja.biljka ? nazivVrste[sadnja.biljka.vrsta] : 'Kultura' }}</h3>
+            <dl>
+              <dt>Datum sejanja</dt>
+              <dd>{{ sadnja.datum | date: 'dd.MM.yyyy' }}</dd>
+              <dt>Količina</dt>
+              <dd>{{ sadnja.kolicinaPosadjeneKulture }}</dd>
+              <dt>Status</dt>
+              <dd>{{ sadnja.status }}</dd>
+              <dt>Prinos</dt>
+              <dd>{{ sadnja.prinos }} {{ sadnja.jedinica }}</dd>
+            </dl>
+            <button type="button" class="dugme dugme-opasnost" (click)="zatraziBrisanje(sadnja.id)">Obriši</button>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <app-potvrda-modal
+    [otvoren]="sadnjaZaBrisanjeId !== null"
+    naslov="Brisanje sadnje"
+    poruka="Da li ste sigurni da želite da obrišete ovu zasejanu kulturu? Ova akcija je nepovratna."
+    (potvrdjeno)="potvrdiBrisanje()"
+    (otkazano)="otkaziBrisanje()"
+  />
+</section>

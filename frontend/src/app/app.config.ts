@@ -13,6 +13,8 @@ import { parceleFeatureKey, parceleReducer } from './features/parcele/store/parc
 import { ParceleEffects } from './features/parcele/store/parcele.effects';
 import { biljkeFeatureKey, biljkeReducer } from './features/biljke/store/biljke.reducer';
 import { BiljkeEffects } from './features/biljke/store/biljke.effects';
+import { sadnjaFeatureKey, sadnjaReducer } from './features/sadnja/store/sadnja.reducer';
+import { SadnjaEffects } from './features/sadnja/store/sadnja.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,8 +24,9 @@ export const appConfig: ApplicationConfig = {
       [authFeatureKey]: authReducer,
       [parceleFeatureKey]: parceleReducer,
       [biljkeFeatureKey]: biljkeReducer,
+      [sadnjaFeatureKey]: sadnjaReducer,
     }),
-    provideEffects([AuthEffects, ParceleEffects, BiljkeEffects]),
+    provideEffects([AuthEffects, ParceleEffects, BiljkeEffects, SadnjaEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };

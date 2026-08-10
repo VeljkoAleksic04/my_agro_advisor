@@ -1,0 +1,36 @@
+<form [formGroup]="forma" (ngSubmit)="posalji()" class="forma">
+  <p class="napomena-forme">
+    Sejanje se evidentira bez unosa tačnog datuma setve — datum se automatski beleži u pozadini,
+    a očekivano vreme berbe možete naknadno definisati.
+  </p>
+
+  <div class="polje">
+    <label for="biljkaId">Biljna kultura na parceli</label>
+    <select id="biljkaId" formControlName="biljkaId">
+      <option [value]="null" disabled>-- izaberite kulturu --</option>
+      @for (biljka of biljkeNaParceli(); track biljka.id) {
+        <option [value]="biljka.id">{{ biljka.naziv }} ({{ nazivVrste[biljka.vrsta] }})</option>
+      }
+    </select>
+    @if (biljkeNaParceli().length === 0) {
+      <span class="greska-polja">Na ovoj parceli još nema definisanih biljnih kultura.</span>
+    }
+  </div>
+
+  <div class="polje">
+    <label for="kolicinaPosadjeneKulture">Količina posađene kulture (kom/kg)</label>
+    <input
+      id="kolicinaPosadjeneKulture"
+      type="number"
+      min="1"
+      formControlName="kolicinaPosadjeneKulture"
+    />
+  </div>
+
+  <div class="akcije-forme">
+    <button type="submit" class="dugme dugme-primarni" [disabled]="biljkeNaParceli().length === 0">
+      Zasej kulturu
+    </button>
+    <button type="button" class="dugme dugme-sekundarni" (click)="otkazano.emit()">Otkaži</button>
+  </div>
+</form>
