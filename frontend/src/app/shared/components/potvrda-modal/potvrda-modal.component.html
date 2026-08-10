@@ -1,0 +1,12 @@
+@if (otvoren) {
+  <div class="modal-preklop" (click)="otkazi()">
+    <div class="modal-okvir" role="alertdialog" aria-modal="true" [attr.aria-label]="naslov" (click)="$event.stopPropagation()">
+      <h3 class="modal-naslov">{{ naslov }}</h3>
+      <p class="modal-poruka">{{ poruka }}</p>
+      <div class="modal-akcije">
+        <button type="button" class="dugme dugme-sekundarni" (click)="otkazi()">{{ tekstOtkazivanja }}</button>
+        <button type="button" class="dugme dugme-opasnost" (click)="potvrdi()">{{ tekstPotvrde }}</button>
+      </div>
+    </div>
+  </div>
+}
