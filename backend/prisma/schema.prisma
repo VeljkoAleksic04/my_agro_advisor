@@ -115,6 +115,8 @@ model Poljoprivrednik {
   datumRodjenja    DateTime
   username         String   @unique
   password         String
+  brojTelefona     String? // dashboard: prikaz kontakt telefona na profilu
+  slika            String? // dashboard: URL/putanja do profilne slike
   parcele          Parcela[]
   sadnje           Sadnja[]
   kreiranDana      DateTime @default(now())
@@ -224,7 +226,9 @@ model Sadnja {
   biljkaId                 Int
   biljka                   Biljka   @relation(fields: [biljkaId], references: [id], onDelete: Restrict) // tacka 9: relacija sad "biljka" umesto "kultura"
   kolicinaPosadjeneKulture Int
-  ocekivaniDatumBerbe      DateTime
+  // Dashboard: sejanje se sada radi bez eksplicitnog navodjenja datuma,
+  // pa ovo polje vise nije obavezno prilikom kreiranja sadnje.
+  ocekivaniDatumBerbe      DateTime?
   prinos                   Int      @default(0)
   jedinica                 Tezina   @default(KG)
   status                   StatusZasadjeneKulture @default(ZASADJENA)
