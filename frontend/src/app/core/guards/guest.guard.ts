@@ -9,5 +9,5 @@ export const guestGuard: CanActivateFn = () => {
   if (!tokenStorage.ucitajToken()) {
     return true;
   }
-  return router.parseUrl('/parcele');
+  return router.parseUrl('/profil');
 };
