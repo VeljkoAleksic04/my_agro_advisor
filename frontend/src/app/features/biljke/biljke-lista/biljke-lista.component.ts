@@ -10,11 +10,12 @@ import { selectSveBiljke } from '../store/biljke.selectors';
 import { BiljkaFormaComponent } from '../biljka-forma/biljka-forma.component';
 import type { NovaBiljka } from '../biljke-api.service';
 import { NAZIVI_VRSTA_BILJAKA } from '../../../core/models/domain.models';
+import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
 
 @Component({
   selector: 'app-biljke-lista',
   standalone: true,
-  imports: [DatePipe, BiljkaFormaComponent],
+  imports: [DatePipe, BiljkaFormaComponent, PotvrdaModalComponent],
   templateUrl: './biljke-lista.component.html',
   styleUrl: './biljke-lista.component.scss',
 })
@@ -30,6 +31,7 @@ export class BiljkeListaComponent implements OnInit {
 
   protected odabranaParcelaId: number | null = null;
   protected prikaziFormu = false;
+  protected biljkaZaBrisanjeId: number | null = null;
 
   ngOnInit(): void {
     this.store.dispatch(ParceleActions.ucitajParcele());
@@ -52,9 +54,18 @@ export class BiljkeListaComponent implements OnInit {
     this.prikaziFormu = false;
   }
 
-  obrisiBiljku(id: number): void {
-    if (confirm('Da li ste sigurni da želite da obrišete ovu biljku?')) {
-      this.store.dispatch(BiljkeActions.obrisiBiljku({ id }));
+  zatraziBrisanje(id: number): void {
+    this.biljkaZaBrisanjeId = id;
+  }
+
+  potvrdiBrisanje(): void {
+    if (this.biljkaZaBrisanjeId !== null) {
+      this.store.dispatch(BiljkeActions.obrisiBiljku({ id: this.biljkaZaBrisanjeId }));
     }
+    this.biljkaZaBrisanjeId = null;
+  }
+
+  otkaziBrisanje(): void {
+    this.biljkaZaBrisanjeId = null;
   }
 }
