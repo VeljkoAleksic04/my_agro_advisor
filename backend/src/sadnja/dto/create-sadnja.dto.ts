@@ -12,8 +12,11 @@ export class CreateSadnjaDto {
   @Min(1)
   kolicinaPosadjeneKulture: number;
 
+  // Dashboard: sejanje se radi bez eksplicitnog navodjenja datuma,
+  // pa je ovo polje sada opciono (moze naknadno da se popuni preko update-a).
+  @IsOptional()
   @IsDateString()
-  ocekivaniDatumBerbe: string;
+  ocekivaniDatumBerbe?: string;
 
   @IsOptional()
   @IsEnum(StatusZasadjeneKulture)

@@ -21,7 +21,7 @@ export class SadnjaService {
       data: {
         ...dto,
         farmerId: korisnikId,
-        ocekivaniDatumBerbe: new Date(dto.ocekivaniDatumBerbe),
+        ocekivaniDatumBerbe: dto.ocekivaniDatumBerbe ? new Date(dto.ocekivaniDatumBerbe) : undefined,
       },
     });
   }
