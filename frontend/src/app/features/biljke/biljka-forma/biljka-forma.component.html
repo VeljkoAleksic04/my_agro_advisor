@@ -1,58 +1,58 @@
 <form [formGroup]="forma" (ngSubmit)="posalji()" class="forma">
-  <div class="polje-red">
-    <div class="polje">
-      <label for="naziv">Naziv biljke</label>
-      <input id="naziv" type="text" formControlName="naziv" placeholder="npr. Paprika red 1" autocomplete="off" />
-      @if (forma.controls.naziv.invalid && forma.controls.naziv.touched) {
-        <span class="greska-polja">Naziv mora imati najmanje 2 karaktera.</span>
+  <div class="polje">
+    <label for="naziv">Naziv biljke</label>
+    <input id="naziv" type="text" formControlName="naziv" placeholder="npr. Paprika red 1" autocomplete="off" />
+    @if (forma.controls.naziv.invalid && forma.controls.naziv.touched) {
+      <span class="greska-polja">Naziv mora imati najmanje 2 karaktera.</span>
+    }
+  </div>
+
+  <div class="polje">
+    <label for="vrsta">Biljna kultura</label>
+    <select id="vrsta" formControlName="vrsta">
+      @for (vrsta of vrsteOpcije; track vrsta) {
+        <option [value]="vrsta">{{ nazivVrste[vrsta] }}</option>
       }
-    </div>
-
-    <div class="polje">
-      <label for="vrsta">Vrsta biljke</label>
-      <select id="vrsta" formControlName="vrsta">
-        @for (vrsta of vrsteOpcije; track vrsta) {
-          <option [value]="vrsta">{{ nazivVrste[vrsta] }}</option>
-        }
-      </select>
-    </div>
+    </select>
   </div>
 
-  <div class="polje-red">
-    <div class="polje">
-      <label for="pocetakSadnje">Početak sadnje</label>
-      <input id="pocetakSadnje" type="date" formControlName="pocetakSadnje" />
-    </div>
-    <div class="polje">
-      <label for="krajSadnje">Kraj sadnje</label>
-      <input id="krajSadnje" type="date" formControlName="krajSadnje" />
-    </div>
-  </div>
+  <p class="napomena-info">
+    {{ preporukaZaOdabranuVrstu.opis }}
+    @if (vanPreporucenogPerioda) {
+      <br /><strong>Napomena:</strong> današnji datum je van preporučenog perioda sadnje za ovu kulturu.
+    }
+  </p>
 
-  <div class="polje-red">
-    <div class="polje">
-      <label for="pocetakBerbe">Početak berbe</label>
-      <input id="pocetakBerbe" type="date" formControlName="pocetakBerbe" />
-    </div>
-    <div class="polje">
-      <label for="krajBerbe">Kraj berbe</label>
-      <input id="krajBerbe" type="date" formControlName="krajBerbe" />
-    </div>
-  </div>
+  <label class="polje-checkbox">
+    <input type="checkbox" formControlName="celaPovrsina" (change)="primeniCeluPovrsinu(forma.controls.celaPovrsina.value)" />
+    Zasadi na celoj slobodnoj površini parcele ({{ slobodnaPovrsina }} a)
+  </label>
 
-  <div class="polje-red">
+  @if (!forma.controls.celaPovrsina.value) {
     <div class="polje">
-      <label for="preporucenaTemperaturaC">Preporučena temperatura (°C)</label>
-      <input id="preporucenaTemperaturaC" type="number" formControlName="preporucenaTemperaturaC" />
+      <label for="povrsina">Površina za sadnju (a)</label>
+      <input id="povrsina" type="number" step="1" min="1" formControlName="povrsina" />
+      @if (forma.controls.povrsina.invalid && forma.controls.povrsina.touched) {
+        <span class="greska-polja">Površina mora biti veća od 0.</span>
+      }
+      <span class="greska-polja" style="color: var(--boja-tekst-suptilan)">
+        Slobodno na parceli: {{ slobodnaPovrsina }} a
+      </span>
     </div>
-    <div class="polje">
-      <label for="preporucenoDjubrivoId">ID preporučenog đubriva (opciono)</label>
-      <input id="preporucenoDjubrivoId" type="number" formControlName="preporucenoDjubrivoId" />
-    </div>
-  </div>
+  }
 
   <div class="akcije-forme">
-    <button type="submit" class="dugme dugme-primarni">Sačuvaj biljku</button>
+    <button type="submit" class="dugme dugme-primarni" [disabled]="slobodnaPovrsina <= 0">Sačuvaj biljku</button>
     <button type="button" class="dugme dugme-sekundarni" (click)="otkazano.emit()">Otkaži</button>
   </div>
 </form>
+
+<app-potvrda-modal
+  [otvoren]="nedovoljnoPovrsineOtvoreno"
+  naslov="Nema dovoljno slobodne površine"
+  poruka="Izabrana površina je veća od slobodne površine na ovoj parceli. Smanjite površinu ili izaberite drugu parcelu."
+  tekstPotvrde="Razumem"
+  [samoInformativno]="true"
+  (potvrdjeno)="zatvoriUpozorenje()"
+  (otkazano)="zatvoriUpozorenje()"
+/>

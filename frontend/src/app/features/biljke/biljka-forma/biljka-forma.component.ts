@@ -1,36 +1,79 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { NAZIVI_VRSTA_BILJAKA, VrstaBiljke } from '../../../core/models/domain.models';
-import { NovaBiljka } from '../biljke-api.service';
+import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
+import { jeDatumUPeriodu, preporukaZaVrstu } from '../periodi.util';
 
+export interface NovaBiljkaForma {
+  naziv: string;
+  vrsta: VrstaBiljke;
+  povrsina: number;
+}
+
+/**
+ * Forma za dodavanje nove biljne kulture na parcelu.
+ * Korisnik unosi SAMO naziv, biljnu kulturu (vrstu) i površinu koju kultura
+ * zauzima. Periode sadnje/berbe i datum sadnje (danas) računa BACKEND
+ * (biljka.service.ts, `izracunajPeriode`) — forma ovde samo prikazuje
+ * preporuku iz istog kataloga (`periodi.util`) radi orijentacije korisniku.
+ */
 @Component({
   selector: 'app-biljka-forma',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, PotvrdaModalComponent],
   templateUrl: './biljka-forma.component.html',
   styleUrl: './biljka-forma.component.scss',
 })
-export class BiljkaFormaComponent {
+export class BiljkaFormaComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
 
   @Input({ required: true }) parcelaId!: number;
+  /** Slobodna (nezauzeta) površina parcele — za validaciju i checkbox "cela površina". */
+  @Input() slobodnaPovrsina = 0;
+  /** Poruka servera da nema dovoljno slobodne površine (409 NEDOVOLJNO_POVRSINE), ako se desi. */
+  @Input() serverskaGreskaPovrsine: { slobodnaPovrsina: number } | null = null;
 
-  @Output() readonly sacuvano = new EventEmitter<NovaBiljka>();
+  @Output() readonly sacuvano = new EventEmitter<NovaBiljkaForma>();
   @Output() readonly otkazano = new EventEmitter<void>();
 
   protected readonly vrsteOpcije = Object.values(VrstaBiljke);
   protected readonly nazivVrste = NAZIVI_VRSTA_BILJAKA;
+  protected nedovoljnoPovrsineOtvoreno = false;
 
   protected readonly forma = this.fb.nonNullable.group({
     naziv: ['', [Validators.required, Validators.minLength(2)]],
-    vrsta: [VrstaBiljke.PSENICA, [Validators.required]],
-    pocetakSadnje: ['', [Validators.required]],
-    krajSadnje: ['', [Validators.required]],
-    pocetakBerbe: ['', [Validators.required]],
-    krajBerbe: ['', [Validators.required]],
-    preporucenaTemperaturaC: [20, [Validators.required]],
-    preporucenoDjubrivoId: this.fb.control<number | null>(null),
+    vrsta: [VrstaBiljke.PARADAJZ, [Validators.required]],
+    celaPovrsina: [false],
+    povrsina: [1, [Validators.required, Validators.min(1)]],
   });
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['slobodnaPovrsina']) {
+      this.primeniCeluPovrsinu(this.forma.controls.celaPovrsina.value);
+    }
+    if (changes['serverskaGreskaPovrsine'] && this.serverskaGreskaPovrsine) {
+      this.nedovoljnoPovrsineOtvoreno = true;
+    }
+  }
+
+  /** Kada je checkbox čekiran, polje za površinu se sakriva i koristi se cela preostala površina. */
+  primeniCeluPovrsinu(celaPovrsina: boolean): void {
+    if (celaPovrsina) {
+      this.forma.controls.povrsina.setValue(Math.floor(this.slobodnaPovrsina));
+      this.forma.controls.povrsina.disable();
+    } else {
+      this.forma.controls.povrsina.enable();
+    }
+  }
+
+  get preporukaZaOdabranuVrstu() {
+    return preporukaZaVrstu(this.forma.controls.vrsta.value);
+  }
+
+  get vanPreporucenogPerioda(): boolean {
+    const danasIso = new Date().toISOString().slice(0, 10);
+    return !jeDatumUPeriodu(danasIso, this.preporukaZaOdabranuVrstu.setva);
+  }
 
   posalji(): void {
     if (this.forma.invalid) {
@@ -39,27 +82,21 @@ export class BiljkaFormaComponent {
     }
 
     const vrednosti = this.forma.getRawValue();
+    const zeljenaPovrsina = vrednosti.celaPovrsina ? Math.floor(this.slobodnaPovrsina) : vrednosti.povrsina;
+
+    if (zeljenaPovrsina <= 0 || zeljenaPovrsina > this.slobodnaPovrsina) {
+      this.nedovoljnoPovrsineOtvoreno = true;
+      return;
+    }
+
     this.sacuvano.emit({
       naziv: vrednosti.naziv,
       vrsta: vrednosti.vrsta,
-      pocetakSadnje: vrednosti.pocetakSadnje,
-      krajSadnje: vrednosti.krajSadnje,
-      pocetakBerbe: vrednosti.pocetakBerbe,
-      krajBerbe: vrednosti.krajBerbe,
-      preporucenaTemperaturaC: vrednosti.preporucenaTemperaturaC,
-      parcelaId: this.parcelaId,
-      preporucenoDjubrivoId: vrednosti.preporucenoDjubrivoId ?? undefined,
+      povrsina: Math.round(zeljenaPovrsina),
     });
+  }
 
-    this.forma.reset({
-      naziv: '',
-      vrsta: VrstaBiljke.PSENICA,
-      pocetakSadnje: '',
-      krajSadnje: '',
-      pocetakBerbe: '',
-      krajBerbe: '',
-      preporucenaTemperaturaC: 20,
-      preporucenoDjubrivoId: null,
-    });
+  zatvoriUpozorenje(): void {
+    this.nedovoljnoPovrsineOtvoreno = false;
   }
 }
