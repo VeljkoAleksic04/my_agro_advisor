@@ -29,6 +29,10 @@ export interface Parcela {
   jedinicaMere: JedinicaPovrsine;
   klasa: number;
   datumUpisa: string;
+  /** Kratak opis parcele — prikazuje se u modalu sa detaljima. */
+  opis?: string;
+  /** Broj biljaka na parceli - vraca ga GET /parcele (findAllZaKorisnika, include _count). */
+  _count?: { biljke: number };
 }
 
 export enum VrstaBiljke {
@@ -47,7 +51,7 @@ export enum VrstaBiljke {
   KUPUS = 'KUPUS',
   LUK = 'LUK',
   BELI_LUK = 'BELI_LUK',
-  MRKVA = 'MRKVA',
+  SARGAREPA = 'SARGAREPA',
   SALATA = 'SALATA',
   TIKVICA = 'TIKVICA',
   LUBENICA = 'LUBENICA',
@@ -71,7 +75,7 @@ export const NAZIVI_VRSTA_BILJAKA: Record<VrstaBiljke, string> = {
   [VrstaBiljke.KUPUS]: 'Kupus',
   [VrstaBiljke.LUK]: 'Luk',
   [VrstaBiljke.BELI_LUK]: 'Beli luk',
-  [VrstaBiljke.MRKVA]: 'Mrkva',
+  [VrstaBiljke.SARGAREPA]: 'Sargarepa',
   [VrstaBiljke.SALATA]: 'Salata',
   [VrstaBiljke.TIKVICA]: 'Tikvica',
   [VrstaBiljke.LUBENICA]: 'Lubenica',
@@ -89,6 +93,14 @@ export interface Biljka {
   preporucenaTemperaturaC: number;
   parcelaId: number;
   preporucenoDjubrivoId?: number | null;
+  status: StatusBiljke;
+  poslednjeZalivanje?: string | null;
+  poslednjiTretman?: string | null;
+  poslednjaBerba?: string | null;
+  /** Površina na parceli zauzeta ovom kulturom. */
+  povrsina: number;
+  /** Datum stvarne sadnje (dodavanja biljke na parcelu). */
+  datumSadnje: string;
 }
 
 /** Kategorija kojoj vrsta biljke pripada — koristi se za dashboard prikaz prinosa. */
@@ -121,7 +133,7 @@ export const KATEGORIJA_VRSTA_BILJAKA: Record<VrstaBiljke, KategorijaBiljke> = {
   [VrstaBiljke.KUPUS]: KategorijaBiljke.POVRCE,
   [VrstaBiljke.LUK]: KategorijaBiljke.POVRCE,
   [VrstaBiljke.BELI_LUK]: KategorijaBiljke.POVRCE,
-  [VrstaBiljke.MRKVA]: KategorijaBiljke.POVRCE,
+  [VrstaBiljke.SARGAREPA]: KategorijaBiljke.POVRCE,
   [VrstaBiljke.SALATA]: KategorijaBiljke.POVRCE,
   [VrstaBiljke.TIKVICA]: KategorijaBiljke.POVRCE,
   [VrstaBiljke.LUBENICA]: KategorijaBiljke.VOCE,
@@ -135,12 +147,61 @@ export enum StatusZasadjeneKulture {
   PROPALA = 'PROPALA',
 }
 
+/** Status same biljke (kulture) — prikazuje se kao badge na kartici.
+ *  Mora biti u skladu sa backend enumom StatusBiljke (schema.prisma). */
+export enum StatusBiljke {
+  POSADJENA = 'POSADJENA',
+  RASTE = 'RASTE',
+  OBRANA = 'OBRANA',
+  PROPALA = 'PROPALA',
+}
+
+export const NAZIVI_STATUSA_BILJKE: Record<StatusBiljke, string> = {
+  [StatusBiljke.POSADJENA]: 'Posađena',
+  [StatusBiljke.RASTE]: 'Raste',
+  [StatusBiljke.OBRANA]: 'Obrana',
+  [StatusBiljke.PROPALA]: 'Propala',
+};
+
+/** Akcije koje farmer može da izvrši nad biljkom. */
+export type BiljkaAkcija = 'OBERI' | 'ZALIJ' | 'TRETIRAJ';
+
+export const BILJKA_AKCIJE: readonly BiljkaAkcija[] = ['OBERI', 'ZALIJ', 'TRETIRAJ'] as const;
+
+export const NAZIVI_AKCIJA: Record<BiljkaAkcija, string> = {
+  OBERI: 'Berba',
+  ZALIJ: 'Navodnjavanje',
+  TRETIRAJ: 'Tretman',
+};
+
+export interface MesecInterval {
+  mesecOd: number;
+  mesecDo: number;
+}
+
+export interface PeriodPreporuke {
+  opis: string;
+  setva: readonly MesecInterval[];
+  berba: readonly MesecInterval[];
+}
+
+export interface ProveraAkcije {
+  akcija: BiljkaAkcija;
+  biljkaId: number;
+  uPeriodu: boolean;
+  trenutniStatus: StatusBiljke;
+  preporuka: PeriodPreporuke;
+  porukaVanPerioda: string | null;
+}
+
 export enum Tezina {
   mg = 'mg',
   G = 'G',
   KG = 'KG',
   T = 'T',
 }
+
+export const TEZINE_OPCIJE = Object.values(Tezina);
 
 /** Sadnja = zasejana kultura na parceli (usev u toku). */
 export interface Sadnja {
@@ -155,4 +216,28 @@ export interface Sadnja {
   jedinica: Tezina;
   status: StatusZasadjeneKulture;
   biljka?: Biljka;
+}
+
+export enum TipPreparata {
+  PESTICID = 'PESTICID',
+  DJUBRIVO = 'DJUBRIVO',
+}
+
+/** Preparat (koristi se i za tretman i za đubrenje - razlikuju se po tipPreparata). */
+export interface Preparat {
+  id: number;
+  naziv: string;
+  proizvodjac: string;
+  tipPreparata: TipPreparata;
+  opis: string;
+}
+
+/** Evidentiran tretman (uključujući đubrenje - preparat sa tipPreparata=DJUBRIVO). */
+export interface Tretman {
+  id: number;
+  parcelaId: number;
+  biljkaId?: number | null;
+  preparatId: number;
+  doza: string;
+  datumTretmana: string;
 }
