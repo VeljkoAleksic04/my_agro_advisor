@@ -1,0 +1,40 @@
+.detalji-kolona {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detalji-blok {
+  padding: 1rem;
+
+  h4 {
+    margin: 0 0 0.6rem;
+  }
+
+  dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 0.75rem;
+  }
+
+  dt {
+    color: var(--boja-tekst-suptilan);
+    font-size: 0.85rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.biljke-kolona {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  h4 {
+    margin: 0;
+  }
+}

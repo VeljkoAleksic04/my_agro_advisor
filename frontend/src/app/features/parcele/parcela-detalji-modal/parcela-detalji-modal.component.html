@@ -1,0 +1,122 @@
+@if (otvoren && parcela) {
+  <div class="modal-pozadina" (click)="zatvori()">
+    <div class="modal-sadrzaj modal-sadrzaj--veliki" (click)="$event.stopPropagation()">
+      <div class="modal-zaglavlje">
+        <h2>{{ parcela.naziv }}</h2>
+        <button type="button" class="modal-zatvori" (click)="zatvori()" aria-label="Zatvori">✕</button>
+      </div>
+
+      <div class="modal-kolone">
+        <div class="detalji-kolona">
+          <div class="karta detalji-blok">
+            <h4>Opšte informacije</h4>
+            <dl>
+              <dt>Klasa zemljišta</dt>
+              <dd>{{ parcela.klasa }}</dd>
+              <dt>Površina</dt>
+              <dd>{{ parcela.povrsina }} {{ parcela.jedinicaMere }} &middot; slobodno {{ slobodnaPovrsina }} a</dd>
+              <dt>Datum upisa</dt>
+              <dd>{{ parcela.datumUpisa | date: 'dd.MM.yyyy' }}</dd>
+              <dt>Broj kultura</dt>
+              <dd>{{ biljke().length }}</dd>
+            </dl>
+          </div>
+
+          <div class="karta detalji-blok">
+            <h4>Opis</h4>
+            @if (parcela.opis) {
+              <p class="opis-tekst">{{ parcela.opis }}</p>
+            } @else {
+              <p class="stanje-prazno">Parcela nema uneti opis.</p>
+            }
+          </div>
+
+          <div class="karta detalji-blok">
+            <h4>Tretiraj đubrivom</h4>
+            <form [formGroup]="formaDjubrenje" (ngSubmit)="posaljiDjubrenje()" class="forma">
+              <div class="polje">
+                <label for="djubrivoId">Đubrivo</label>
+                <select id="djubrivoId" formControlName="preparatId">
+                  <option [value]="0" disabled>Izaberite đubrivo</option>
+                  @for (preparat of djubriva; track preparat.id) {
+                    <option [value]="preparat.id">{{ preparat.naziv }} ({{ preparat.proizvodjac }})</option>
+                  }
+                </select>
+                @if (djubriva.length === 0) {
+                  <span class="greska-polja">Nema dostupnih đubriva.</span>
+                }
+              </div>
+              <div class="polje">
+                <label for="dozaDjubriva">Doza</label>
+                <input id="dozaDjubriva" type="text" formControlName="doza" placeholder="npr. 30 kg/ha" />
+              </div>
+              @if (greskaDjubriva) {
+                <p class="napomena-upozorenje">{{ greskaDjubriva }}</p>
+              }
+              <div class="akcije-forme">
+                <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeDjubriva">Evidentiraj đubrenje</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="biljke-kolona">
+          <h4>Biljke na parceli</h4>
+
+          @if (biljke().length === 0) {
+            <p class="stanje-prazno">Na ovoj parceli još nema zasađenih kultura.</p>
+          }
+
+          <div class="mreza-mini-kartica">
+            @for (biljka of biljke(); track biljka.id) {
+              <article class="mini-karta" (click)="otvoriBiljku(biljka)">
+                <h4>{{ biljka.naziv }}</h4>
+                <p class="opis-tekst">{{ biljka.povrsina }} a</p>
+              </article>
+            }
+
+            @if (slobodnaPovrsina > 0 && !prikaziFormuBiljke) {
+              <button type="button" class="mini-karta mini-karta--dodaj" (click)="prikaziFormuBiljke = true">
+                + Dodaj biljku
+              </button>
+            }
+          </div>
+
+          @if (prikaziFormuBiljke) {
+            <div class="karta detalji-blok">
+              @if (greskaBiljke() && !nedovoljnoPovrsineInfo()) {
+                <p class="napomena-upozorenje">{{ greskaBiljke() }}</p>
+              }
+              <app-biljka-forma
+                [parcelaId]="parcela.id"
+                [slobodnaPovrsina]="slobodnaPovrsina"
+                [serverskaGreskaPovrsine]="nedovoljnoPovrsineInfo()"
+                (sacuvano)="dodajBiljku($event)"
+                (otkazano)="prikaziFormuBiljke = false"
+              />
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-akcije">
+        <button type="button" class="dugme dugme-opasnost" (click)="zatraziBrisanje()">Obriši parcelu</button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-potvrda-modal
+  [otvoren]="potvrdaBrisanjaOtvorena"
+  naslov="Brisanje parcele"
+  poruka="Da li ste sigurni da želite da obrišete ovu parcelu? Ova akcija je nepovratna."
+  (potvrdjeno)="potvrdiBrisanje()"
+  (otkazano)="potvrdaBrisanjaOtvorena = false"
+/>
+
+<app-biljka-detalji-modal
+  [otvoren]="biljkaZaModal !== null"
+  [biljka]="biljkaZaModal"
+  (zatvoreno)="zatvoriBiljkuModal()"
+  (obrisano)="obrisiBiljkuIzModala($event)"
+/>
