@@ -29,7 +29,13 @@
     <p class="stanje-prazno">Izaberite parcelu iznad da biste videli njene biljke.</p>
   } @else if (prikaziFormu) {
     <div class="karta">
-      <app-biljka-forma [parcelaId]="odabranaParcelaId" (sacuvano)="dodajBiljku($event)" (otkazano)="prikaziFormu = false" />
+      <app-biljka-forma
+        [parcelaId]="odabranaParcelaId"
+        [slobodnaPovrsina]="slobodnaPovrsina"
+        [serverskaGreskaPovrsine]="nedovoljnoPovrsineInfo()"
+        (sacuvano)="dodajBiljku($event)"
+        (otkazano)="prikaziFormu = false"
+      />
     </div>
   }
 
