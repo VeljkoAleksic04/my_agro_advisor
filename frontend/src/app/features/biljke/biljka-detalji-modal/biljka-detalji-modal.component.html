@@ -1,0 +1,87 @@
+@if (otvoren && biljka) {
+  <div class="modal-pozadina" (click)="zatvori()">
+    <div class="modal-sadrzaj" (click)="$event.stopPropagation()">
+      <div class="modal-zaglavlje">
+        <h2>{{ biljka.naziv }}</h2>
+        <button type="button" class="modal-zatvori" (click)="zatvori()" aria-label="Zatvori">✕</button>
+      </div>
+
+      <dl>
+        <dt>Kultura</dt>
+        <dd>{{ nazivVrste[biljka.vrsta] }}</dd>
+        <dt>Površina</dt>
+        <dd>{{ biljka.povrsina }} a</dd>
+      </dl>
+
+      <div class="akcije-biljke">
+        <button type="button" class="dugme dugme-sekundarni" (click)="odaberiPanel('TRETMAN')">Tretman</button>
+        <button type="button" class="dugme dugme-sekundarni" (click)="odaberiPanel('NAVODNJAVANJE')">Navodnjavanje</button>
+        <button type="button" class="dugme dugme-sekundarni" (click)="odaberiPanel('BERBA')">Berba</button>
+      </div>
+
+      @if (panel === 'TRETMAN') {
+        <form [formGroup]="formaTretman" (ngSubmit)="posaljiTretman()" class="forma forma-akcije">
+          <div class="polje">
+            <label for="preparatId">Preparat</label>
+            <select id="preparatId" formControlName="preparatId">
+              <option [value]="0" disabled>Izaberite preparat</option>
+              @for (preparat of pesticidi; track preparat.id) {
+                <option [value]="preparat.id">{{ preparat.naziv }} ({{ preparat.proizvodjac }})</option>
+              }
+            </select>
+            @if (pesticidi.length === 0) {
+              <span class="greska-polja">Nema dostupnih preparata za tretman.</span>
+            }
+          </div>
+          <div class="polje">
+            <label for="doza">Doza</label>
+            <input id="doza" type="text" formControlName="doza" placeholder="npr. 2 l/ha" />
+          </div>
+          @if (greskaTretmana) {
+            <p class="napomena-upozorenje">{{ greskaTretmana }}</p>
+          }
+          <div class="akcije-forme">
+            <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeTretmana">Evidentiraj tretman</button>
+          </div>
+        </form>
+      }
+
+      @if (panel === 'NAVODNJAVANJE') {
+        <div class="forma-akcije">
+          <p class="opis-tekst">Evidentira se navodnjavanje sa današnjim datumom.</p>
+          <div class="akcije-forme">
+            <button type="button" class="dugme dugme-primarni" (click)="potvrdiNavodnjavanje()">Potvrdi navodnjavanje</button>
+          </div>
+        </div>
+      }
+
+      @if (panel === 'BERBA') {
+        <div class="forma-akcije">
+          @if (provereBerbaVanPerioda) {
+            <p class="napomena-upozorenje">{{ poslednjaProvera()?.porukaVanPerioda }}</p>
+            <div class="akcije-forme">
+              <button type="button" class="dugme dugme-sekundarni" (click)="potvrdiBerbu(true)">Forsiraj berbu</button>
+            </div>
+          } @else {
+            <p class="opis-tekst">Evidentira se berba sa današnjim datumom.</p>
+            <div class="akcije-forme">
+              <button type="button" class="dugme dugme-primarni" (click)="potvrdiBerbu()">Potvrdi berbu</button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="modal-akcije">
+        <button type="button" class="dugme dugme-opasnost" (click)="zatraziBrisanje()">Obriši biljku</button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-potvrda-modal
+  [otvoren]="potvrdaBrisanjaOtvorena"
+  naslov="Brisanje biljke"
+  poruka="Da li ste sigurni da želite da obrišete ovu biljku? Ova akcija je nepovratna."
+  (potvrdjeno)="potvrdiBrisanje()"
+  (otkazano)="potvrdaBrisanjaOtvorena = false"
+/>
