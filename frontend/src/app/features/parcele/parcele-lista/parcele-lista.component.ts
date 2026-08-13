@@ -7,14 +7,14 @@ import { ParceleActions } from '../store/parcele.actions';
 import { selectGreska, selectUcitavanje } from '../store/parcele.reducer';
 import { selectSveParcele, selectUkupnaPovrsina } from '../store/parcele.selectors';
 import { ParcelaFormaComponent } from '../parcela-forma/parcela-forma.component';
+import { ParcelaDetaljiModalComponent } from '../parcela-detalji-modal/parcela-detalji-modal.component';
 import type { NovaParcela } from '../parcele-api.service';
 import type { Parcela } from '../../../core/models/domain.models';
-import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
 
 @Component({
   selector: 'app-parcele-lista',
   standalone: true,
-  imports: [DatePipe, ParcelaFormaComponent, PotvrdaModalComponent],
+  imports: [DatePipe, ParcelaFormaComponent, ParcelaDetaljiModalComponent],
   templateUrl: './parcele-lista.component.html',
   styleUrl: './parcele-lista.component.scss',
 })
@@ -45,10 +45,15 @@ export class ParceleListaComponent implements OnInit {
   );
 
   protected prikaziFormu = false;
-  protected parcelaZaBrisanjeId: number | null = null;
+  protected parcelaZaModal: Parcela | null = null;
 
   ngOnInit(): void {
     this.store.dispatch(ParceleActions.ucitajParcele());
+  }
+
+  /** Broj kultura zasađenih na parceli — prikazuje se kao bedž na kartici (backend GET /parcele vraca _count.biljke). */
+  brojKultura(parcela: Parcela): number {
+    return parcela._count?.biljke ?? 0;
   }
 
   pretraziPo(pojam: string): void {
@@ -65,18 +70,16 @@ export class ParceleListaComponent implements OnInit {
     this.prikaziFormu = false;
   }
 
-  zatraziBrisanje(id: number): void {
-    this.parcelaZaBrisanjeId = id;
+  otvoriDetalje(parcela: Parcela): void {
+    this.parcelaZaModal = parcela;
   }
 
-  potvrdiBrisanje(): void {
-    if (this.parcelaZaBrisanjeId !== null) {
-      this.store.dispatch(ParceleActions.obrisiParcelu({ id: this.parcelaZaBrisanjeId }));
-    }
-    this.parcelaZaBrisanjeId = null;
+  zatvoriDetalje(): void {
+    this.parcelaZaModal = null;
   }
 
-  otkaziBrisanje(): void {
-    this.parcelaZaBrisanjeId = null;
+  obrisiParceluIzModala(id: number): void {
+    this.store.dispatch(ParceleActions.obrisiParcelu({ id }));
+    this.parcelaZaModal = null;
   }
 }

@@ -38,7 +38,7 @@
   } @else {
     <div class="mreza-kartica">
       @for (parcela of filtriraneParcele(); track parcela.id) {
-        <article class="karta karta-stavka">
+        <article class="karta karta-stavka karta-klikabilna" (click)="otvoriDetalje(parcela)">
           <h3>{{ parcela.naziv }}</h3>
           <dl>
             <dt>Površina</dt>
@@ -48,17 +48,16 @@
             <dt>Datum upisa</dt>
             <dd>{{ parcela.datumUpisa | date: 'dd.MM.yyyy' }}</dd>
           </dl>
-          <button type="button" class="dugme dugme-opasnost" (click)="zatraziBrisanje(parcela.id)">Obriši</button>
+          <span class="znacka">{{ brojKultura(parcela) }} kultura na parceli</span>
         </article>
       }
     </div>
   }
 
-  <app-potvrda-modal
-    [otvoren]="parcelaZaBrisanjeId !== null"
-    naslov="Brisanje parcele"
-    poruka="Da li ste sigurni da želite da obrišete ovu parcelu? Ova akcija je nepovratna."
-    (potvrdjeno)="potvrdiBrisanje()"
-    (otkazano)="otkaziBrisanje()"
+  <app-parcela-detalji-modal
+    [otvoren]="parcelaZaModal !== null"
+    [parcela]="parcelaZaModal"
+    (zatvoreno)="zatvoriDetalje()"
+    (obrisano)="obrisiParceluIzModala($event)"
   />
 </section>
