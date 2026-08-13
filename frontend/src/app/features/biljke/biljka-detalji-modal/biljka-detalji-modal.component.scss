@@ -1,0 +1,36 @@
+dl {
+  margin: 0 0 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.75rem;
+}
+
+dt {
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.85rem;
+}
+
+dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.akcije-biljke {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.forma-akcije {
+  background: var(--boja-povrsina-hover);
+  border-radius: var(--radijus);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.polje-red {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
