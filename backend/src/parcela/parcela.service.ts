@@ -17,6 +17,8 @@ export class ParcelaService {
     return this.prisma.parcela.findMany({
       where: { vlasnikId },
       orderBy: { datumUpisa: 'desc' },
+      // _count.biljke se koristi na front-endu za bedž "broj kultura" na kartici u listi
+      include: { _count: { select: { biljke: true } } },
     });
   }
 
