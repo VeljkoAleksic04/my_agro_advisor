@@ -1,17 +1,11 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 /**
- * Generička modalna potvrda koja se koristi umesto browser-ovog confirm()/alert()
- * dijaloga, npr. prilikom brisanja parcele, biljke ili sadnje.
+ * Generička modalna komponenta za potvrdu akcije ili prikaz informativne
+ * poruke (npr. upozorenje o odstupanju od preporučenog perioda sadnje/berbe).
  *
- * Primer korišćenja:
- * <app-potvrda-modal
- *   [otvoren]="obrisatiId !== null"
- *   naslov="Brisanje parcele"
- *   poruka="Da li ste sigurni da želite da obrišete ovu parcelu? Ova akcija je nepovratna."
- *   (potvrdjeno)="potvrdiBrisanje()"
- *   (otkazano)="obrisatiId = null"
- * />
+ * Kada je `samoInformativno` true, prikazuje se samo dugme za potvrdu
+ * (nema dugmeta "Otkaži") — koristi se za čisto informativne modale.
  */
 @Component({
   selector: 'app-potvrda-modal',
@@ -21,20 +15,14 @@ import { Component, EventEmitter, HostListener, Input, Output } from '@angular/c
 })
 export class PotvrdaModalComponent {
   @Input() otvoren = false;
-  @Input() naslov = 'Potvrda brisanja';
-  @Input() poruka = 'Da li ste sigurni da želite da obrišete ovu stavku? Ova akcija je nepovratna.';
-  @Input() tekstPotvrde = 'Obriši';
+  @Input() naslov = 'Potvrda';
+  @Input() poruka = '';
+  @Input() tekstPotvrde = 'Potvrdi';
   @Input() tekstOtkazivanja = 'Otkaži';
+  @Input() samoInformativno = false;
 
   @Output() readonly potvrdjeno = new EventEmitter<void>();
   @Output() readonly otkazano = new EventEmitter<void>();
-
-  @HostListener('document:keydown.escape')
-  naEscape(): void {
-    if (this.otvoren) {
-      this.otkazano.emit();
-    }
-  }
 
   potvrdi(): void {
     this.potvrdjeno.emit();
