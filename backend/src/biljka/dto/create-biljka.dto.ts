@@ -1,5 +1,6 @@
 import { IsEnum, IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
-import { VrstaBiljke } from '@prisma/client';
+import { JedinicaPovrsine, VrstaBiljke } from '@prisma/client';
+import { findIndex } from 'rxjs';
 
 export class CreateBiljkaDto {
   @IsString()
@@ -12,6 +13,9 @@ export class CreateBiljkaDto {
   @IsInt()
   @Min(1)
   povrsina: number;
+
+  // @IsEnum(JedinicaPovrsine)
+  // jedinica : JedinicaPovrsine;
 
   @IsInt()
   parcelaId: number;

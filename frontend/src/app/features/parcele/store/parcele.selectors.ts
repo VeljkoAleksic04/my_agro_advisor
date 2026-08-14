@@ -5,6 +5,7 @@ const { selectAll, selectTotal } = parceleAdapter.getSelectors(selectParceleStat
 
 export const selectSveParcele = selectAll;
 export const selectBrojParcela = selectTotal;
+export const selectSveJediniceMere = selectAll;
 
 export const selectUkupnaPovrsina = createSelector(selectSveParcele, (parcele) =>
   parcele.reduce((zbir, parcela) => zbir + parcela.povrsina, 0),

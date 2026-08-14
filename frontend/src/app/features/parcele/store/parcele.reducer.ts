@@ -69,5 +69,5 @@ export const {
   reducer: parceleReducer,
   selectParceleState,
   selectUcitavanje,
-  selectGreska,
+  selectGreska
 } = parceleFeature;

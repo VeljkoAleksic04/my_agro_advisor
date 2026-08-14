@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, StatusBiljke, VrstaBiljke } from '@prisma/client';import { PrismaService } from '../prisma/prisma.service';
+import { JedinicaPovrsine, Prisma, StatusBiljke, VrstaBiljke } from '@prisma/client';import { PrismaService } from '../prisma/prisma.service';
 import { CreateBiljkaDto } from './dto/create-biljka.dto';
 import { UpdateBiljkaDto } from './dto/update-biljka.dto';
 import { BiljkaAkcijaTip, IzvrsiAkcijuDto } from './dto/izvrsi-akciju.dto';
@@ -69,10 +69,14 @@ export class BiljkaService {
     });
     if (!parcela) throw new NotFoundException('Parcela ne postoji');
 
-    const zauzeto = parcela.biljke
-      .filter((b) => b.id !== izuzmiBiljkuId)
+    const zauzeto = parcela.jedinicaMere === JedinicaPovrsine.HA ? 
+      parcela.biljke.filter((b) => b.id !== izuzmiBiljkuId)
+      .reduce((zbir, b) => zbir + b.povrsina*100, 0) : 
+      parcela.biljke.filter((b) => b.id !== izuzmiBiljkuId)
       .reduce((zbir, b) => zbir + b.povrsina, 0);
-    const slobodno = parcela.povrsina - zauzeto;
+      
+    const slobodno = parcela.jedinicaMere === JedinicaPovrsine.HA ? 
+      parcela.povrsina*100 - zauzeto : parcela.povrsina - zauzeto;
 
     if (zeljenaPovrsina > slobodno) {
       throw new ConflictException({

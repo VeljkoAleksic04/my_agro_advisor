@@ -14,7 +14,7 @@
               <dt>Klasa zemljišta</dt>
               <dd>{{ parcela.klasa }}</dd>
               <dt>Površina</dt>
-              <dd>{{ parcela.povrsina }} {{ parcela.jedinicaMere }} &middot; slobodno {{ slobodnaPovrsina }} a</dd>
+              <dd>{{ parcela.povrsina }} {{ parcela.jedinicaMere }} &middot; slobodno {{ slobodnaPovrsina }} {{jedinicaPovrsine}}</dd>
               <dt>Datum upisa</dt>
               <dd>{{ parcela.datumUpisa | date: 'dd.MM.yyyy' }}</dd>
               <dt>Broj kultura</dt>
@@ -71,7 +71,7 @@
             @for (biljka of biljke(); track biljka.id) {
               <article class="mini-karta" (click)="otvoriBiljku(biljka)">
                 <h4>{{ biljka.naziv }}</h4>
-                <p class="opis-tekst">{{ biljka.povrsina }} a</p>
+                <p class="opis-tekst">{{ biljka.povrsina }} </p>
               </article>
             }
 
