@@ -111,7 +111,7 @@ export const PERIODI_SADNJE_BERBE: Record<VrstaBiljke, PeriodPreporuke> = {
   },
   [VrstaBiljke.LUBENICA]: {
     opis: 'Lubenica: sadnja maj; berba jul-septembar.',
-    setva: [m(5, 9)],
+    setva: [m(5, 7)],
     berba: [m(7, 9)],
   },
   [VrstaBiljke.DINJA]: {

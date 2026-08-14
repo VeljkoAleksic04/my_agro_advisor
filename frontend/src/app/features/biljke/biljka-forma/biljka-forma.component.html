@@ -25,18 +25,25 @@
 
   <label class="polje-checkbox">
     <input type="checkbox" formControlName="celaPovrsina" (change)="primeniCeluPovrsinu(forma.controls.celaPovrsina.value)" />
-    Zasadi na celoj slobodnoj površini parcele ({{ slobodnaPovrsina }} a)
+    Zasadi na celoj slobodnoj površini parcele ({{ slobodnaPovrsina }} )
   </label>
 
   @if (!forma.controls.celaPovrsina.value) {
     <div class="polje">
-      <label for="povrsina">Površina za sadnju (a)</label>
+      <label for="povrsina">Površina za sadnju</label>
       <input id="povrsina" type="number" step="1" min="1" formControlName="povrsina" />
       @if (forma.controls.povrsina.invalid && forma.controls.povrsina.touched) {
         <span class="greska-polja">Površina mora biti veća od 0.</span>
       }
+      <label for="jedinica">Jediinica mere za sadnju</label>
+      <select name="jedinica">
+        <option [value]="0">--- Izaberite jedinicu mere povrsine za sadnju ---</option>
+          @for (item of jediniceMerePovrsine; track item) {
+            <option [value]="item">{{item}}</option>
+          }
+      </select>
       <span class="greska-polja" style="color: var(--boja-tekst-suptilan)">
-        Slobodno na parceli: {{ slobodnaPovrsina }} a
+        Slobodno na parceli: {{ slobodnaPovrsina }}
       </span>
     </div>
   }

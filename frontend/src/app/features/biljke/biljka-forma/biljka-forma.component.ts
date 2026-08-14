@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
-import { NAZIVI_VRSTA_BILJAKA, VrstaBiljke } from '../../../core/models/domain.models';
+import { JedinicaPovrsine, NAZIVI_VRSTA_BILJAKA, VrstaBiljke } from '../../../core/models/domain.models';
 import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
 import { jeDatumUPeriodu, preporukaZaVrstu } from '../periodi.util';
 
@@ -36,6 +36,8 @@ export class BiljkaFormaComponent implements OnChanges {
   @Output() readonly sacuvano = new EventEmitter<NovaBiljkaForma>();
   @Output() readonly otkazano = new EventEmitter<void>();
 
+  
+  protected readonly jediniceMerePovrsine = Object.values(JedinicaPovrsine);
   protected readonly vrsteOpcije = Object.values(VrstaBiljke);
   protected readonly nazivVrste = NAZIVI_VRSTA_BILJAKA;
   protected nedovoljnoPovrsineOtvoreno = false;

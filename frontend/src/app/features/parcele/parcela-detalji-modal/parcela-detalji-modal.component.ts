@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { TipPreparata, type Biljka, type Parcela } from '../../../core/models/domain.models';
+import { JedinicaPovrsine, TipPreparata, type Biljka, type Parcela } from '../../../core/models/domain.models';
 import { BiljkaFormaComponent, type NovaBiljkaForma } from '../../biljke/biljka-forma/biljka-forma.component';
 import { BiljkaDetaljiModalComponent } from '../../biljke/biljka-detalji-modal/biljka-detalji-modal.component';
 import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
@@ -90,6 +90,11 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
     if (!this.parcela) return 0;
     const zauzeto = this.biljke().reduce((zbir, b) => zbir + b.povrsina, 0);
     return Math.max(0, Math.floor(this.parcela.povrsina - zauzeto));
+  }
+
+  get jedinicaPovrsine(): JedinicaPovrsine {
+    if(!this.parcela) return JedinicaPovrsine.A;
+    return this.parcela.jedinicaMere;
   }
 
   zatvori(): void {
