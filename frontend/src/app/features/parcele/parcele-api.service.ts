@@ -15,6 +15,11 @@ export class ParceleApiService {
     return this.http.get<Parcela[]>(this.baseUrl);
   }
 
+  /** GET /parcele/:id - backend ovde ukljucuje i `biljke` i `sadnje` (include). */
+  ucitajJednu(id: number): Observable<Parcela> {
+    return this.http.get<Parcela>(`${this.baseUrl}/${id}`);
+  }
+
   kreiraj(dto: NovaParcela): Observable<Parcela> {
     return this.http.post<Parcela>(this.baseUrl, dto);
   }

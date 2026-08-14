@@ -33,13 +33,16 @@ export class BiljkeEffects {
       switchMap(({ dto }) =>
         this.api.kreiraj(dto).pipe(
           map((biljka) => BiljkeActions.dodajBiljkuUspesno({ biljka })),
-          catchError((greska) =>
-            of(
+          catchError((greska) => {
+            const telo = greska?.error;
+            return of(
               BiljkeActions.dodajBiljkuNeuspesno({
-                greska: greska?.error?.message ?? 'Greška pri dodavanju biljke',
+                greska: (telo?.message as string | undefined) ?? 'Greška pri dodavanju biljke',
+                kod: telo?.kod as string | undefined,
+                slobodnaPovrsina: telo?.slobodnaPovrsina as number | undefined,
               }),
-            ),
-          ),
+            );
+          }),
         ),
       ),
     ),
@@ -55,6 +58,57 @@ export class BiljkeEffects {
             of(
               BiljkeActions.obrisiBiljkuNeuspesno({
                 greska: greska?.error?.message ?? 'Greška pri brisanju biljke',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  /**
+   * Slanje akcije (oberi, zalij, tretiraj) na backend. Ako backend vrati
+   * gresku sa kodom VAN_PERIODA, akcija se ne izvrsava — komponenta dobije
+   * `provera` objekat i prikazuje modal sa porukom i dugmetom "Forsiraj".
+   */
+  izvrsiAkciju$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(BiljkeActions.izvrsiAkciju),
+      switchMap(({ id, payload }) =>
+        this.api.izvrsiAkciju(id, payload).pipe(
+          map((biljka) => BiljkeActions.izvrsiAkcijuUspesno({ biljka })),
+          catchError((greska) => {
+            const telo = greska?.error;
+            const kod = telo?.kod as string | undefined;
+            const poruka = (telo?.message as string | undefined) ?? greska?.error?.message ?? 'Greška pri izvršavanju akcije';
+            return of(
+              BiljkeActions.izvrsiAkcijuNeuspesno({
+                greska: poruka,
+                kod,
+                provera: telo?.provera,
+              }),
+            );
+          }),
+        ),
+      ),
+    ),
+  );
+
+  /**
+   * "Suvi" pregled akcije — poziva se pre same akcije da bi komponenta
+   * znala unapred da li je u periodu, bez menjanja stanja.
+   * (Trenutno nije u upotrebi u komponenti; ostavljeno za buduću optimizaciju.)
+   */
+  proveriAkciju$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(BiljkeActions.proveriAkciju),
+      switchMap(({ id, akcija }) =>
+        this.api.proveriAkciju(id, akcija).pipe(
+          map((provera) => BiljkeActions.proveriAkcijuUspesno({ id, akcija, provera })),
+          catchError((greska) =>
+            of(
+              BiljkeActions.proveriAkcijuNeuspesno({
+                greska: greska?.error?.message ?? 'Greška pri proveri akcije',
               }),
             ),
           ),

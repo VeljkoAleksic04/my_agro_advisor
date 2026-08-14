@@ -1,12 +1,19 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { EntityState, createEntityAdapter } from '@ngrx/entity';
-import { Biljka } from '../../../core/models/domain.models';
+import { Biljka, ProveraAkcije } from '../../../core/models/domain.models';
 import { BiljkeActions } from './biljke.actions';
 
 export interface BiljkeState extends EntityState<Biljka> {
   ucitavanje: boolean;
   greska: string | null;
   aktivnaParcelaId: number | null;
+  /**
+   * Poslednja vracena provera akcije koja je bila van perioda —
+   * koristi se da komponenta prikaze modal sa potvrdom.
+   */
+  poslednjaProvera: ProveraAkcije | null;
+  /** Detalji poslednje 409 NEDOVOLJNO_POVRSINE greske - koristi ga forma za informativni modal. */
+  nedovoljnoPovrsineInfo: { slobodnaPovrsina: number } | null;
 }
 
 export const biljkeAdapter = createEntityAdapter<Biljka>({
@@ -18,6 +25,8 @@ const pocetnoStanje: BiljkeState = biljkeAdapter.getInitialState({
   ucitavanje: false,
   greska: null,
   aktivnaParcelaId: null,
+  poslednjaProvera: null,
+  nedovoljnoPovrsineInfo: null,
 });
 
 export const biljkeFeature = createFeature({
@@ -29,6 +38,7 @@ export const biljkeFeature = createFeature({
       ucitavanje: true,
       greska: null,
       aktivnaParcelaId: parcelaId,
+      poslednjaProvera: null,
     })),
     on(BiljkeActions.ucitajBiljkeUspesno, (state, { biljke }): BiljkeState =>
       biljkeAdapter.setAll(biljke, { ...state, ucitavanje: false }),
@@ -43,14 +53,19 @@ export const biljkeFeature = createFeature({
       ...state,
       ucitavanje: true,
       greska: null,
+      nedovoljnoPovrsineInfo: null,
     })),
     on(BiljkeActions.dodajBiljkuUspesno, (state, { biljka }): BiljkeState =>
       biljkeAdapter.addOne(biljka, { ...state, ucitavanje: false }),
     ),
-    on(BiljkeActions.dodajBiljkuNeuspesno, (state, { greska }): BiljkeState => ({
+    on(BiljkeActions.dodajBiljkuNeuspesno, (state, { greska, kod, slobodnaPovrsina }): BiljkeState => ({
       ...state,
       ucitavanje: false,
       greska,
+      nedovoljnoPovrsineInfo:
+        kod === 'NEDOVOLJNO_POVRSINE' && slobodnaPovrsina !== undefined
+          ? { slobodnaPovrsina }
+          : state.nedovoljnoPovrsineInfo,
     })),
 
     on(BiljkeActions.obrisiBiljku, (state): BiljkeState => ({
@@ -65,8 +80,33 @@ export const biljkeFeature = createFeature({
       greska,
     })),
 
+    on(BiljkeActions.izvrsiAkciju, (state): BiljkeState => ({
+      ...state,
+      greska: null,
+    })),
+    on(BiljkeActions.izvrsiAkcijuUspesno, (state, { biljka }): BiljkeState =>
+      biljkeAdapter.upsertOne(biljka, {
+        ...state,
+        poslednjaProvera: null,
+      }),
+    ),
+    on(BiljkeActions.izvrsiAkcijuNeuspesno, (state, { greska, kod, provera }): BiljkeState => ({
+      ...state,
+      greska,
+      poslednjaProvera: kod === 'VAN_PERIODA' && provera ? provera : state.poslednjaProvera,
+    })),
+
+    on(BiljkeActions.azurirajStatus, (state, { id, status }): BiljkeState =>
+      biljkeAdapter.updateOne({ id, changes: { status } }, state),
+    ),
+
     on(BiljkeActions.ocistiBiljke, (state): BiljkeState =>
-      biljkeAdapter.removeAll({ ...state, aktivnaParcelaId: null }),
+      biljkeAdapter.removeAll({
+        ...state,
+        aktivnaParcelaId: null,
+        poslednjaProvera: null,
+        nedovoljnoPovrsineInfo: null,
+      }),
     ),
   ),
 });
@@ -78,4 +118,6 @@ export const {
   selectUcitavanje,
   selectGreska,
   selectAktivnaParcelaId,
+  selectPoslednjaProvera,
+  selectNedovoljnoPovrsineInfo,
 } = biljkeFeature;
