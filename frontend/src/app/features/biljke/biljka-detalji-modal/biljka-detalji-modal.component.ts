@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -24,7 +25,7 @@ type PanelAkcije = 'TRETMAN' | 'NAVODNJAVANJE' | 'BERBA' | null;
 @Component({
   selector: 'app-biljka-detalji-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, PotvrdaModalComponent],
+  imports: [ReactiveFormsModule, PotvrdaModalComponent, DatePipe],
   templateUrl: './biljka-detalji-modal.component.html',
   styleUrl: './biljka-detalji-modal.component.scss',
 })

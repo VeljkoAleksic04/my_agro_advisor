@@ -1,0 +1,52 @@
+[2026-08-13 14:02:28] [frontend] Povezivanje lista komponenti sa novim modalima
+[main 88c390e] refactor(lista): otvaranje detalja klikom na karticu, badge broja kultura
+ 4 files changed, 51 insertions(+), 25 deletions(-)
+[2026-08-13 14:02:28] Pauza od 37 min pre sledeceg komita...
+[2026-08-13 14:39:49] [backend] Prisma sema
+[main 08735c2] feat(schema): status/povrsina/datumSadnje na Biljka, opis na Parcela, MRKVA->SARGAREPA
+ 1 file changed, 44 insertions(+), 39 deletions(-)
+[2026-08-13 14:39:49] Pauza od 42 min pre sledeceg komita...
+[2026-08-13 15:22:14] [backend] Biljka DTO + servis (server racuna periode, proverava povrsinu)
+[main dbcd2e5] feat(biljka): server racuna periode sadnje/berbe, validacija slobodne povrsine (409)
+ 2 files changed, 174 insertions(+), 40 deletions(-)
+[2026-08-13 15:22:14] Pauza od 30 min pre sledeceg komita...
+[2026-08-13 15:52:35] [backend] Parcela DTO + servis (opis, _count.biljke)
+[main 2164f55] feat(parcela): opis polje + _count.biljke za badge u listi
+ 1 file changed, 2 insertions(+)
+[2026-08-13 15:52:35] Pauza od 41 min pre sledeceg komita...
+[2026-08-13 16:33:55] [frontend] Modeli usklajeni sa backend semom
+On branch main
+Your branch is ahead of 'origin/main' by 8 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   backend/package-lock.json
+	deleted:    backend/prisma/migrations/20260801081923_agro_baza/migration.sql
+	deleted:    backend/prisma/migrations/20260809134310_nova_migracija/migration.sql
+	deleted:    backend/prisma/migrations/20260810091803_dashboard_izmene/migration.sql
+	modified:   backend/src/biljka/biljka.controller.ts
+	modified:   frontend/src/app/features/biljke/biljke-api.service.ts
+	modified:   frontend/src/app/features/biljke/store/biljke.actions.ts
+	modified:   frontend/src/app/features/biljke/store/biljke.effects.ts
+	modified:   frontend/src/app/features/biljke/store/biljke.reducer.ts
+	modified:   frontend/src/app/features/biljke/store/biljke.selectors.ts
+	modified:   frontend/src/app/features/parcele/parcele-api.service.ts
+	modified:   frontend/src/app/features/profil/profil-layout/profil-layout.component.html
+	modified:   frontend/src/app/shared/components/potvrda-modal/potvrda-modal.component.html
+	modified:   frontend/src/app/shared/components/potvrda-modal/potvrda-modal.component.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	backend/prisma/migrations/20260813085709_/
+	backend/src/biljka/dto/akcija-biljke.dto.ts
+	backend/src/biljka/dto/izvrsi-akciju.dto.ts
+	backend/src/biljka/periodi.util.ts
+	commits.sh
+	frontend/src/app/features/biljke/periodi.util.ts
+	frontend/src/app/features/preparat/
+	frontend/src/app/features/tretman/
+	komit_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

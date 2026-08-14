@@ -70,9 +70,9 @@
       </ul>
     </article>
 
-    <!-- Kružni prikazi ukupnog prinosa ove godine -->
+    <!-- Kružni prikazi zasejane površine ove godine (po kategoriji biljaka) -->
     <article class="karta karta-prinosi">
-      <h3>Ukupan prinos ove godine</h3>
+      <h3>Zasejana površina ove godine</h3>
       <div class="prinosi-red">
         @for (k of kategorijePrinosa(); track k.kategorija) {
           <div class="prinos-stavka">
@@ -87,7 +87,7 @@
                 [style.stroke-dasharray]="obimKruga(42)"
                 [style.stroke-dashoffset]="obimKruga(42) * (1 - k.procenat / 100)"
               />
-              <text x="50" y="55" text-anchor="middle" class="prinos-tekst">{{ k.vrednost }}</text>
+              <text x="50" y="55" text-anchor="middle" class="prinos-tekst">{{ k.vrednost }}a</text>
             </svg>
             <span class="prinos-naziv">{{ k.naziv }}</span>
           </div>

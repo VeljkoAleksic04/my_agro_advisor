@@ -27,6 +27,24 @@ export class BiljkeEffects {
     ),
   );
 
+  ucitajSveBiljke$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(BiljkeActions.ucitajSveBiljke),
+      switchMap(() =>
+        this.api.ucitajSve().pipe(
+          map((biljke) => BiljkeActions.ucitajSveBiljkeUspesno({ biljke })),
+          catchError((greska) =>
+            of(
+              BiljkeActions.ucitajSveBiljkeNeuspesno({
+                greska: greska?.error?.message ?? 'Greška pri učitavanju biljaka',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
   dodajBiljku$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BiljkeActions.dodajBiljku),

@@ -9,6 +9,11 @@ export const BiljkeActions = createActionGroup({
     'Ucitaj Biljke Uspesno': props<{ biljke: Biljka[] }>(),
     'Ucitaj Biljke Neuspesno': props<{ greska: string }>(),
 
+    /** Sve biljke ulogovanog korisnika sa svih parcela - koristi dashboard profila. */
+    'Ucitaj Sve Biljke': emptyProps(),
+    'Ucitaj Sve Biljke Uspesno': props<{ biljke: Biljka[] }>(),
+    'Ucitaj Sve Biljke Neuspesno': props<{ greska: string }>(),
+
     'Dodaj Biljku': props<{ dto: NovaBiljka }>(),
     'Dodaj Biljku Uspesno': props<{ biljka: Biljka }>(),
     'Dodaj Biljku Neuspesno': props<{
