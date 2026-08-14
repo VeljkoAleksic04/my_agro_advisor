@@ -49,6 +49,20 @@ export const biljkeFeature = createFeature({
       greska,
     })),
 
+    on(BiljkeActions.ucitajSveBiljke, (state): BiljkeState => ({
+      ...state,
+      ucitavanje: true,
+      greska: null,
+    })),
+    on(BiljkeActions.ucitajSveBiljkeUspesno, (state, { biljke }): BiljkeState =>
+      biljkeAdapter.setAll(biljke, { ...state, ucitavanje: false, aktivnaParcelaId: null }),
+    ),
+    on(BiljkeActions.ucitajSveBiljkeNeuspesno, (state, { greska }): BiljkeState => ({
+      ...state,
+      ucitavanje: false,
+      greska,
+    })),
+
     on(BiljkeActions.dodajBiljku, (state): BiljkeState => ({
       ...state,
       ucitavanje: true,

@@ -27,6 +27,11 @@ export class BiljkeApiService {
     return this.http.get<Biljka[]>(this.baseUrl, { params: { parcelaId } });
   }
 
+  /** Sve biljke ulogovanog korisnika, sa svih njegovih parcela (za dashboard). */
+  ucitajSve(): Observable<Biljka[]> {
+    return this.http.get<Biljka[]>(this.baseUrl);
+  }
+
   kreiraj(dto: NovaBiljka): Observable<Biljka> {
     return this.http.post<Biljka>(this.baseUrl, dto);
   }

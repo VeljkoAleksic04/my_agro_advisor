@@ -30,8 +30,14 @@ export class BiljkaController {
   }
 
   @Get()
-  findAll(@Query('parcelaId', new ParseIntPipe()) parcelaId: number) {
-    return this.biljkaService.findAllZaParcelu(parcelaId);
+  findAll(
+    @CurrentUser() korisnik: any,
+    @Query('parcelaId', new ParseIntPipe({ optional: true })) parcelaId?: number,
+  ) {
+    if (parcelaId !== undefined) {
+      return this.biljkaService.findAllZaParcelu(parcelaId);
+    }
+    return this.biljkaService.findAllZaKorisnika(korisnik.id);
   }
 
   // Preporuceni period setve/sadnje i berbe za datu vrstu - koristi front-end

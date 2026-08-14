@@ -114,6 +114,17 @@ export class BiljkaService {
     return this.prisma.biljka.findMany({ where: { parcelaId } });
   }
 
+  /**
+   * Sve biljke korisnika, sa svih njegovih parcela - koristi dashboard
+   * profila za prikaz "uzivo" (npr. odmah nakon dodavanja nove biljke,
+   * bez cekanja na evidentiranu berbu/prinos preko modula Sadnja).
+   */
+  findAllZaKorisnika(korisnikId: number) {
+    return this.prisma.biljka.findMany({
+      where: { parcela: { vlasnikId: korisnikId } },
+    });
+  }
+
   async findOne(id: number) {
     const biljka = await this.prisma.biljka.findUnique({ where: { id } });
     if (!biljka) throw new NotFoundException('Biljka ne postoji');

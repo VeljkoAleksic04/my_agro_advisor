@@ -5,8 +5,8 @@ import { Store } from '@ngrx/store';
 import { selectKorisnik } from '../../core/auth/store/auth.reducer';
 import { ParceleActions } from '../parcele/store/parcele.actions';
 import { selectBrojParcela } from '../parcele/store/parcele.selectors';
-import { SadnjaActions } from '../sadnja/store/sadnja.actions';
-import { selectPrinosPoKategoriji } from '../sadnja/store/sadnja.selectors';
+import { BiljkeActions } from '../biljke/store/biljke.actions';
+import { selectPovrsinaPoKategoriji } from '../biljke/store/biljke.selectors';
 import { KategorijaBiljke, NAZIVI_KATEGORIJA } from '../../core/models/domain.models';
 
 interface DemoDogadjajSetve {
@@ -40,13 +40,17 @@ export class DashboardComponent implements OnInit {
 
   protected readonly korisnik = toSignal(this.store.select(selectKorisnik), { initialValue: null });
   protected readonly brojParcela = toSignal(this.store.select(selectBrojParcela), { initialValue: 0 });
-  private readonly prinosPoKategoriji = toSignal(this.store.select(selectPrinosPoKategoriji), {
+  private readonly povrsinaPoKategoriji = toSignal(this.store.select(selectPovrsinaPoKategoriji), {
     initialValue: { ZITARICE: 0, POVRCE: 0, VOCE: 0 } as Record<KategorijaBiljke, number>,
   });
 
-  /** Kružni prikazi prinosa: procenat = učešće kategorije u ukupnom prinosu ove godine. */
+  /**
+   * Kružni prikazi po kategoriji: procenat = učešće kategorije u ukupnoj
+   * zasejanoj površini ove godine. Računa se direktno iz biljaka (ne iz
+   * evidentiranog prinosa), pa se nova biljka odmah odražava na dashboard-u.
+   */
   protected readonly kategorijePrinosa = computed<KategorijaPrikaz[]>(() => {
-    const zbirovi = this.prinosPoKategoriji();
+    const zbirovi = this.povrsinaPoKategoriji();
     const ukupno = zbirovi.ZITARICE + zbirovi.POVRCE + zbirovi.VOCE;
     return (Object.values(KategorijaBiljke) as KategorijaBiljke[]).map((kategorija) => {
       const vrednost = zbirovi[kategorija];
@@ -79,7 +83,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(ParceleActions.ucitajParcele());
-    this.store.dispatch(SadnjaActions.ucitajSadnje());
+    this.store.dispatch(BiljkeActions.ucitajSveBiljke());
   }
 
   dogadjajZaDan(dan: number): DemoDogadjajSetve | undefined {

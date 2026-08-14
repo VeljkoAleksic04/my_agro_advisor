@@ -11,6 +11,12 @@
         <dd>{{ nazivVrste[biljka.vrsta] }}</dd>
         <dt>Površina</dt>
         <dd>{{ biljka.povrsina }} a</dd>
+        <dt>Poslednji tretman</dt>
+        <dd>{{ biljka.poslednjiTretman ? (biljka.poslednjiTretman | date: 'dd.MM.yyyy. HH:mm') : 'Nije evidentirano' }}</dd>
+        <dt>Poslednje navodnjavanje</dt>
+        <dd>{{ biljka.poslednjeZalivanje ? (biljka.poslednjeZalivanje | date: 'dd.MM.yyyy. HH:mm') : 'Nije evidentirano' }}</dd>
+        <dt>Poslednja berba</dt>
+        <dd>{{ biljka.poslednjaBerba ? (biljka.poslednjaBerba | date: 'dd.MM.yyyy. HH:mm') : 'Nije evidentirano' }}</dd>
       </dl>
 
       <div class="akcije-biljke">
