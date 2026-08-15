@@ -1,0 +1,150 @@
+<section class="stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Istorija Sadnje po Parcelama</h1>
+      <p class="podnaslov">Pregled prinosa, tretmana i kultura</p>
+    </div>
+  </header>
+
+  <div class="karta traka-filtera">
+    <label for="izbor-godine">Izaberi godinu:</label>
+    <select id="izbor-godine" [(ngModel)]="izabranaGodina">
+      @for (godina of dostupneGodine(); track godina) {
+        <option [value]="godina">{{ godina }}</option>
+      }
+    </select>
+    <button type="button" class="dugme dugme-primarni" (click)="ucitaj()">Filtriraj</button>
+  </div>
+
+  @if (greska()) {
+    <p class="poruka-greske">{{ greska() }}</p>
+  }
+
+  @if (ucitavanje()) {
+    <p class="stanje-ucitavanja">Učitavanje istorije...</p>
+  } @else if (parcele().length === 0) {
+    <p class="stanje-prazno">Nema podataka o parcelama za prikaz.</p>
+  } @else {
+    <div class="lista-parcela">
+      @for (parcela of parcele(); track parcela.id) {
+        <div class="karta parcela-panel">
+          <button type="button" class="parcela-panel-header" (click)="preklopiParcelu(parcela.id)">
+            <h3>{{ parcela.naziv }}</h3>
+            <span class="strelica" [class.otvorena]="jeOtvorena(parcela.id)">&#9662;</span>
+          </button>
+
+          @if (jeOtvorena(parcela.id)) {
+            <div class="parcela-panel-telo">
+              <div class="statistike-red">
+                <div class="stat">
+                  <span class="stat-oznaka">Parcela ID</span>
+                  <span class="stat-vrednost">P-{{ parcela.id.toString().padStart(3, '0') }} ({{ parcela.povrsina }} {{ parcela.jedinicaMere }})</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-oznaka">Godina</span>
+                  <span class="stat-vrednost">{{ izabranaGodina() }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-oznaka">Kultura</span>
+                  <span class="stat-vrednost">{{ parcela.kultura?.naziv ?? 'Nema zasejane kulture' }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-oznaka">Prinos (Ukupno)</span>
+                  <span class="stat-vrednost">{{ prinosText(parcela) }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-oznaka">Prinos (po ha)</span>
+                  <span class="stat-vrednost">{{ prinosPoHaText(parcela) }}</span>
+                </div>
+              </div>
+
+              <div class="tabovi">
+                <button
+                  type="button"
+                  class="tab-dugme"
+                  [class.aktivan]="aktivniTab(parcela.id) === 'prinos'"
+                  (click)="postaviTab(parcela.id, 'prinos')"
+                >
+                  Prinos po Godinama
+                </button>
+                <button
+                  type="button"
+                  class="tab-dugme"
+                  [class.aktivan]="aktivniTab(parcela.id) === 'tretmani'"
+                  (click)="postaviTab(parcela.id, 'tretmani')"
+                >
+                  Evidencija Tretmana ({{ izabranaGodina() }})
+                </button>
+              </div>
+
+              @if (aktivniTab(parcela.id) === 'tretmani') {
+                @if (parcela.aktivnosti.length === 0) {
+                  <p class="stanje-prazno">Nema evidentiranih tretmana za izabranu godinu.</p>
+                } @else {
+                  <table class="tabela-aktivnosti">
+                    <thead>
+                      <tr>
+                        <th>Datum</th>
+                        <th>Tip Tretmana</th>
+                        <th>Sredstvo / Količina</th>
+                        <th>Status</th>
+                        <th>Detalji</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (stavka of parcela.aktivnosti; track stavka.id) {
+                        <tr>
+                          <td>{{ stavka.datum | date: 'dd.MM.yyyy' }}</td>
+                          <td>{{ stavka.tip }}</td>
+                          <td>{{ stavka.sredstvo }}</td>
+                          <td><span class="znacka znacka-uspeh">{{ stavka.status }}</span></td>
+                          <td>
+                            <button type="button" class="dugme-detalji" (click)="prikaziDetalje(parcela.id, stavka)" title="Prikaži detalje">
+                              &#128196;
+                            </button>
+                          </td>
+                        </tr>
+                        @if (jeStavkaOtvorena(parcela.id, stavka.id)) {
+                          <tr class="red-detalja">
+                            <td colspan="5">
+                              <div class="detalji-tretmana">
+                                <h4>Detalji Tretmana {{ stavka.tip }} - {{ parcela.naziv }}</h4>
+                                <dl>
+                                  <dt>Tip Sredstva</dt>
+                                  <dd>{{ stavka.detalji.tipSredstva }}</dd>
+                                  <dt>Sredstvo</dt>
+                                  <dd>{{ stavka.detalji.sredstvo }}</dd>
+                                  <dt>Količina</dt>
+                                  <dd>{{ stavka.detalji.kolicina }}</dd>
+                                  <dt>Metod</dt>
+                                  <dd>{{ stavka.detalji.metod }}</dd>
+                                  <dt>Potvrdio</dt>
+                                  <dd>{{ stavka.detalji.potvrdio }}</dd>
+                                </dl>
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      }
+                    </tbody>
+                  </table>
+                }
+              } @else {
+                <div class="prinos-po-godinama">
+                  <div class="stat">
+                    <span class="stat-oznaka">Ukupan prinos u {{ izabranaGodina() }}.</span>
+                    <span class="stat-vrednost stat-vrednost-veliko">{{ prinosText(parcela) }}</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-oznaka">Prinos po hektaru</span>
+                    <span class="stat-vrednost stat-vrednost-veliko">{{ prinosPoHaText(parcela) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

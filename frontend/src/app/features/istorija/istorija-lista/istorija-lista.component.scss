@@ -1,0 +1,180 @@
+.traka-filtera {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  label {
+    color: var(--boja-tekst-suptilan);
+    font-size: 0.9rem;
+  }
+
+  select {
+    padding: 0.45rem 0.75rem;
+    border-radius: var(--radijus);
+    border: 1px solid var(--boja-ivica);
+    background: var(--boja-povrsina);
+    color: var(--boja-tekst);
+  }
+}
+
+.lista-parcela {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.parcela-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.parcela-panel-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1rem 1.25rem;
+  color: var(--boja-tekst);
+
+  h3 {
+    margin: 0;
+  }
+
+  .strelica {
+    transition: transform 0.15s ease;
+    color: var(--boja-tekst-suptilan);
+
+    &.otvorena {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.parcela-panel-telo {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--boja-ivica);
+}
+
+.statistike-red {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 8rem;
+}
+
+.stat-oznaka {
+  font-size: 0.8rem;
+  color: var(--boja-tekst-suptilan);
+}
+
+.stat-vrednost {
+  font-weight: 600;
+}
+
+.stat-vrednost-veliko {
+  font-size: 1.4rem;
+  color: var(--boja-primarna);
+}
+
+.tabovi {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--boja-ivica);
+  margin-bottom: 1rem;
+}
+
+.tab-dugme {
+  background: none;
+  border: none;
+  padding: 0.6rem 0.25rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  color: var(--boja-tekst-suptilan);
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+
+  &.aktivan {
+    color: var(--boja-primarna);
+    border-bottom-color: var(--boja-primarna);
+  }
+}
+
+.tabela-aktivnosti {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid var(--boja-ivica);
+    font-size: 0.9rem;
+  }
+
+  th {
+    color: var(--boja-tekst-suptilan);
+    font-weight: 500;
+  }
+}
+
+.znacka-uspeh {
+  background: var(--boja-primarna-blaga);
+  color: var(--boja-primarna);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.dugme-detalji {
+  background: none;
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+}
+
+.red-detalja td {
+  padding: 0;
+  border-bottom: 1px solid var(--boja-ivica);
+}
+
+.detalji-tretmana {
+  background: var(--boja-povrsina-hover);
+  padding: 1rem 1.25rem;
+
+  h4 {
+    margin: 0 0 0.6rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 1rem;
+    margin: 0;
+  }
+
+  dt {
+    color: var(--boja-tekst-suptilan);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.prinos-po-godinama {
+  display: flex;
+  gap: 2.5rem;
+  padding: 0.5rem 0 1rem;
+}
