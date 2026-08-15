@@ -11,6 +11,7 @@ import { SadnjaModule } from './sadnja/sadnja.module';
 import { NavodnjavanjeModule } from './navodnjavanje/navodnjavanje.module';
 import { TemaForumaModule } from './tema-foruma/tema-foruma.module';
 import { PorukaForumaModule } from './poruka-foruma/poruka-foruma.module';
+import { IstorijaModule } from './istorija/istorija.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PorukaForumaModule } from './poruka-foruma/poruka-foruma.module';
     NavodnjavanjeModule,
     TemaForumaModule,
     PorukaForumaModule,
+    IstorijaModule,
   ],
 })
 export class AppModule {}
