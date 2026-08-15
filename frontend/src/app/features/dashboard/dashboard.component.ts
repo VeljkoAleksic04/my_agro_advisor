@@ -18,8 +18,21 @@ interface KategorijaPrikaz {
   kategorija: KategorijaBiljke;
   naziv: string;
   vrednost: number;
+  /** Tekst za prikaz u krugu: preko 100 ari se prikazuje u hektarima (2 decimale). */
+  prikazVrednosti: string;
   procenat: number;
   boja: string;
+}
+
+/** 1 hektar = 100 ari. Preko 100 ari prikaz prelazi na hektare, zaokruženo na 2 decimale. */
+const ARI_PO_HEKTARU = 100;
+
+function formatirajPovrsinu(vrednostUArima: number): string {
+  if (vrednostUArima > ARI_PO_HEKTARU) {
+    const hektari = vrednostUArima / ARI_PO_HEKTARU;
+    return `${hektari.toFixed(2)} ha`;
+  }
+  return `${vrednostUArima} a`;
 }
 
 const BOJE_KATEGORIJA: Record<KategorijaBiljke, string> = {
@@ -58,6 +71,7 @@ export class DashboardComponent implements OnInit {
         kategorija,
         naziv: NAZIVI_KATEGORIJA[kategorija],
         vrednost,
+        prikazVrednosti: formatirajPovrsinu(vrednost),
         procenat: ukupno > 0 ? Math.round((vrednost / ukupno) * 100) : 0,
         boja: BOJE_KATEGORIJA[kategorija],
       };

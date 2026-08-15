@@ -45,5 +45,7 @@ export const BiljkeActions = createActionGroup({
     'Azuriraj Status': props<{ id: number; status: StatusBiljke }>(),
 
     'Ocisti Biljke': emptyProps(),
+    /** Cisti `poslednjaProvera` (npr. pri otvaranju druge biljke u modalu). */
+    'Ocisti Proveru': emptyProps(),
   },
 });

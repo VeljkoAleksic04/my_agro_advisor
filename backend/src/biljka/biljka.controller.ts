@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -32,9 +33,13 @@ export class BiljkaController {
   @Get()
   findAll(
     @CurrentUser() korisnik: any,
-    @Query('parcelaId', new ParseIntPipe({ optional: true })) parcelaId?: number,
+    @Query('parcelaId') parcelaIdRaw?: string,
   ) {
-    if (parcelaId !== undefined) {
+    if (parcelaIdRaw !== undefined) {
+      const parcelaId = parseInt(parcelaIdRaw, 10);
+      if (isNaN(parcelaId)) {
+        throw new BadRequestException('parcelaId mora biti broj');
+      }
       return this.biljkaService.findAllZaParcelu(parcelaId);
     }
     return this.biljkaService.findAllZaKorisnika(korisnik.id);
