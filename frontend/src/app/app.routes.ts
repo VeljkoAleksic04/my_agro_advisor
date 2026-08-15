@@ -49,7 +49,9 @@ export const routes: Routes = [
         path: 'istorija',
         data: { naslov: 'History' },
         loadComponent: () =>
-          import('./features/profil/placeholder/placeholder.component').then((m) => m.PlaceholderComponent),
+          import('./features/istorija/istorija-lista/istorija-lista.component').then(
+            (m) => m.IstorijaListaComponent,
+          ),
       },
       {
         path: 'statistika',
