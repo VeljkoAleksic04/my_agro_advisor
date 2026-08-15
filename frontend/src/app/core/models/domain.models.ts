@@ -241,3 +241,42 @@ export interface Tretman {
   doza: string;
   datumTretmana: string;
 }
+
+/** Tip aktivnosti u istoriji parcele — objedinjuje tretmane i navodnjavanja. */
+export type TipAktivnosti = 'Đubrenje' | 'Prskanje' | 'Navodnjavanje';
+
+export type StatusAktivnosti = 'Zakazano' | 'Završeno';
+
+export interface DetaljiAktivnosti {
+  tipSredstva: string;
+  sredstvo: string;
+  kolicina: string;
+  metod: string;
+  potvrdio: string;
+}
+
+/** Jedan red u tabeli "Evidencija tretmana" na ekranu Istorija. */
+export interface StavkaAktivnosti {
+  id: string;
+  datum: string;
+  tip: TipAktivnosti;
+  sredstvo: string;
+  kolicina: string;
+  status: StatusAktivnosti;
+  detalji: DetaljiAktivnosti;
+}
+
+/** Istorija sadnje i tretmana za jednu parcelu — vraća je GET /istorija. */
+export interface IstorijaParcele {
+  id: number;
+  naziv: string;
+  povrsina: number;
+  jedinicaMere: JedinicaPovrsine;
+  godina: number | null;
+  godineSaZapisima: number[];
+  kultura: { naziv: string; vrsta: VrstaBiljke } | null;
+  prinosUkupno: number;
+  prinosPoHa: number;
+  jedinicaPrinosa: Tezina;
+  aktivnosti: StavkaAktivnosti[];
+}
