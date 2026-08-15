@@ -70,7 +70,8 @@
           <div class="mreza-mini-kartica">
             @for (biljka of biljke(); track biljka.id) {
               <article class="mini-karta" (click)="otvoriBiljku(biljka)">
-                <h4>{{ biljka.naziv }}</h4>
+                <h4>{{ biljka.vrsta }}</h4>
+                <p style="color:#6b7280">{{ biljka.naziv }}</p>
                 <p class="opis-tekst">{{ biljka.povrsina }} </p>
               </article>
             }

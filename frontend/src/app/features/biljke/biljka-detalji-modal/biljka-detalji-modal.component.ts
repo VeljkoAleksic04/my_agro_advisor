@@ -65,6 +65,10 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
     if (changes['biljka']) {
       this.panel = null;
       this.greskaTretmana = null;
+      // Ocisti staru "van perioda" proveru kad se otvori DRUGA biljka, da
+      // eventualna poruka/dugme "Forsiraj berbu" sa prethodno otvorene
+      // biljke ne ostane (i pogresno) vidljivo za novu.
+      this.store.dispatch(BiljkeActions.ocistiProveru());
     }
   }
 
