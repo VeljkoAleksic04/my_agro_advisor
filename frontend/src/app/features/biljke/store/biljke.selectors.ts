@@ -37,7 +37,10 @@ export const selectPovrsinaPoKategoriji = createSelector(selectSveBiljkeGlobalno
   };
 
   for (const biljka of biljke) {
-    if (biljka.status === StatusBiljke.PROPALA) continue;
+    // Obrana ili propala biljka vise ne zauzima povrsinu - nakon berbe/propadanja
+    // treba da "nestane" iz ovog zbira (backend je vec iskljucuje iz aktivne liste,
+    // ali filtriramo i ovde radi bezbednosti ako se ikad koristi ukljuciZavrsene=true).
+    if (biljka.status === StatusBiljke.PROPALA || biljka.status === StatusBiljke.OBRANA) continue;
     if (new Date(biljka.datumSadnje).getFullYear() !== tekucaGodina) continue;
 
     const kategorija = KATEGORIJA_VRSTA_BILJAKA[biljka.vrsta];
