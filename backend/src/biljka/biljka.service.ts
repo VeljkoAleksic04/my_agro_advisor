@@ -4,11 +4,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { JedinicaPovrsine, Prisma, StatusBiljke, VrstaBiljke } from '@prisma/client';import { PrismaService } from '../prisma/prisma.service';
+import { JedinicaPovrsine, Prisma, StatusBiljke, StatusZasadjeneKulture, VrstaBiljke } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateBiljkaDto } from './dto/create-biljka.dto';
 import { UpdateBiljkaDto } from './dto/update-biljka.dto';
 import { BiljkaAkcijaTip, IzvrsiAkcijuDto } from './dto/izvrsi-akciju.dto';
 import { jeMesecUPeriodu, preporukaZaVrstu } from './periodi.util';
+
+/** Biljka u ovim statusima se smatra "zavrsenom" - vise ne zauzima povrsinu
+ *  na parceli i ne prikazuje se kao aktivna kultura (berba/propadanje su
+ *  konacni ishodi ciklusa gajenja). */
+const ZAVRSENI_STATUSI: StatusBiljke[] = [StatusBiljke.OBRANA, StatusBiljke.PROPALA];
 
 @Injectable()
 export class BiljkaService {
@@ -69,11 +75,15 @@ export class BiljkaService {
     });
     if (!parcela) throw new NotFoundException('Parcela ne postoji');
 
-    const zauzeto = parcela.jedinicaMere === JedinicaPovrsine.HA ? 
-      parcela.biljke.filter((b) => b.id !== izuzmiBiljkuId)
-      .reduce((zbir, b) => zbir + b.povrsina*100, 0) : 
-      parcela.biljke.filter((b) => b.id !== izuzmiBiljkuId)
-      .reduce((zbir, b) => zbir + b.povrsina, 0);
+    // Obrane/propale biljke vise ne racunaju u zauzetu povrsinu - parcela
+    // (ili deo nje) postaje ponovo slobodna za novu setvu nakon berbe.
+    const aktivneBiljke = parcela.biljke.filter(
+      (b) => b.id !== izuzmiBiljkuId && !ZAVRSENI_STATUSI.includes(b.status),
+    );
+
+    const zauzeto = parcela.jedinicaMere === JedinicaPovrsine.HA ?
+      aktivneBiljke.reduce((zbir, b) => zbir + b.povrsina*100, 0) :
+      aktivneBiljke.reduce((zbir, b) => zbir + b.povrsina, 0);
       
     const slobodno = parcela.jedinicaMere === JedinicaPovrsine.HA ? 
       parcela.povrsina*100 - zauzeto : parcela.povrsina - zauzeto;
@@ -90,6 +100,17 @@ export class BiljkaService {
   async create(korisnikId: number, dto: CreateBiljkaDto) {
     await this.proveriVlasnistvoParcele(dto.parcelaId, korisnikId);
     await this.proveriSlobodnuPovrsinu(dto.parcelaId, dto.povrsina);
+
+    // Jedinstvenost (parcelaId, vrsta) se proverava samo medju AKTIVNIM
+    // biljkama - vec obrana/propala biljka iste vrste ne sprecava ponovnu
+    // setvu (baza vise nema DB-level unique za ovu kombinaciju, videti
+    // migraciju 20260815120000_dozvoli_ponovnu_setvu_iste_vrste).
+    const postojecaAktivna = await this.prisma.biljka.findFirst({
+      where: { parcelaId: dto.parcelaId, vrsta: dto.vrsta, status: { notIn: ZAVRSENI_STATUSI } },
+    });
+    if (postojecaAktivna) {
+      throw new ConflictException('Ta vrsta biljke je vec zasadjena na ovoj parceli');
+    }
 
     const periodi = this.izracunajPeriode(dto.vrsta);
 
@@ -114,18 +135,31 @@ export class BiljkaService {
     }
   }
 
-  findAllZaParcelu(parcelaId: number) {
-    return this.prisma.biljka.findMany({ where: { parcelaId } });
+  /**
+   * Biljke na parceli. Podrazumevano vraca samo AKTIVNE (obrana/propala
+   * biljka "nestaje" sa parcele nakon berbe - njeni podaci ostaju
+   * sacuvani u istoriji preko modula Sadnja/Istorija, a parcela postaje
+   * ponovo slobodna za novu setvu). Prosledi `ukljuciZavrsene=true` da
+   * dobijes i njih (npr. za buduci pregled istorije direktno po biljci).
+   */
+  findAllZaParcelu(parcelaId: number, ukljuciZavrsene = false) {
+    return this.prisma.biljka.findMany({
+      where: { parcelaId, ...(ukljuciZavrsene ? {} : { status: { notIn: ZAVRSENI_STATUSI } }) },
+    });
   }
 
   /**
    * Sve biljke korisnika, sa svih njegovih parcela - koristi dashboard
    * profila za prikaz "uzivo" (npr. odmah nakon dodavanja nove biljke,
    * bez cekanja na evidentiranu berbu/prinos preko modula Sadnja).
+   * Podrazumevano samo AKTIVNE, iz istog razloga kao findAllZaParcelu.
    */
-  findAllZaKorisnika(korisnikId: number) {
+  findAllZaKorisnika(korisnikId: number, ukljuciZavrsene = false) {
     return this.prisma.biljka.findMany({
-      where: { parcela: { vlasnikId: korisnikId } },
+      where: {
+        parcela: { vlasnikId: korisnikId },
+        ...(ukljuciZavrsene ? {} : { status: { notIn: ZAVRSENI_STATUSI } }),
+      },
     });
   }
 
@@ -207,10 +241,7 @@ export class BiljkaService {
         });
       }
 
-      return this.prisma.biljka.update({
-        where: { id: biljka.id },
-        data: { status: StatusBiljke.OBRANA, poslednjaBerba: sada },
-      });
+      return this.zavrsiBerbu(biljka, korisnikId, sada);
     }
 
     if (dto.akcija === 'ZALIJ') {
@@ -230,6 +261,70 @@ export class BiljkaService {
         poslednjiTretman: sada,
         status: biljka.status === StatusBiljke.POSADJENA ? StatusBiljke.RASTE : biljka.status,
       },
+    });
+  }
+
+  /**
+   * Zavrsava ciklus gajenja biljke pri berbi (akcija OBERI):
+   *  1. Biljku oznacava kao OBRANU (i dalje ostaje u bazi radi istorije,
+   *     ali je od sada iskljucena iz "aktivnih" upita - vidi ZAVRSENI_STATUSI
+   *     u findAllZaParcelu/findAllZaKorisnika/proveriSlobodnuPovrsinu - pa
+   *     "nestaje" sa parcele i oslobadja povrsinu za novu setvu).
+   *  2. Prenosi podatak o prinosu u modul Sadnja (koji hrani ekran Istorija):
+   *     ako vec postoji Sadnja vezana za ovu biljku bez upisanog prinosa,
+   *     zatvara je (status OBRANA, prinos = zasadjena kolicina ako prinos
+   *     jos nije rucno unet); ako ne postoji nijedna, kreira novu Sadnja
+   *     zapis sa datumom berbe, tako da se prinos odmah pojavi u istoriji
+   *     parcele za tekucu godinu.
+   * Sve se radi u jednoj transakciji da ne bi doslo do nekonzistentnog stanja.
+   */
+  private zavrsiBerbu(
+    biljka: { id: number; parcelaId: number; povrsina: number },
+    korisnikId: number,
+    sada: Date,
+  ) {
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const azuriranaBiljka = await tx.biljka.update({
+        where: { id: biljka.id },
+        data: { status: StatusBiljke.OBRANA, poslednjaBerba: sada },
+      });
+
+      const nezavrseneSadnje = await tx.sadnja.findMany({
+        where: {
+          biljkaId: biljka.id,
+          status: { notIn: [StatusZasadjeneKulture.OBRANA, StatusZasadjeneKulture.PROPALA] },
+        },
+      });
+
+      if (nezavrseneSadnje.length > 0) {
+        for (const sadnja of nezavrseneSadnje) {
+          await tx.sadnja.update({
+            where: { id: sadnja.id },
+            data: {
+              status: StatusZasadjeneKulture.OBRANA,
+              ocekivaniDatumBerbe: sadnja.ocekivaniDatumBerbe ?? sada,
+              // Ako prinos jos nije rucno unet (npr. preko ekrana Sadnja),
+              // koristimo zasadjenu kolicinu kao razumnu pocetnu vrednost
+              // umesto da istorija ostane prazna (0) nakon berbe.
+              prinos: sadnja.prinos > 0 ? sadnja.prinos : sadnja.kolicinaPosadjeneKulture,
+            },
+          });
+        }
+      } else {
+        await tx.sadnja.create({
+          data: {
+            farmerId: korisnikId,
+            parcelaId: biljka.parcelaId,
+            biljkaId: biljka.id,
+            kolicinaPosadjeneKulture: biljka.povrsina,
+            prinos: biljka.povrsina,
+            ocekivaniDatumBerbe: sada,
+            status: StatusZasadjeneKulture.OBRANA,
+          },
+        });
+      }
+
+      return azuriranaBiljka;
     });
   }
 
