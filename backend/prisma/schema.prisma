@@ -1,6 +1,6 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL")
 }
 
 generator client {
@@ -175,7 +175,10 @@ model Biljka {
   sadnje                     Sadnja[]
   tretmani                   Tretman[]
 
-  @@unique([parcelaId, vrsta])
+  // NAPOMENA: ranije je ovde postojao @@unique([parcelaId, vrsta]) koji je
+  // sprecavao ponovnu setvu iste vrste na parceli i nakon berbe (jer obrana
+  // biljka ostaje u bazi radi istorije). Jedinstvenost se sada proverava u
+  // BiljkaService.create() samo medju AKTIVNIM biljkama (status != OBRANA/PROPALA).
   @@map("biljke")
 }
 
@@ -231,8 +234,15 @@ model Sadnja {
   datum                    DateTime @default(now())
   parcelaId                Int
   parcela                  Parcela  @relation(fields: [parcelaId], references: [id], onDelete: Cascade)
-  biljkaId                 Int
-  biljka                   Biljka   @relation(fields: [biljkaId], references: [id], onDelete: Restrict)
+  // biljkaId je NAMERNO opciono (nullable): nakon berbe se Biljka trajno
+  // brise (stvarno se uklanja veza sa parcelom, ne samo sakriva u UI-ju),
+  // pa ovde ostaje null. naziv/vrsta kulture se zato "snapshot"-uju u
+  // nazivKulture/vrstaKulture u trenutku sadnje, da istorija/statistika i
+  // dalje mogu da prikazu kulturu i nakon sto biljka vise ne postoji.
+  biljkaId                 Int?
+  biljka                   Biljka?  @relation(fields: [biljkaId], references: [id], onDelete: SetNull)
+  nazivKulture             String
+  vrstaKulture             VrstaBiljke
   kolicinaPosadjeneKulture Int
   ocekivaniDatumBerbe      DateTime?
   prinos                   Int      @default(0)
