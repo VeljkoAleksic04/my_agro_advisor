@@ -17,10 +17,19 @@ export class SadnjaService {
 
   async create(korisnikId: number, dto: CreateSadnjaDto) {
     await this.proveriVlasnistvo(dto.parcelaId, korisnikId);
+
+    // Naziv i vrsta kulture se "snapshot"-uju u trenutku sadnje - Sadnja
+    // ostaje citljiva (npr. na ekranu Istorija/Statistics) i nakon sto
+    // biljka bude obrisana pri berbi (videti BiljkaService.zavrsiBerbu).
+    const biljka = await this.prisma.biljka.findUnique({ where: { id: dto.biljkaId } });
+    if (!biljka) throw new NotFoundException('Biljka ne postoji');
+
     return this.prisma.sadnja.create({
       data: {
         ...dto,
         farmerId: korisnikId,
+        nazivKulture: biljka.naziv,
+        vrstaKulture: biljka.vrsta,
         ocekivaniDatumBerbe: dto.ocekivaniDatumBerbe ? new Date(dto.ocekivaniDatumBerbe) : undefined,
       },
     });
