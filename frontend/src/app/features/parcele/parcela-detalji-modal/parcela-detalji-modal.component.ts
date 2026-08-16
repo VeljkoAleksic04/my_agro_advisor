@@ -66,6 +66,16 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
       }
       this.prethodniBrojBiljaka = trenutniBroj;
     });
+
+    // Ako se otvorena biljka izbrise iz liste (npr. berba je upravo
+    // zavrsila ciklus gajenja pa je biljka uklonjena iz store-a), zatvori
+    // njen modal sa detaljima umesto da ostane da prikazuje zastarelo stanje.
+    effect(() => {
+      const lista = this.biljke();
+      if (this.biljkaZaModal && !lista.some((b) => b.id === this.biljkaZaModal!.id)) {
+        this.biljkaZaModal = null;
+      }
+    });
   }
 
   protected get djubriva() {
