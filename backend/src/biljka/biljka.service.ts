@@ -266,29 +266,25 @@ export class BiljkaService {
 
   /**
    * Zavrsava ciklus gajenja biljke pri berbi (akcija OBERI):
-   *  1. Biljku oznacava kao OBRANU (i dalje ostaje u bazi radi istorije,
-   *     ali je od sada iskljucena iz "aktivnih" upita - vidi ZAVRSENI_STATUSI
-   *     u findAllZaParcelu/findAllZaKorisnika/proveriSlobodnuPovrsinu - pa
-   *     "nestaje" sa parcele i oslobadja povrsinu za novu setvu).
-   *  2. Prenosi podatak o prinosu u modul Sadnja (koji hrani ekran Istorija):
-   *     ako vec postoji Sadnja vezana za ovu biljku bez upisanog prinosa,
-   *     zatvara je (status OBRANA, prinos = zasadjena kolicina ako prinos
-   *     jos nije rucno unet); ako ne postoji nijedna, kreira novu Sadnja
-   *     zapis sa datumom berbe, tako da se prinos odmah pojavi u istoriji
-   *     parcele za tekucu godinu.
+   *  1. Prenosi podatak o prinosu u modul Sadnja (koji hrani ekrane Istorija
+   *     i Statistics): ako vec postoji Sadnja vezana za ovu biljku bez
+   *     upisanog prinosa, zatvara je (status OBRANA, prinos = zasadjena
+   *     kolicina ako prinos jos nije rucno unet); ako ne postoji nijedna,
+   *     kreira novu. Naziv/vrsta kulture se snapshot-uju na Sadnja zapisu
+   *     (nazivKulture/vrstaKulture) JER SE BILJKA U SLEDECEM KORAKU BRISE.
+   *  2. TRAJNO brise Biljku - ovo je stvarno brisanje veze biljka<->parcela
+   *     (ne samo filtriranje iz upita), pa parcela odmah postaje slobodna
+   *     za novu setvu iste ili druge vrste. Tretman.biljkaId i
+   *     Sadnja.biljkaId su ON DELETE SET NULL, pa istorija tretmana i
+   *     sadnje ostaju netaknute - samo vise ne pokazuju na (obrisanu) biljku.
    * Sve se radi u jednoj transakciji da ne bi doslo do nekonzistentnog stanja.
    */
   private zavrsiBerbu(
-    biljka: { id: number; parcelaId: number; povrsina: number },
+    biljka: { id: number; parcelaId: number; naziv: string; vrsta: VrstaBiljke; povrsina: number },
     korisnikId: number,
     sada: Date,
   ) {
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const azuriranaBiljka = await tx.biljka.update({
-        where: { id: biljka.id },
-        data: { status: StatusBiljke.OBRANA, poslednjaBerba: sada },
-      });
-
       const nezavrseneSadnje = await tx.sadnja.findMany({
         where: {
           biljkaId: biljka.id,
@@ -303,6 +299,8 @@ export class BiljkaService {
             data: {
               status: StatusZasadjeneKulture.OBRANA,
               ocekivaniDatumBerbe: sadnja.ocekivaniDatumBerbe ?? sada,
+              nazivKulture: biljka.naziv,
+              vrstaKulture: biljka.vrsta,
               // Ako prinos jos nije rucno unet (npr. preko ekrana Sadnja),
               // koristimo zasadjenu kolicinu kao razumnu pocetnu vrednost
               // umesto da istorija ostane prazna (0) nakon berbe.
@@ -316,6 +314,8 @@ export class BiljkaService {
             farmerId: korisnikId,
             parcelaId: biljka.parcelaId,
             biljkaId: biljka.id,
+            nazivKulture: biljka.naziv,
+            vrstaKulture: biljka.vrsta,
             kolicinaPosadjeneKulture: biljka.povrsina,
             prinos: biljka.povrsina,
             ocekivaniDatumBerbe: sada,
@@ -324,7 +324,13 @@ export class BiljkaService {
         });
       }
 
-      return azuriranaBiljka;
+      await tx.biljka.delete({ where: { id: biljka.id } });
+
+      // Biljka je obrisana iz baze - vracamo "logicki" prikaz stanja (isti
+      // oblik kao Biljka zapis) da front-end (koji ocekuje azuriranu biljku
+      // sa statusom OBRANA da bi je uklonio iz svoje liste) i dalje radi
+      // bez izmena, iako fizicki red vise ne postoji.
+      return { ...biljka, status: StatusBiljke.OBRANA, poslednjaBerba: sada };
     });
   }
 
