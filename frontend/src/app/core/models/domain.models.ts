@@ -280,3 +280,35 @@ export interface IstorijaParcele {
   jedinicaPrinosa: Tezina;
   aktivnosti: StavkaAktivnosti[];
 }
+
+/** Nivo procenjenog troška tretmana na ekranu Statistics. */
+export type NivoTroska = 'Nizak' | 'Srednji' | 'Visok';
+
+export interface StatistikaKpi {
+  ukupanPrinosT: number;
+  najproduktivnijaParcela: { id: number; naziv: string; prinosPoHaKg: number } | null;
+  prosecanPrinosPoTretmanuT: number;
+  prosecanBrojTretmana: number;
+  troskoTretmana: { nivo: NivoTroska; indeksPct: number };
+}
+
+export interface StatistikaTackaScatter {
+  parcelaId: number;
+  parcelaNaziv: string;
+  brojTretmana: number;
+  prinosT: number;
+}
+
+export interface StatistikaBarStavka {
+  parcelaId: number;
+  parcelaNaziv: string;
+  prosecanPrinosT: number;
+}
+
+/** Odgovor GET /statistika — sve za ekran "Statistics" (dubinska analiza uticaja tretmana na prinos). */
+export interface StatistikaOdgovor {
+  dostupneGodine: number[];
+  kpi: StatistikaKpi;
+  scatter: StatistikaTackaScatter[];
+  barPoParceli: StatistikaBarStavka[];
+}
