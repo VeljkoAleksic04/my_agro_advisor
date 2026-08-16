@@ -29,7 +29,7 @@ export class IstorijaService {
       orderBy: { naziv: 'asc' },
       include: {
         vlasnik: { select: { username: true } },
-        sadnje: { include: { biljka: true }, orderBy: { datum: 'desc' } },
+        sadnje: { orderBy: { datum: 'desc' } },
         tretmani: { include: { preparat: true }, orderBy: { datumTretmana: 'desc' } },
         navodnjavanja: { orderBy: { datumNavodnjavanja: 'desc' } },
       },
@@ -64,8 +64,13 @@ export class IstorijaService {
       const prinosPoHa = povrsinaHa > 0 ? Math.round((prinosUkupno / povrsinaHa) * 100) / 100 : 0;
 
       // Kultura koja se prikazuje u zaglavlju kartice: najskorija sadnja u izabranoj godini,
-      // a ako je nema, najskorija sadnja na parceli uopšte.
-      const vodecaBiljka = (sadnjeUGodini[0] ?? parcela.sadnje[0])?.biljka ?? null;
+      // a ako je nema, najskorija sadnja na parceli uopšte. Koristi se snapshot
+      // nazivKulture/vrstaKulture sa Sadnja zapisa (a ne sadnja.biljka), jer
+      // biljka biva TRAJNO obrisana pri berbi (BiljkaService.zavrsiBerbu).
+      const vodecaSadnja = sadnjeUGodini[0] ?? parcela.sadnje[0];
+      const vodecaBiljka = vodecaSadnja
+        ? { naziv: vodecaSadnja.nazivKulture, vrsta: vodecaSadnja.vrstaKulture }
+        : null;
 
       return {
         id: parcela.id,
