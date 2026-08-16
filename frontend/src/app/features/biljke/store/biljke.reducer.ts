@@ -136,13 +136,24 @@ export const biljkeFeature = createFeature({
       ...state,
       greska: null,
     })),
-    on(BiljkeActions.izvrsiAkcijuUspesno, (state, { biljka }): BiljkeState =>
-      biljkeAdapter.upsertOne(biljka, {
-        ...state,
+    on(BiljkeActions.izvrsiAkcijuUspesno, (state, { biljka }): BiljkeState => {
+      // Nakon berbe (ili propadanja) biljka se vise ne smatra aktivnom -
+      // backend je od sada iskljucuje iz findAllZaParcelu/findAllZaKorisnika,
+      // pa je uklanjamo i iz lokalnog store-a da odmah "nestane" sa parcele
+      // (umesto da ostane vidljiva sa statusom OBRANA do sledeceg refetch-a).
+      const jeZavrsena = biljka.status === 'OBRANA' || biljka.status === 'PROPALA';
+      const noviStateAdaptera = jeZavrsena
+        ? biljkeAdapter.removeOne(biljka.id, state)
+        : biljkeAdapter.upsertOne(biljka, state);
+
+      return {
+        ...noviStateAdaptera,
         poslednjaProvera: null,
-        sveBiljke: azurirajUSvimBiljkama(state.sveBiljke, biljka),
-      }),
-    ),
+        sveBiljke: jeZavrsena
+          ? state.sveBiljke.filter((b) => b.id !== biljka.id)
+          : azurirajUSvimBiljkama(state.sveBiljke, biljka),
+      };
+    }),
     on(BiljkeActions.izvrsiAkcijuNeuspesno, (state, { greska, kod, provera }): BiljkeState => ({
       ...state,
       greska,
