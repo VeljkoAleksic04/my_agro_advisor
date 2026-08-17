@@ -1,0 +1,28 @@
+.sastojci-zaglavlje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.dugme-malo {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.red-sastojka {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.dugme-ukloni {
+  background: none;
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  padding: 0.35rem 0.6rem;
+  color: var(--boja-opasnost, #c62828);
+}
