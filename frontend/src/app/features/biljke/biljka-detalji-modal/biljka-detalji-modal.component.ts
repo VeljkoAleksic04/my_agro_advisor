@@ -4,9 +4,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import type { Biljka } from '../../../core/models/domain.models';
-import { NAZIVI_VRSTA_BILJAKA, TipPreparata } from '../../../core/models/domain.models';
+import { NAZIVI_VRSTA_BILJAKA, Preparat, TipPreparata } from '../../../core/models/domain.models';
 import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
 import { PreparatApiService } from '../../preparat/preparat-api.service';
+import { PreparatFormaModalComponent } from '../../preparat/preparat-forma-modal/preparat-forma-modal.component';
 import { TretmanApiService } from '../../tretman/tretman-api.service';
 import { BiljkeActions } from '../store/biljke.actions';
 import { selectPoslednjaProvera } from '../store/biljke.reducer';
@@ -25,7 +26,7 @@ type PanelAkcije = 'TRETMAN' | 'NAVODNJAVANJE' | 'BERBA' | null;
 @Component({
   selector: 'app-biljka-detalji-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, PotvrdaModalComponent, DatePipe],
+  imports: [ReactiveFormsModule, PotvrdaModalComponent, DatePipe, PreparatFormaModalComponent],
   templateUrl: './biljka-detalji-modal.component.html',
   styleUrl: './biljka-detalji-modal.component.scss',
 })
@@ -41,6 +42,7 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
   @Output() readonly zatvoreno = new EventEmitter<void>();
   @Output() readonly obrisano = new EventEmitter<number>();
 
+  protected readonly TipPreparata = TipPreparata;
   protected readonly nazivVrste = NAZIVI_VRSTA_BILJAKA;
   protected readonly preparati = toSignal(this.preparatApi.ucitajSve(), { initialValue: [] });
   protected readonly poslednjaProvera = toSignal(this.store.select(selectPoslednjaProvera), {
@@ -49,6 +51,7 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
 
   protected panel: PanelAkcije = null;
   protected potvrdaBrisanjaOtvorena = false;
+  protected novPreparatOtvoren = false;
   protected slanjeTretmana = false;
   protected greskaTretmana: string | null = null;
 
@@ -128,6 +131,18 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
   zatvori(): void {
     this.panel = null;
     this.zatvoreno.emit();
+  }
+
+  /** Otvara modal za kreiranje novog preparata (unapred selektuje PESTICID,
+   *  jer se ovaj poziv desava iz panela "Tretman"). Novi preparat se automatski
+   *  pojavljuje u listi pesticida preko PreparatApiService kesa. */
+  otvoriNoviPreparat(): void {
+    this.novPreparatOtvoren = true;
+  }
+
+  preparatKreiran(noviPreparat: Preparat): void {
+    this.novPreparatOtvoren = false;
+    this.formaTretman.patchValue({ preparatId: noviPreparat.id });
   }
 
   zatraziBrisanje(): void {

@@ -38,6 +38,7 @@
             @if (pesticidi.length === 0) {
               <span class="greska-polja">Nema dostupnih preparata za tretman.</span>
             }
+            <button type="button" class="dugme-link" (click)="otvoriNoviPreparat()">+ Novi preparat</button>
           </div>
           <div class="polje">
             <label for="doza">Doza</label>
@@ -90,4 +91,11 @@
   poruka="Da li ste sigurni da želite da obrišete ovu biljku? Ova akcija je nepovratna."
   (potvrdjeno)="potvrdiBrisanje()"
   (otkazano)="potvrdaBrisanjaOtvorena = false"
+/>
+
+<app-preparat-forma-modal
+  [otvoren]="novPreparatOtvoren"
+  [podrazumevaniTip]="TipPreparata.PESTICID"
+  (zatvoreno)="novPreparatOtvoren = false"
+  (kreiran)="preparatKreiran($event)"
 />
