@@ -45,6 +45,7 @@
                 @if (djubriva.length === 0) {
                   <span class="greska-polja">Nema dostupnih đubriva.</span>
                 }
+                <button type="button" class="dugme-link" (click)="novPreparatOtvoren = true">+ Novo đubrivo</button>
               </div>
               <div class="polje">
                 <label for="dozaDjubriva">Doza</label>
@@ -120,4 +121,11 @@
   [biljka]="biljkaZaModal"
   (zatvoreno)="zatvoriBiljkuModal()"
   (obrisano)="obrisiBiljkuIzModala($event)"
+/>
+
+<app-preparat-forma-modal
+  [otvoren]="novPreparatOtvoren"
+  [podrazumevaniTip]="TipPreparata.DJUBRIVO"
+  (zatvoreno)="novPreparatOtvoren = false"
+  (kreiran)="preparatKreiran($event)"
 />

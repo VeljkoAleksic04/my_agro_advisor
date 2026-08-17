@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { JedinicaPovrsine, TipPreparata, type Biljka, type Parcela } from '../../../core/models/domain.models';
+import { JedinicaPovrsine, Preparat, TipPreparata, type Biljka, type Parcela } from '../../../core/models/domain.models';
 import { BiljkaFormaComponent, type NovaBiljkaForma } from '../../biljke/biljka-forma/biljka-forma.component';
 import { BiljkaDetaljiModalComponent } from '../../biljke/biljka-detalji-modal/biljka-detalji-modal.component';
 import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
@@ -11,6 +11,7 @@ import { BiljkeActions } from '../../biljke/store/biljke.actions';
 import { selectGreska, selectNedovoljnoPovrsineInfo } from '../../biljke/store/biljke.reducer';
 import { selectSveBiljke } from '../../biljke/store/biljke.selectors';
 import { PreparatApiService } from '../../preparat/preparat-api.service';
+import { PreparatFormaModalComponent } from '../../preparat/preparat-forma-modal/preparat-forma-modal.component';
 import { TretmanApiService } from '../../tretman/tretman-api.service';
 
 /**
@@ -24,7 +25,14 @@ import { TretmanApiService } from '../../tretman/tretman-api.service';
 @Component({
   selector: 'app-parcela-detalji-modal',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, BiljkaFormaComponent, BiljkaDetaljiModalComponent, PotvrdaModalComponent],
+  imports: [
+    DatePipe,
+    ReactiveFormsModule,
+    BiljkaFormaComponent,
+    BiljkaDetaljiModalComponent,
+    PotvrdaModalComponent,
+    PreparatFormaModalComponent,
+  ],
   templateUrl: './parcela-detalji-modal.component.html',
   styleUrl: './parcela-detalji-modal.component.scss',
 })
@@ -45,9 +53,11 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
   protected readonly nedovoljnoPovrsineInfo = toSignal(this.store.select(selectNedovoljnoPovrsineInfo), {
     initialValue: null,
   });
+  protected readonly TipPreparata = TipPreparata;
   protected readonly preparati = toSignal(this.preparatApi.ucitajSve(), { initialValue: [] });
 
   protected prikaziFormuBiljke = false;
+  protected novPreparatOtvoren = false;
   protected potvrdaBrisanjaOtvorena = false;
   protected biljkaZaModal: Biljka | null = null;
   protected slanjeDjubriva = false;
@@ -86,6 +96,11 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
     preparatId: [0, [Validators.required, Validators.min(1)]],
     doza: ['', [Validators.required]],
   });
+
+  preparatKreiran(noviPreparat: Preparat): void {
+    this.novPreparatOtvoren = false;
+    this.formaDjubrenje.patchValue({ preparatId: noviPreparat.id });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['parcela'] && this.parcela) {
