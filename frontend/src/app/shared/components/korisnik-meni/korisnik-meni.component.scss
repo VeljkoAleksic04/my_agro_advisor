@@ -1,0 +1,73 @@
+.korisnik-meni {
+  position: relative;
+}
+
+.dugme-avatar {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+
+  .avatar-inicijal {
+    font-weight: 700;
+    color: var(--boja-primarna-tamnija);
+  }
+
+  &:hover {
+    background: #fff;
+  }
+}
+
+.padajuci-meni {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  min-width: 12rem;
+  background: var(--boja-povrsina);
+  border: 1px solid var(--boja-ivica);
+  border-radius: var(--radijus);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  z-index: 30;
+}
+
+.padajuci-meni-korisnik {
+  padding: 0.5rem 0.7rem 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--boja-tekst-suptilan);
+  border-bottom: 1px solid var(--boja-ivica);
+  margin-bottom: 0.2rem;
+}
+
+.padajuci-meni-stavka {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  color: var(--boja-tekst);
+  text-decoration: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--boja-povrsina-hover);
+  }
+}
+
+.padajuci-meni-dugme {
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--boja-opasnost, #c62828);
+}
