@@ -1,0 +1,111 @@
+@if (otvoren) {
+  <div class="modal-pozadina" (click)="zatvori()">
+    <div class="modal-sadrzaj" (click)="$event.stopPropagation()">
+      <div class="modal-zaglavlje">
+        <h2>Novi preparat</h2>
+        <button type="button" class="modal-zatvori" (click)="zatvori()" aria-label="Zatvori">✕</button>
+      </div>
+
+      <form [formGroup]="forma" (ngSubmit)="posalji()" class="forma">
+        <div class="polje-red">
+          <div class="polje">
+            <label for="pf-naziv">Naziv</label>
+            <input id="pf-naziv" type="text" formControlName="naziv" placeholder="npr. Moje đubrivo" />
+          </div>
+          <div class="polje">
+            <label for="pf-proizvodjac">Proizvođač</label>
+            <input id="pf-proizvodjac" type="text" formControlName="proizvodjac" placeholder="npr. Domaća radinost" />
+          </div>
+        </div>
+
+        <div class="polje-red">
+          <div class="polje">
+            <label for="pf-tip">Tip preparata</label>
+            <select id="pf-tip" formControlName="tipPreparata">
+              <option [value]="TipPreparata.PESTICID">Pesticid</option>
+              <option [value]="TipPreparata.DJUBRIVO">Đubrivo</option>
+            </select>
+          </div>
+
+          @if (tipPreparata === TipPreparata.PESTICID) {
+            <div class="polje">
+              <label for="pf-tip-pesticida">Tip pesticida</label>
+              <select id="pf-tip-pesticida" formControlName="tipPesticida">
+                <option [value]="null" disabled>Izaberite tip</option>
+                @for (tip of sviTipoviPesticida; track tip) {
+                  <option [value]="tip">{{ nazivTipPesticida[tip] }}</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div class="polje">
+              <label for="pf-tip-djubriva">Tip đubriva</label>
+              <select id="pf-tip-djubriva" formControlName="tipDjubriva">
+                <option [value]="null" disabled>Izaberite tip</option>
+                @for (tip of sviTipoviDjubriva; track tip) {
+                  <option [value]="tip">{{ nazivTipDjubriva[tip] }}</option>
+                }
+              </select>
+            </div>
+          }
+        </div>
+
+        <div class="polje-red">
+          <div class="polje">
+            <label for="pf-karenca">Trajanje karence</label>
+            <input id="pf-karenca" type="number" min="0" formControlName="trajanjeKarence" />
+          </div>
+          <div class="polje">
+            <label for="pf-jed-karence">Jedinica karence</label>
+            <select id="pf-jed-karence" formControlName="jedinicaKarence">
+              @for (jed of sveJedinceKarence; track jed) {
+                <option [value]="jed">{{ nazivJedinicaKarence[jed] }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="polje">
+          <label for="pf-opis">Opis</label>
+          <textarea id="pf-opis" rows="2" formControlName="opis" placeholder="Kratak opis preparata i namene"></textarea>
+        </div>
+
+        <div class="polje">
+          <div class="sastojci-zaglavlje">
+            <label>Sastojci (opciono)</label>
+            <button type="button" class="dugme dugme-sekundarni dugme-malo" (click)="dodajSastojak()">
+              + Dodaj sastojak
+            </button>
+          </div>
+
+          @for (red of sastojciNiz.controls; track $index; let i = $index) {
+            <div class="red-sastojka" [formGroup]="red">
+              <select formControlName="element">
+                @for (el of sviElementi; track el) {
+                  <option [value]="el">{{ el }}</option>
+                }
+              </select>
+              <input type="number" min="1" formControlName="kolicina" placeholder="Količina" />
+              <select formControlName="jedinica">
+                @for (tez of sveTezine; track tez) {
+                  <option [value]="tez">{{ tez }}</option>
+                }
+              </select>
+              <button type="button" class="dugme-ukloni" (click)="ukloniSastojak(i)" title="Ukloni sastojak">✕</button>
+            </div>
+          }
+        </div>
+
+        @if (greska) {
+          <p class="napomena-upozorenje">{{ greska }}</p>
+        }
+
+        <div class="akcije-forme">
+          <button type="submit" class="dugme dugme-primarni" [disabled]="slanje">
+            {{ slanje ? 'Čuvanje...' : 'Sačuvaj preparat' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
