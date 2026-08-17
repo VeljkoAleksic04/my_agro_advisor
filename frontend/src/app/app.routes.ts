@@ -57,7 +57,9 @@ export const routes: Routes = [
         path: 'statistika',
         data: { naslov: 'Statistics' },
         loadComponent: () =>
-          import('./features/profil/placeholder/placeholder.component').then((m) => m.PlaceholderComponent),
+          import('./features/statistika/statistika-pregled/statistika-pregled.component').then(
+            (m) => m.StatistikaPregledComponent,
+          ),
       },
       {
         path: 'chatovi',
