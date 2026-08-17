@@ -107,12 +107,12 @@ export class StatistikaPregledComponent implements OnInit {
 
   protected readonly maxBrojTretmana = computed(() => {
     const tacke = this.podaci()?.scatter ?? [];
-    return Math.max(1, ...tacke.map((t) => t.brojTretmana));
+    return this.lepMax(Math.max(0, ...tacke.map((t) => t.brojTretmana)));
   });
 
   protected readonly maxPrinosScatter = computed(() => {
     const tacke = this.podaci()?.scatter ?? [];
-    return Math.max(1, ...tacke.map((t) => t.prinosT));
+    return this.lepMax(Math.max(0, ...tacke.map((t) => t.prinosT)));
   });
 
   protected readonly tackeZaCrtanje = computed<TackaZaCrtanje[]>(() => {
@@ -165,7 +165,7 @@ export class StatistikaPregledComponent implements OnInit {
 
   protected readonly maxPrinosBar = computed(() => {
     const stubovi = this.podaci()?.barPoParceli ?? [];
-    return Math.max(1, ...stubovi.map((s) => s.prosecanPrinosT));
+    return this.lepMax(Math.max(0, ...stubovi.map((s) => s.prosecanPrinosT)));
   });
 
   protected readonly stuboviZaCrtanje = computed<StubZaCrtanje[]>(() => {
@@ -207,5 +207,22 @@ export class StatistikaPregledComponent implements OnInit {
   private oznakeOse(max: number): number[] {
     const korak = max / 4;
     return [0, 1, 2, 3, 4].map((i) => Math.round(korak * i * 10) / 10);
+  }
+
+  /**
+   * Zaokruzuje sirovu maksimalnu vrednost na "lepu" gornju granicu ose
+   * (1/2/5/10 * 10^n), tako da Y osa uvek pokriva tacno 0..trenutni-maksimum
+   * i sama raste kako vrednosti prinosa rastu (umesto fiksnog opsega).
+   */
+  private lepMax(sirovaVrednost: number): number {
+    if (sirovaVrednost <= 0) return 1;
+    const magnituda = 10 ** Math.floor(Math.log10(sirovaVrednost));
+    const normalizovano = sirovaVrednost / magnituda;
+    let lepaVrednost: number;
+    if (normalizovano <= 1) lepaVrednost = 1;
+    else if (normalizovano <= 2) lepaVrednost = 2;
+    else if (normalizovano <= 5) lepaVrednost = 5;
+    else lepaVrednost = 10;
+    return lepaVrednost * magnituda;
   }
 }
