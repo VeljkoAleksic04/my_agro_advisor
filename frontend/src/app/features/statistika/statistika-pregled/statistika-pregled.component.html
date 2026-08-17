@@ -1,0 +1,167 @@
+<section class="stranica">
+  <header class="stranica-header stranica-header-sa-filterima">
+    <div>
+      <h1>Statistics</h1>
+      <p class="podnaslov">Duboka analiza — uticaj tretmana na prinos ({{ nazivKultureLabela() }})</p>
+    </div>
+
+    <div class="traka-filtera">
+      <label>
+        Godina:
+        <select (change)="postaviGodinu($any($event.target).value)">
+          <option value="">Sve</option>
+          @for (godina of podaci()?.dostupneGodine ?? []; track godina) {
+            <option [value]="godina">{{ godina }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Kultura:
+        <select (change)="postaviVrstu($any($event.target).value)">
+          <option value="">Sve</option>
+          @for (vrsta of sveVrste; track vrsta) {
+            <option [value]="vrsta">{{ nazivVrste[vrsta] }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Parcela:
+        <select (change)="postaviParcelu($any($event.target).value)">
+          <option value="">Sve</option>
+          @for (parcela of sveParcele(); track parcela.id) {
+            <option [value]="parcela.id">{{ parcela.naziv }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </header>
+
+  @if (greska()) {
+    <p class="poruka-greske">{{ greska() }}</p>
+  }
+
+  @if (ucitavanje() && !podaci()) {
+    <p class="stanje-ucitavanja">Učitavanje statistike...</p>
+  } @else if (podaci()) {
+    <div class="kpi-red">
+      <article class="karta kpi-kartica">
+        <span class="kpi-naslov">Ukupan Prinos ({{ nazivKultureLabela() }})</span>
+        <span class="kpi-vrednost">{{ podaci()!.kpi.ukupanPrinosT }} t</span>
+        <span class="kpi-podnaslov">Suman prinos: {{ podaci()!.kpi.ukupanPrinosT }} t</span>
+      </article>
+
+      <article class="karta kpi-kartica">
+        <span class="kpi-naslov">Najproduktivnija Parcela ({{ nazivKultureLabela() }})</span>
+        @if (podaci()!.kpi.najproduktivnijaParcela; as parcela) {
+          <span class="kpi-vrednost kpi-vrednost-tekst">{{ parcela.naziv }}</span>
+          <span class="kpi-podnaslov">Prinos {{ parcela.prinosPoHaKg }} kg/ha</span>
+        } @else {
+          <span class="kpi-vrednost kpi-vrednost-tekst">—</span>
+          <span class="kpi-podnaslov">Nema dovoljno podataka</span>
+        }
+      </article>
+
+      <article class="karta kpi-kartica">
+        <span class="kpi-naslov">Prosečan Prinos po Tretmanu</span>
+        <span class="kpi-vrednost">{{ podaci()!.kpi.prosecanPrinosPoTretmanuT }} t/ha/tretman</span>
+        <span class="kpi-podnaslov">Average prinos: {{ podaci()!.kpi.prosecanPrinosPoTretmanuT * 1000 }} kg/ha</span>
+      </article>
+
+      <article class="karta kpi-kartica">
+        <span class="kpi-naslov">Prosečan Br. Tretmana ({{ nazivKultureLabela() }})</span>
+        <span class="kpi-vrednost">{{ podaci()!.kpi.prosecanBrojTretmana }}</span>
+      </article>
+
+      <article class="karta kpi-kartica">
+        <span class="kpi-naslov">Trošak Tretmana (Procena)</span>
+        <span class="kpi-vrednost kpi-vrednost-nivo" [class]="'nivo-' + podaci()!.kpi.troskoTretmana.nivo.toLowerCase()">
+          {{ podaci()!.kpi.troskoTretmana.nivo }}
+        </span>
+        <span class="kpi-podnaslov">Prosek Indeks: {{ podaci()!.kpi.troskoTretmana.indeksPct }}%</span>
+      </article>
+    </div>
+
+    <div class="karta karta-najava-charta">
+      <h3>Chart</h3>
+      <p>Ova stranica pruža agregirani pregled učinka.</p>
+    </div>
+
+    <div class="grafikoni-red">
+      <article class="karta karta-grafikon">
+        <h3>Efikasnost Tretmana: Br. Tretmana vs Prinos ({{ nazivKultureLabela() }})</h3>
+
+        @if ((podaci()!.scatter.length ?? 0) === 0) {
+          <p class="stanje-prazno">Nema dovoljno podataka za prikaz.</p>
+        } @else {
+          <svg [attr.viewBox]="'0 0 ' + sirinaGrafikona + ' ' + visinaGrafikona" class="svg-grafikon">
+            <!-- Y osa i horizontalne linije mreže -->
+            @for (oznaka of osaYOznakeScatter(); track oznaka) {
+              <text x="2" [attr.y]="196 - (oznaka / (osaYOznakeScatter()[4] || 1)) * 168" class="osa-tekst">
+                {{ oznaka }} t
+              </text>
+            }
+            <line x1="40" y1="12" x2="40" y2="196" class="osa-linija" />
+            <line x1="40" y1="196" x2="448" y2="196" class="osa-linija" />
+
+            <!-- X osa oznake -->
+            @for (oznaka of osaXOznake(); track oznaka) {
+              <text
+                [attr.x]="40 + (oznaka / (osaXOznake()[4] || 1)) * 408"
+                y="212"
+                class="osa-tekst osa-tekst-centar"
+              >
+                {{ oznaka }}
+              </text>
+            }
+
+            <!-- Linija trenda -->
+            @if (linijaTrenda(); as putanja) {
+              <path [attr.d]="putanja" class="linija-trenda" />
+            }
+
+            <!-- Tacke -->
+            @for (tacka of tackeZaCrtanje(); track $index) {
+              <circle [attr.cx]="tacka.x" [attr.cy]="tacka.y" r="5" class="tacka-scatter">
+                <title>{{ tacka.parcelaNaziv }}: {{ tacka.brojTretmana }} tretmana, {{ tacka.prinosT }} t</title>
+              </circle>
+            }
+          </svg>
+        }
+      </article>
+
+      <article class="karta karta-grafikon">
+        <h3>Poređenje Parcela: Prosečan Prinos ({{ nazivKultureLabela() }})</h3>
+
+        @if ((podaci()!.barPoParceli.length ?? 0) === 0) {
+          <p class="stanje-prazno">Nema dovoljno podataka za prikaz.</p>
+        } @else {
+          <svg [attr.viewBox]="'0 0 ' + sirinaGrafikona + ' ' + visinaGrafikona" class="svg-grafikon">
+            @for (oznaka of osaYOznakeBar(); track oznaka) {
+              <text x="2" [attr.y]="196 - (oznaka / (osaYOznakeBar()[4] || 1)) * 168" class="osa-tekst">
+                {{ oznaka }} t
+              </text>
+            }
+            <line x1="40" y1="12" x2="40" y2="196" class="osa-linija" />
+            <line x1="40" y1="196" x2="448" y2="196" class="osa-linija" />
+
+            @for (stub of stuboviZaCrtanje(); track $index) {
+              <rect
+                [attr.x]="stub.x"
+                [attr.y]="stub.y"
+                [attr.width]="sirinaStuba()"
+                [attr.height]="stub.visina"
+                [attr.fill]="stub.boja"
+                rx="3"
+              >
+                <title>{{ stub.naziv }}: {{ stub.vrednost }} t</title>
+              </rect>
+              <text [attr.x]="stub.x + sirinaStuba() / 2" y="212" class="osa-tekst osa-tekst-centar">
+                {{ stub.naziv }}
+              </text>
+            }
+          </svg>
+        }
+      </article>
+    </div>
+  }
+</section>
