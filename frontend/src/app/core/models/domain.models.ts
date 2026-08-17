@@ -223,13 +223,90 @@ export enum TipPreparata {
   DJUBRIVO = 'DJUBRIVO',
 }
 
+export enum TipPesticida {
+  INSEKTICID = 'INSEKTICID',
+  HERBICID = 'HERBICID',
+  FUNGICID = 'FUNGICID',
+}
+
+export enum TipDjubriva {
+  ZEMLJANO = 'ZEMLJANO',
+  FOLIJALNO = 'FOLIJALNO',
+  FERTILIGACIONO = 'FERTILIGACIONO',
+}
+
+export enum JedinicaKarence {
+  DAN = 'DAN',
+  NEDELJA = 'NEDELJA',
+  MESEC = 'MESEC',
+}
+
+export enum Elementi {
+  Mg = 'Mg',
+  Ca = 'Ca',
+  S = 'S',
+  Cu = 'Cu',
+  NH4NO3 = 'NH4NO3',
+  SO4 = 'SO4',
+  Cl = 'Cl',
+  NATRIJUM_HIPOHLORIT = 'NATRIJUM_HIPOHLORIT',
+  LIMUNSKA_KISELINA = 'LIMUNSKA_KISELINA',
+  FOSFORNA_KISELINA = 'FOSFORNA_KISELINA',
+  ALUMINIJUM_FOSFID = 'ALUMINIJUM_FOSFID',
+  ORGANOFOSFATI = 'ORGANOFOSFATI',
+  XILEN = 'XILEN',
+  TOLUEN = 'TOLUEN',
+}
+
+export const NAZIVI_TIP_PESTICIDA: Record<TipPesticida, string> = {
+  [TipPesticida.INSEKTICID]: 'Insekticid',
+  [TipPesticida.HERBICID]: 'Herbicid',
+  [TipPesticida.FUNGICID]: 'Fungicid',
+};
+
+export const NAZIVI_TIP_DJUBRIVA: Record<TipDjubriva, string> = {
+  [TipDjubriva.ZEMLJANO]: 'Zemljano',
+  [TipDjubriva.FOLIJALNO]: 'Folijarno',
+  [TipDjubriva.FERTILIGACIONO]: 'Fertirigaciono',
+};
+
+export const NAZIVI_JEDINICA_KARENCE: Record<JedinicaKarence, string> = {
+  [JedinicaKarence.DAN]: 'dan',
+  [JedinicaKarence.NEDELJA]: 'nedelja',
+  [JedinicaKarence.MESEC]: 'mesec',
+};
+
+export interface Sastojak {
+  element: Elementi;
+  kolicina: number;
+  jedinica: Tezina;
+}
+
 /** Preparat (koristi se i za tretman i za đubrenje - razlikuju se po tipPreparata). */
 export interface Preparat {
   id: number;
   naziv: string;
   proizvodjac: string;
+  trajanjeKarence: number;
+  jedinicaKarence: JedinicaKarence;
   tipPreparata: TipPreparata;
+  tipPesticida?: TipPesticida | null;
+  tipDjubriva?: TipDjubriva | null;
   opis: string;
+  sastojci?: Sastojak[];
+}
+
+/** Telo zahteva za kreiranje sopstvenog preparata (POST /preparati). */
+export interface CreatePreparatZahtev {
+  naziv: string;
+  proizvodjac: string;
+  trajanjeKarence: number;
+  jedinicaKarence: JedinicaKarence;
+  tipPreparata: TipPreparata;
+  tipPesticida?: TipPesticida;
+  tipDjubriva?: TipDjubriva;
+  opis: string;
+  sastojci?: Sastojak[];
 }
 
 /** Evidentiran tretman (uključujući đubrenje - preparat sa tipPreparata=DJUBRIVO). */
