@@ -1,52 +1,34 @@
-[2026-08-13 14:02:28] [frontend] Povezivanje lista komponenti sa novim modalima
-[main 88c390e] refactor(lista): otvaranje detalja klikom na karticu, badge broja kultura
- 4 files changed, 51 insertions(+), 25 deletions(-)
-[2026-08-13 14:02:28] Pauza od 37 min pre sledeceg komita...
-[2026-08-13 14:39:49] [backend] Prisma sema
-[main 08735c2] feat(schema): status/povrsina/datumSadnje na Biljka, opis na Parcela, MRKVA->SARGAREPA
- 1 file changed, 44 insertions(+), 39 deletions(-)
-[2026-08-13 14:39:49] Pauza od 42 min pre sledeceg komita...
-[2026-08-13 15:22:14] [backend] Biljka DTO + servis (server racuna periode, proverava povrsinu)
-[main dbcd2e5] feat(biljka): server racuna periode sadnje/berbe, validacija slobodne povrsine (409)
- 2 files changed, 174 insertions(+), 40 deletions(-)
-[2026-08-13 15:22:14] Pauza od 30 min pre sledeceg komita...
-[2026-08-13 15:52:35] [backend] Parcela DTO + servis (opis, _count.biljke)
-[main 2164f55] feat(parcela): opis polje + _count.biljke za badge u listi
- 1 file changed, 2 insertions(+)
-[2026-08-13 15:52:35] Pauza od 41 min pre sledeceg komita...
-[2026-08-13 16:33:55] [frontend] Modeli usklajeni sa backend semom
-On branch main
-Your branch is ahead of 'origin/main' by 8 commits.
-  (use "git push" to publish your local commits)
-
-Changes not staged for commit:
-  (use "git add/rm <file>..." to update what will be committed)
-  (use "git restore <file>..." to discard changes in working directory)
-	modified:   backend/package-lock.json
-	deleted:    backend/prisma/migrations/20260801081923_agro_baza/migration.sql
-	deleted:    backend/prisma/migrations/20260809134310_nova_migracija/migration.sql
-	deleted:    backend/prisma/migrations/20260810091803_dashboard_izmene/migration.sql
-	modified:   backend/src/biljka/biljka.controller.ts
-	modified:   frontend/src/app/features/biljke/biljke-api.service.ts
-	modified:   frontend/src/app/features/biljke/store/biljke.actions.ts
-	modified:   frontend/src/app/features/biljke/store/biljke.effects.ts
-	modified:   frontend/src/app/features/biljke/store/biljke.reducer.ts
-	modified:   frontend/src/app/features/biljke/store/biljke.selectors.ts
-	modified:   frontend/src/app/features/parcele/parcele-api.service.ts
-	modified:   frontend/src/app/features/profil/profil-layout/profil-layout.component.html
-	modified:   frontend/src/app/shared/components/potvrda-modal/potvrda-modal.component.html
-	modified:   frontend/src/app/shared/components/potvrda-modal/potvrda-modal.component.ts
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	backend/prisma/migrations/20260813085709_/
-	backend/src/biljka/dto/akcija-biljke.dto.ts
-	backend/src/biljka/dto/izvrsi-akciju.dto.ts
-	backend/src/biljka/periodi.util.ts
-	commits.sh
-	frontend/src/app/features/biljke/periodi.util.ts
-	frontend/src/app/features/preparat/
-	frontend/src/app/features/tretman/
-	komit_log.txt
-
-no changes added to commit (use "git add" and/or "git commit -a")
+[2026-08-17 12:45:25] ===================================================================
+[main 3ccdaca] fix(seed): findFirst+create/update umesto upsert po (parcelaId,vrsta); dodaj nazivKulture/vrstaKulture u sadnja.create
+ 1 file changed, 208 insertions(+), 44 deletions(-)
+[2026-08-17 13:57:32] ===================================================================
+[main 26ac358] fix(statistika): Y osa grafikona sada raste dinamicki (0..trenutni max, zaokruzeno na lepu vrednost)
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+[2026-08-17 14:23:08] ===================================================================
+[main dc08fb9] feat(models): dodaj tipove za kreiranje preparata (TipPesticida, TipDjubriva, JedinicaKarence, Elementi, Sastojak, CreatePreparatZahtev)
+ 1 file changed, 77 insertions(+)
+[2026-08-17 14:35:00] ===================================================================
+[main 794704c] feat(preparat): PreparatApiService sada kesira preparate i azurira ih odmah pri kreiranju BehaviorSubject kes umesto obicnog HTTP GET-a na svaki ucitajSve() poziv - kreiraj() dodaje novi preparat u kes, pa se on ODMAH pojavljuje u svim dropdown listama (tretman biljke, djubrenje parcele) bez rucnog refetch-a.
+ 1 file changed, 24 insertions(+), 3 deletions(-)
+[2026-08-17 14:54:40] ===================================================================
+[main 4c2f8bb] feat(preparat): modal komponenta za kreiranje sopstvenog preparata (pesticid/djubrivo) Forma: naziv, proizvodjac, tip preparata (+ pod-tip pesticida/djubriva), karenca, opis, i opcioni sastojci (element/kolicina/jedinica, dinamican FormArray). 'podrazumevaniTip' Input unapred selektuje tip preparata u zavisnosti od konteksta iz kog je modal otvoren (tretman -> pesticid, djubrenje -> djubrivo).
+ 3 files changed, 306 insertions(+)
+ create mode 100644 frontend/src/app/features/preparat/preparat-forma-modal/preparat-forma-modal.component.html
+ create mode 100644 frontend/src/app/features/preparat/preparat-forma-modal/preparat-forma-modal.component.scss
+ create mode 100644 frontend/src/app/features/preparat/preparat-forma-modal/preparat-forma-modal.component.ts
+[2026-08-17 15:58:41] ===================================================================
+[main ac937af] feat(biljka-modal): dugme '+ Novi preparat' u panelu Tretman, otvara PreparatFormaModalComponent Nakon kreiranja, novi preparat se automatski selektuje u formi tretmana.
+ 3 files changed, 37 insertions(+), 2 deletions(-)
+[2026-08-17 16:14:19] ===================================================================
+[main 02cb624] feat(parcela-modal): dugme '+ Novo djubrivo' u panelu Djubrenje, otvara PreparatFormaModalComponent Isti obrazac kao kod biljka-detalji-modal, samo sa podrazumevaniTip=DJUBRIVO.
+ 2 files changed, 25 insertions(+), 2 deletions(-)
+[2026-08-17 16:25:52] ===================================================================log ===================================================================
+[main 47fbbe6] feat(korisnik-meni): deljena padajuca meni komponenta za ikonu korisnika Prijavljen korisnik: 'Pregled profila' + 'Odjava'. Neprijavljen: 'Prijava' + 'Registracija'. Zatvara se klikom van menija (HostListener document:click).
+ 3 files changed, 146 insertions(+)
+ create mode 100644 frontend/src/app/shared/components/korisnik-meni/korisnik-meni.component.html
+ create mode 100644 frontend/src/app/shared/components/korisnik-meni/korisnik-meni.component.scss
+ create mode 100644 frontend/src/app/shared/components/korisnik-meni/korisnik-meni.component.ts
+[2026-08-17 16:39:24] ===================================================================
+[main c4c446c] feat(landing): ikona korisnika u zaglavlju sada otvara KorisnikMeniComponent (Prijava/Registracija/Profil/Odjava) Hero CTA dugme ('Pridruži se' / 'Otvori profil') ostaje nepromenjeno - i dalje direktno navigira, samo ikona u zaglavlju sada otvara meni.
+ 2 files changed, 9 insertions(+), 13 deletions(-)
+commits.sh: line 121: syntax error near unexpected token `('

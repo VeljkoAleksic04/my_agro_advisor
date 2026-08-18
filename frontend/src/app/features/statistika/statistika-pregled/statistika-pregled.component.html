@@ -90,7 +90,7 @@
       <article class="karta karta-grafikon">
         <h3>Efikasnost Tretmana: Br. Tretmana vs Prinos ({{ nazivKultureLabela() }})</h3>
 
-        @if ((podaci()!.scatter.length ?? 0) === 0) {
+        @if (podaci()!.scatter.length === 0) {
           <p class="stanje-prazno">Nema dovoljno podataka za prikaz.</p>
         } @else {
           <svg [attr.viewBox]="'0 0 ' + sirinaGrafikona + ' ' + visinaGrafikona" class="svg-grafikon">
@@ -132,7 +132,7 @@
       <article class="karta karta-grafikon">
         <h3>Poređenje Parcela: Prosečan Prinos ({{ nazivKultureLabela() }})</h3>
 
-        @if ((podaci()!.barPoParceli.length ?? 0) === 0) {
+        @if (podaci()!.barPoParceli.length === 0) {
           <p class="stanje-prazno">Nema dovoljno podataka za prikaz.</p>
         } @else {
           <svg [attr.viewBox]="'0 0 ' + sirinaGrafikona + ' ' + visinaGrafikona" class="svg-grafikon">

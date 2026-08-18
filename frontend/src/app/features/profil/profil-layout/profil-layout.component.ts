@@ -5,11 +5,12 @@ import { Store } from '@ngrx/store';
 import { AuthActions } from '../../../core/auth/store/auth.actions';
 import { selectKorisnik } from '../../../core/auth/store/auth.reducer';
 import { ThemeService } from '../../../shared/services/theme.service';
+import { KorisnikMeniComponent } from '../../../shared/components/korisnik-meni/korisnik-meni.component';
 
 @Component({
   selector: 'app-profil-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, KorisnikMeniComponent],
   templateUrl: './profil-layout.component.html',
   styleUrl: './profil-layout.component.scss',
 })
