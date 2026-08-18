@@ -6,16 +6,22 @@
       <button type="button" class="dugme-tema" (click)="promeniTemu()">
         {{ temaServis.tema() === 'tamna' ? 'Light theme' : 'Dark theme' }}
       </button>
+      <a
+        routerLink="/profil/chatovi"
+        class="dugme-ikonica"
+        title="Chat / Forum"
+        aria-label="Chat / Forum"
+      >💬</a>
+      <button
+        type="button"
+        class="dugme-ikonica"
+        title="Obaveštenja (uskoro)"
+        aria-label="Obaveštenja"
+      >🔔</button>
       @if (korisnik(); as k) {
         <span class="korisnik-oznaka">{{ k.username }}</span>
       }
-      <button type="button" class="dugme-avatar" (click)="odjaviSe()" title="Odjava">
-        @if (korisnik(); as k) {
-          <span class="avatar-inicijal">{{ k.username.charAt(0).toUpperCase() }}</span>
-        } @else {
-          👤
-        }
-      </button>
+      <app-korisnik-meni [korisnik]="korisnik()" (odjava)="odjaviSe()" />
     </div>
   </header>
 
