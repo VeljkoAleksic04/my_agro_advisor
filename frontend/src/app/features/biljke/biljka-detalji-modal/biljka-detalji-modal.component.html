@@ -71,6 +71,16 @@
             </div>
           } @else {
             <p class="opis-tekst">Evidentira se berba sa današnjim datumom.</p>
+            <form [formGroup]="formaBerba" class="polje">
+              <label for="prinosKg">Ostvareni prinos (kg) — opciono</label>
+              <input
+                id="prinosKg"
+                type="number"
+                min="0"
+                formControlName="prinosKg"
+                placeholder="Ako ostavite prazno, koristi se procenjena vrednost"
+              />
+            </form>
             <div class="akcije-forme">
               <button type="button" class="dugme dugme-primarni" (click)="potvrdiBerbu()">Potvrdi berbu</button>
             </div>

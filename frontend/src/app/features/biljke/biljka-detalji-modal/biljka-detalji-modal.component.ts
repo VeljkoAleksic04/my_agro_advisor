@@ -64,10 +64,15 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
     doza: ['', [Validators.required]],
   });
 
+  protected readonly formaBerba = this.fb.group({
+    prinosKg: [null as number | null, [Validators.min(0)]],
+  });
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['biljka']) {
       this.panel = null;
       this.greskaTretmana = null;
+      this.formaBerba.reset({ prinosKg: null });
       // Ocisti staru "van perioda" proveru kad se otvori DRUGA biljka, da
       // eventualna poruka/dugme "Forsiraj berbu" sa prethodno otvorene
       // biljke ne ostane (i pogresno) vidljivo za novu.
@@ -87,10 +92,15 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
 
   potvrdiBerbu(forsiraj = false): void {
     if (!this.biljka) return;
+    const prinosUneti = this.formaBerba.getRawValue().prinosKg;
     this.store.dispatch(
       BiljkeActions.izvrsiAkciju({
         id: this.biljka.id,
-        payload: { akcija: 'OBERI', forsirajVanPerioda: forsiraj },
+        payload: {
+          akcija: 'OBERI',
+          forsirajVanPerioda: forsiraj,
+          prinosKg: prinosUneti !== null && prinosUneti > 0 ? prinosUneti : undefined,
+        },
       }),
     );
     if (forsiraj) this.panel = null;
