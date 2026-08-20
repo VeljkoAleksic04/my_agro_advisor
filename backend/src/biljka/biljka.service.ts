@@ -10,6 +10,7 @@ import { CreateBiljkaDto } from './dto/create-biljka.dto';
 import { UpdateBiljkaDto } from './dto/update-biljka.dto';
 import { BiljkaAkcijaTip, IzvrsiAkcijuDto } from './dto/izvrsi-akciju.dto';
 import { jeMesecUPeriodu, preporukaZaVrstu } from './periodi.util';
+import { podrazumevaniPrinosKg } from './prinosi.util';
 
 /** Biljka u ovim statusima se smatra "zavrsenom" - vise ne zauzima povrsinu
  *  na parceli i ne prikazuje se kao aktivna kultura (berba/propadanje su
@@ -241,7 +242,7 @@ export class BiljkaService {
         });
       }
 
-      return this.zavrsiBerbu(biljka, korisnikId, sada);
+      return this.zavrsiBerbu(biljka, korisnikId, sada, dto.prinosKg);
     }
 
     if (dto.akcija === 'ZALIJ') {
@@ -266,24 +267,35 @@ export class BiljkaService {
 
   /**
    * Zavrsava ciklus gajenja biljke pri berbi (akcija OBERI):
-   *  1. Prenosi podatak o prinosu u modul Sadnja (koji hrani ekrane Istorija
-   *     i Statistics): ako vec postoji Sadnja vezana za ovu biljku bez
-   *     upisanog prinosa, zatvara je (status OBRANA, prinos = zasadjena
-   *     kolicina ako prinos jos nije rucno unet); ako ne postoji nijedna,
+   *  1. Odredjuje prinos (u kg): ako je farmer rucno uneo prinos (dto.prinosKg
+   *     iz forme za berbu na front-endu), koristi se ta vrednost. U suprotnom
+   *     se generise realisticna podrazumevana vrednost na osnovu opsega t/ha
+   *     za tu vrstu biljke (videti prinosi.util.ts) i povrsine parcele.
+   *  2. Prenosi taj prinos u modul Sadnja (koji hrani ekrane Istorija i
+   *     Statistics): ako vec postoji nezavrsena Sadnja vezana za ovu biljku,
+   *     zatvara je (status OBRANA, upisuje prinos); ako ne postoji nijedna,
    *     kreira novu. Naziv/vrsta kulture se snapshot-uju na Sadnja zapisu
    *     (nazivKulture/vrstaKulture) JER SE BILJKA U SLEDECEM KORAKU BRISE.
-   *  2. TRAJNO brise Biljku - ovo je stvarno brisanje veze biljka<->parcela
+   *  3. TRAJNO brise Biljku - ovo je stvarno brisanje veze biljka<->parcela
    *     (ne samo filtriranje iz upita), pa parcela odmah postaje slobodna
    *     za novu setvu iste ili druge vrste. Tretman.biljkaId i
    *     Sadnja.biljkaId su ON DELETE SET NULL, pa istorija tretmana i
    *     sadnje ostaju netaknute - samo vise ne pokazuju na (obrisanu) biljku.
    * Sve se radi u jednoj transakciji da ne bi doslo do nekonzistentnog stanja.
    */
-  private zavrsiBerbu(
+  private async zavrsiBerbu(
     biljka: { id: number; parcelaId: number; naziv: string; vrsta: VrstaBiljke; povrsina: number },
     korisnikId: number,
     sada: Date,
+    rucnoUnetPrinosKg?: number,
   ) {
+    const parcela = await this.prisma.parcela.findUnique({
+      where: { id: biljka.parcelaId },
+      select: { jedinicaMere: true },
+    });
+    const povrsinaHa = this.uHektarima(biljka.povrsina, parcela?.jedinicaMere ?? JedinicaPovrsine.A);
+    const prinosKg = rucnoUnetPrinosKg ?? podrazumevaniPrinosKg(biljka.vrsta, povrsinaHa);
+
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const nezavrseneSadnje = await tx.sadnja.findMany({
         where: {
@@ -301,10 +313,7 @@ export class BiljkaService {
               ocekivaniDatumBerbe: sadnja.ocekivaniDatumBerbe ?? sada,
               nazivKulture: biljka.naziv,
               vrstaKulture: biljka.vrsta,
-              // Ako prinos jos nije rucno unet (npr. preko ekrana Sadnja),
-              // koristimo zasadjenu kolicinu kao razumnu pocetnu vrednost
-              // umesto da istorija ostane prazna (0) nakon berbe.
-              prinos: sadnja.prinos > 0 ? sadnja.prinos : sadnja.kolicinaPosadjeneKulture,
+              prinos: prinosKg,
             },
           });
         }
@@ -317,7 +326,7 @@ export class BiljkaService {
             nazivKulture: biljka.naziv,
             vrstaKulture: biljka.vrsta,
             kolicinaPosadjeneKulture: biljka.povrsina,
-            prinos: biljka.povrsina,
+            prinos: prinosKg,
             ocekivaniDatumBerbe: sada,
             status: StatusZasadjeneKulture.OBRANA,
           },
@@ -330,8 +339,21 @@ export class BiljkaService {
       // oblik kao Biljka zapis) da front-end (koji ocekuje azuriranu biljku
       // sa statusom OBRANA da bi je uklonio iz svoje liste) i dalje radi
       // bez izmena, iako fizicki red vise ne postoji.
-      return { ...biljka, status: StatusBiljke.OBRANA, poslednjaBerba: sada };
+      return { ...biljka, status: StatusBiljke.OBRANA, poslednjaBerba: sada, prinosKg };
     });
+  }
+
+  private uHektarima(povrsina: number, jedinica: JedinicaPovrsine): number {
+    switch (jedinica) {
+      case JedinicaPovrsine.HA:
+        return povrsina;
+      case JedinicaPovrsine.A:
+        return povrsina / 100;
+      case JedinicaPovrsine.M2:
+        return povrsina / 10000;
+      default:
+        return povrsina;
+    }
   }
 
   private proveriDaBiljkaNijeZavrsena(status: StatusBiljke, akcija: BiljkaAkcijaTip) {
