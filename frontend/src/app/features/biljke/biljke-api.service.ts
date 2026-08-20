@@ -16,6 +16,9 @@ export type NovaBiljka = {
 export interface AkcijaBiljkePayload {
   akcija: BiljkaAkcija;
   forsirajVanPerioda?: boolean;
+  /** Rucno unet prinos (u kg) - koristi se samo za akciju OBERI (berba). Ako
+   *  se ne posalje, backend generise realisticnu podrazumevanu vrednost. */
+  prinosKg?: number;
 }
 
 @Injectable({ providedIn: 'root' })
