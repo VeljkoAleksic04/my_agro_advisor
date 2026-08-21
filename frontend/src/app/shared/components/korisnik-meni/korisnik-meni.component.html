@@ -11,7 +11,7 @@
     <div class="padajuci-meni">
       @if (korisnik) {
         <span class="padajuci-meni-korisnik">{{ korisnik.username }}</span>
-        <a routerLink="/profil/dashboard" class="padajuci-meni-stavka" (click)="zatvori()">Pregled profila</a>
+        <a routerLink="/profil/nalog" class="padajuci-meni-stavka" (click)="zatvori()">Pregled profila</a>
         <button type="button" class="padajuci-meni-stavka padajuci-meni-dugme" (click)="odjaviSe()">Odjava</button>
       } @else {
         <a routerLink="/prijava" class="padajuci-meni-stavka" (click)="zatvori()">Prijava</a>
@@ -20,3 +20,4 @@
     </div>
   }
 </div>
+0
