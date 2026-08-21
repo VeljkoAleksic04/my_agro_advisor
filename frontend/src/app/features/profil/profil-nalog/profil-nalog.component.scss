@@ -1,0 +1,38 @@
+.nalog-karta {
+  margin-bottom: 1.25rem;
+}
+
+.podaci-red {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.25rem 0 1.25rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 10rem;
+}
+
+.stat-oznaka {
+  font-size: 0.8rem;
+  color: var(--boja-tekst-suptilan);
+}
+
+.stat-vrednost {
+  font-weight: 600;
+}
+
+.polje-red {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.poruka-uspeha {
+  color: var(--boja-primarna);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
