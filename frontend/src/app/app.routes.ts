@@ -19,6 +19,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
   },
   {
+    path: 'forum/tema/:temaId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/forum/forum.component').then((m) => m.ForumComponent),
+  },
+  {
+    path: 'forum',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/forum/forum.component').then((m) => m.ForumComponent),
+  },
+  {
     path: 'profil',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -67,12 +77,7 @@ export const routes: Routes = [
             (m) => m.StatistikaPregledComponent,
           ),
       },
-      {
-        path: 'chatovi',
-        data: { naslov: 'Chats' },
-        loadComponent: () =>
-          import('./features/profil/placeholder/placeholder.component').then((m) => m.PlaceholderComponent),
-      },
+
     ],
   },
   { path: '**', redirectTo: '' },
