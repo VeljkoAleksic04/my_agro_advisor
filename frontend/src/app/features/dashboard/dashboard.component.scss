@@ -14,6 +14,7 @@
   display: flex;
   gap: 1.25rem;
   align-items: center;
+  position: relative;
 }
 
 .profil-slika {
@@ -243,4 +244,23 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--boja-tekst-suptilan);
+}
+
+
+.dugme-uredi-profil {
+  margin-left: auto;
+  align-self: flex-start;
+  flex: 0 0 auto;
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .karta-profil {
+    flex-wrap: wrap;
+  }
+
+  .dugme-uredi-profil {
+    width: 100%;
+    text-align: center;
+  }
 }
