@@ -14,3 +14,4 @@ Thumbs.db
 frontend/.angular/
 commits.sh
 kommit_log.txt
+ngrok.yml

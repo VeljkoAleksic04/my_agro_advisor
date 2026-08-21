@@ -1,0 +1,509 @@
+.forum-aplikacija {
+  min-height: 100vh;
+  background: var(--boja-pozadina);
+}
+
+.forum-zaglavlje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, var(--boja-primarna-tamnija), var(--boja-primarna));
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  .logo {
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.zaglavlje-akcije {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.dugme-tema,
+.dugme-ikonica {
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.dugme-tema {
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+
+.dugme-ikonica {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+
+.aktivna-ikona {
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.korisnik-oznaka {
+  color: #fff;
+  font-weight: 500;
+}
+
+.forum-sadrzaj {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.forum-feed,
+.forum-tema {
+  width: 100%;
+}
+
+.forum-naslovna-zaglavlje {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--boja-tekst-suptilan);
+  }
+}
+
+.forum-karta {
+  background: var(--boja-povrsina);
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.65rem;
+  box-shadow: var(--senka);
+}
+
+.objave {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.objava {
+  display: flex;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: var(--boja-primarna);
+  }
+}
+
+.glasanje {
+  width: 58px;
+  flex: 0 0 58px;
+  background: var(--boja-povrsina-hover);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.3rem;
+  padding: 0.8rem 0;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.8rem;
+
+  strong {
+    color: var(--boja-tekst);
+  }
+
+  span,
+  button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 1rem;
+  }
+}
+
+.objava-sadrzaj {
+  flex: 1;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+}
+
+.objava-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.75rem;
+}
+
+.subreddit {
+  color: var(--boja-tekst);
+  font-weight: 700;
+}
+
+.objava h2 {
+  margin: 0.45rem 0;
+  font-size: 1.15rem;
+  color: var(--boja-tekst);
+}
+
+.objava-opis {
+  margin: 0;
+  color: var(--boja-tekst-suptilan);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.objava-akcije,
+.tema-akcije,
+.komentar-akcije {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.8rem;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.nova-tema {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.nova-tema-zaglavlje {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    font-size: 1.15rem;
+  }
+}
+
+.zatvori {
+  border: 0;
+  background: transparent;
+  color: var(--boja-tekst-suptilan);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nova-tema label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.nova-tema input,
+.nova-tema textarea,
+.komentar-forma textarea {
+  width: 100%;
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.45rem;
+  padding: 0.7rem 0.8rem;
+  background: var(--boja-povrsina);
+  color: var(--boja-tekst);
+  font: inherit;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: var(--boja-primarna);
+    box-shadow: 0 0 0 3px var(--boja-primarna-blaga);
+  }
+}
+
+.forma-akcije {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.forum-prazno,
+.forum-stanje,
+.forum-greska {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.forum-prazno h2,
+.forum-prazno h3 {
+  margin-bottom: 0.35rem;
+}
+
+.forum-prazno p {
+  margin: 0;
+  color: var(--boja-tekst-suptilan);
+}
+
+.prazno-ikona {
+  font-size: 2rem;
+  margin-bottom: 0.7rem;
+}
+
+.forum-stanje {
+  color: var(--boja-tekst-suptilan);
+}
+
+.forum-greska {
+  background: var(--boja-opasnost-blaga);
+  color: var(--boja-opasnost);
+  border-radius: var(--radijus);
+}
+
+.nazad-forum {
+  border: 0;
+  background: transparent;
+  color: var(--boja-tekst-suptilan);
+  padding: 0;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--boja-primarna);
+  }
+}
+
+.tema-karta {
+  display: flex;
+  overflow: hidden;
+}
+
+.tema-glasanje {
+  justify-content: flex-start;
+  padding-top: 1.2rem;
+
+  button {
+    cursor: pointer;
+
+    &:hover {
+      color: var(--boja-primarna);
+    }
+  }
+}
+
+.tema-sadrzaj {
+  flex: 1;
+  padding: 1.25rem 1.35rem;
+}
+
+.tema-sadrzaj h1 {
+  margin: 0.55rem 0 0.8rem;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.tema-opis {
+  white-space: pre-wrap;
+  line-height: 1.65;
+  color: var(--boja-tekst);
+  margin: 0;
+}
+
+.tema-akcije {
+  border-top: 1px solid var(--boja-ivica);
+  padding-top: 0.75rem;
+}
+
+.tekst-dugme {
+  border: 0;
+  background: transparent;
+  color: var(--boja-tekst-suptilan);
+  cursor: pointer;
+  font-weight: 600;
+
+  &:hover {
+    color: var(--boja-tekst);
+  }
+}
+
+.opasnost {
+  color: var(--boja-opasnost) !important;
+}
+
+.komentari-sekcija {
+  margin-top: 1.5rem;
+}
+
+.komentari-zaglavlje {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  span {
+    background: var(--boja-povrsina-hover);
+    color: var(--boja-tekst-suptilan);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.75rem;
+  }
+}
+
+.komentar-forma {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.odgovor-na {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--boja-povrsina-hover);
+  border-radius: 0.4rem;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.8rem;
+
+  button {
+    border: 0;
+    background: transparent;
+    color: var(--boja-tekst-suptilan);
+    cursor: pointer;
+  }
+}
+
+.komentari {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.komentar {
+  padding: 0.65rem 0;
+  border-left: 2px solid var(--boja-ivica);
+  padding-left: 0.8rem;
+}
+
+.komentar-linija {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 50%;
+  background: var(--boja-primarna-blaga);
+  color: var(--boja-primarna-tamnija);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.komentar-glavno {
+  flex: 1;
+  min-width: 0;
+
+  p {
+    margin: 0.4rem 0 0;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    color: var(--boja-tekst);
+  }
+}
+
+.komentar-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.75rem;
+
+  strong {
+    color: var(--boja-tekst);
+  }
+}
+
+.komentar-akcije {
+  margin-top: 0.5rem;
+
+  button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--boja-tekst-suptilan);
+    cursor: pointer;
+    font: inherit;
+
+    &:hover {
+      color: var(--boja-tekst);
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .forum-zaglavlje {
+    padding: 0.8rem 1rem;
+  }
+
+  .korisnik-oznaka {
+    display: none;
+  }
+
+  .forum-sadrzaj {
+    padding: 1rem 0.75rem 3rem;
+  }
+
+  .forum-naslovna-zaglavlje {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .glasanje {
+    width: 48px;
+    flex-basis: 48px;
+  }
+
+  .tema-sadrzaj,
+  .objava-sadrzaj {
+    padding: 0.8rem;
+  }
+}

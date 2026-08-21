@@ -36,6 +36,12 @@ export class TemaForumaController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/reakcija')
+  promeniReakciju(@CurrentUser() korisnik: any, @Param('id', ParseIntPipe) id: number) {
+    return this.temaForumaService.promeniReakciju(id, korisnik.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @CurrentUser() korisnik: any,

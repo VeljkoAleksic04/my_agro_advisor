@@ -1,0 +1,191 @@
+<div class="forum-aplikacija">
+  <header class="forum-zaglavlje">
+    <a routerLink="/profil/dashboard" class="logo">🌾 <span>MAS</span></a>
+
+    <div class="zaglavlje-akcije">
+      <button type="button" class="dugme-tema" (click)="promeniTemu()">
+        {{ temaServis.tema() === 'tamna' ? 'Light theme' : 'Dark theme' }}
+      </button>
+      <a routerLink="/forum" class="dugme-ikonica aktivna-ikona" title="Forum" aria-label="Forum">💬</a>
+      <button type="button" class="dugme-ikonica" title="Obaveštenja (uskoro)" aria-label="Obaveštenja">🔔</button>
+      @if (korisnik(); as k) {
+        <span class="korisnik-oznaka">{{ k.username }}</span>
+      }
+      <app-korisnik-meni [korisnik]="korisnik()" (odjava)="odjaviSe()" />
+    </div>
+  </header>
+
+  <main class="forum-sadrzaj">
+    @if (ucitavanje()) {
+      <div class="forum-stanje">Učitavanje foruma...</div>
+    } @else if (greska() && !izabranaTema()) {
+      <div class="forum-greska">{{ greska() }}</div>
+    } @else if (!temaId()) {
+      <section class="forum-feed">
+        <header class="forum-naslovna-zaglavlje">
+          <div>
+            <h1>Forum</h1>
+            <p>Razmenjujte iskustva, savete i pitanja sa drugim poljoprivrednicima.</p>
+          </div>
+          <button type="button" class="dugme dugme-primarni" (click)="otvoriFormuTeme()">Nova objava</button>
+        </header>
+
+        @if (prikaziFormuTeme()) {
+          <form class="forum-karta nova-tema" [formGroup]="formaTeme" (ngSubmit)="kreirajTemu()">
+            <div class="nova-tema-zaglavlje">
+              <h2>Kreiraj novu objavu</h2>
+              <button type="button" class="zatvori" (click)="zatvoriFormuTeme()" aria-label="Zatvori">×</button>
+            </div>
+
+            <label>
+              Naslov
+              <input type="text" formControlName="naslov" placeholder="O čemu želite da razgovarate?" />
+            </label>
+            <label>
+              Tekst objave
+              <textarea formControlName="opis" rows="5" placeholder="Opišite problem, pitanje ili iskustvo..."></textarea>
+            </label>
+
+            <div class="forma-akcije">
+              <button type="button" class="dugme dugme-sekundarni" (click)="zatvoriFormuTeme()">Otkaži</button>
+              <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeTeme()">
+                {{ slanjeTeme() ? 'Objavljivanje...' : 'Objavi' }}
+              </button>
+            </div>
+          </form>
+        }
+
+        @if (teme().length === 0) {
+          <div class="forum-prazno forum-karta">
+            <div class="prazno-ikona">💬</div>
+            <h2>Forum je još prazan</h2>
+            <p>Budite prvi koji će pokrenuti razgovor.</p>
+          </div>
+        } @else {
+          <div class="objave">
+            @for (tema of teme(); track tema.id) {
+              <article class="objava forum-karta" (click)="otvoriTemu(tema)">
+                <div class="glasanje" aria-hidden="true">
+                  <span>▲</span>
+                  <strong>{{ tema._count?.reakcije ?? 0 }}</strong>
+                  <span>▼</span>
+                </div>
+
+                <div class="objava-sadrzaj">
+                  <div class="objava-meta">
+                    <span class="subreddit">r/AgroForum</span>
+                    <span>•</span>
+                    <span>u/{{ tema.farmer.username }}</span>
+                    <span>•</span>
+                    <span>{{ tema.datumKreiranja | date: 'dd.MM.yyyy. HH:mm' }}</span>
+                  </div>
+                  <h2>{{ tema.naslov }}</h2>
+                  <p class="objava-opis">{{ tema.opis }}</p>
+                  <div class="objava-akcije">
+                    <span>💬 {{ tema._count?.poruke ?? 0 }} komentara</span>
+                    <span>↗ Podeli</span>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    } @else if (izabranaTema(); as tema) {
+      <section class="forum-tema">
+        <button type="button" class="nazad-forum" (click)="nazadNaForum()">← Nazad na Forum</button>
+
+        <article class="forum-karta tema-karta">
+          <div class="glasanje tema-glasanje">
+            <button type="button" (click)="promeniReakcijuNaTemu()" [disabled]="reagovanjeNaTemu()" aria-label="Glasaj za objavu">▲</button>
+            <strong>{{ tema._count?.reakcije ?? 0 }}</strong>
+            <span>▼</span>
+          </div>
+
+          <div class="tema-sadrzaj">
+            <div class="objava-meta">
+              <span class="subreddit">r/AgroForum</span>
+              <span>•</span>
+              <span>u/{{ tema.farmer.username }}</span>
+              <span>•</span>
+              <span>{{ tema.datumKreiranja | date: 'dd.MM.yyyy. HH:mm' }}</span>
+            </div>
+            <h1>{{ tema.naslov }}</h1>
+            <p class="tema-opis">{{ tema.opis }}</p>
+
+            <div class="tema-akcije">
+              <span>💬 {{ poruke().length }} komentara</span>
+              @if (tema.farmerId === korisnik()?.id) {
+                <button type="button" class="tekst-dugme opasnost" (click)="obrisiTemu(); $event.stopPropagation()">Obriši objavu</button>
+              }
+            </div>
+          </div>
+        </article>
+
+        <section class="komentari-sekcija">
+          <div class="komentari-zaglavlje">
+            <h2>Komentari</h2>
+            <span>{{ poruke().length }}</span>
+          </div>
+
+          <form id="forum-odgovor" class="forum-karta komentar-forma" [formGroup]="formaPoruke" (ngSubmit)="posaljiPoruku()">
+            @if (odgovorNa(); as odgovor) {
+              <div class="odgovor-na">
+                Odgovarate korisniku <strong>u/{{ odgovor.autor.username }}</strong>
+                <button type="button" (click)="otkaziOdgovor()">Otkaži</button>
+              </div>
+            }
+            <textarea formControlName="sadrzaj" rows="4" placeholder="Napišite komentar..."></textarea>
+            <div class="forma-akcije">
+              <button type="submit" class="dugme dugme-primarni" [disabled]="slanjePoruke()">
+                {{ slanjePoruke() ? 'Slanje...' : 'Komentariši' }}
+              </button>
+            </div>
+          </form>
+
+          @if (komentariStablo().length === 0) {
+            <div class="forum-prazno forum-karta">
+              <h3>Nema komentara</h3>
+              <p>Budite prvi koji će odgovoriti na ovu objavu.</p>
+            </div>
+          } @else {
+            <div class="komentari">
+              @for (komentar of komentariStablo(); track komentar.id) {
+                <ng-container *ngTemplateOutlet="komentarTemplate; context: { $implicit: komentar }"></ng-container>
+              }
+            </div>
+          }
+        </section>
+      </section>
+    }
+  </main>
+</div>
+
+<ng-template #komentarTemplate let-komentar>
+  <article class="komentar" [style.margin-left.rem]="komentar.nivo * 2.2">
+    <div class="komentar-linija">
+      <div class="avatar">{{ inicijal(komentar.autor) }}</div>
+      <div class="komentar-glavno">
+        <div class="komentar-meta">
+          <strong>u/{{ komentar.autor.username }}</strong>
+          <span>•</span>
+          <span>{{ komentar.datumKreiranja | date: 'dd.MM.yyyy. HH:mm' }}</span>
+        </div>
+        <p>{{ komentar.sadrzaj }}</p>
+        <div class="komentar-akcije">
+          <button type="button" (click)="promeniReakcijuNaPoruku(komentar)">
+            ▲ {{ komentar._count?.reakcije ?? 0 }}
+          </button>
+          <button type="button" (click)="zapocniOdgovor(komentar)">↩ Odgovori</button>
+          @if (komentar.autorId === korisnik()?.id) {
+            <button type="button" class="opasnost" (click)="obrisiPoruku(komentar)">Obriši</button>
+          }
+        </div>
+      </div>
+    </div>
+
+    @for (odgovor of komentar.odgovoriStablo; track odgovor.id) {
+      <ng-container *ngTemplateOutlet="komentarTemplate; context: { $implicit: odgovor }"></ng-container>
+    }
+  </article>
+</ng-template>

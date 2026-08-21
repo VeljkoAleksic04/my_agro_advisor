@@ -30,6 +30,12 @@ export class PorukaForumaController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/reakcija')
+  promeniReakciju(@CurrentUser() korisnik: any, @Param('id', ParseIntPipe) id: number) {
+    return this.porukaForumaService.promeniReakciju(id, korisnik.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@CurrentUser() korisnik: any, @Param('id', ParseIntPipe) id: number) {
     return this.porukaForumaService.remove(id, korisnik.id);

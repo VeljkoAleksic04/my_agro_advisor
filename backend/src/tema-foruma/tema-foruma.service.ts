@@ -10,12 +10,19 @@ export class TemaForumaService {
   create(korisnikId: number, dto: CreateTemaForumaDto) {
     return this.prisma.temaForuma.create({
       data: { ...dto, farmerId: korisnikId },
+      include: {
+        farmer: { select: { id: true, ime: true, prezime: true, username: true } },
+        _count: { select: { poruke: true, reakcije: true } },
+      },
     });
   }
 
   findAll() {
     return this.prisma.temaForuma.findMany({
-      include: { farmer: { select: { id: true, ime: true, prezime: true, username: true } } },
+      include: {
+        farmer: { select: { id: true, ime: true, prezime: true, username: true } },
+        _count: { select: { poruke: true, reakcije: true } },
+      },
       orderBy: { datumKreiranja: 'desc' },
     });
   }
@@ -25,7 +32,14 @@ export class TemaForumaService {
       where: { id },
       include: {
         farmer: { select: { id: true, ime: true, prezime: true, username: true } },
-        poruke: { orderBy: { datumKreiranja: 'asc' } },
+        poruke: {
+          include: {
+            autor: { select: { id: true, ime: true, prezime: true, username: true } },
+            _count: { select: { reakcije: true, odgovori: true } },
+          },
+          orderBy: { datumKreiranja: 'asc' },
+        },
+        _count: { select: { poruke: true, reakcije: true } },
       },
     });
     if (!tema) throw new NotFoundException('Tema ne postoji');
@@ -46,5 +60,30 @@ export class TemaForumaService {
       throw new ForbiddenException('Ne mozete obrisati tudju temu');
     }
     return this.prisma.temaForuma.delete({ where: { id } });
+  }
+
+  async promeniReakciju(id: number, korisnikId: number) {
+    await this.proveriTemu(id);
+
+    const postojeca = await this.prisma.reakcijaNaTemu.findUnique({
+      where: { idPost_idFarmera: { idPost: id, idFarmera: korisnikId } },
+    });
+
+    if (postojeca) {
+      await this.prisma.reakcijaNaTemu.delete({ where: { id: postojeca.id } });
+    } else {
+      await this.prisma.reakcijaNaTemu.create({
+        data: { idPost: id, idFarmera: korisnikId },
+      });
+    }
+
+    const brojReakcija = await this.prisma.reakcijaNaTemu.count({ where: { idPost: id } });
+    return { brojReakcija, reagovao: !postojeca };
+  }
+
+  private async proveriTemu(id: number) {
+    const tema = await this.prisma.temaForuma.findUnique({ where: { id } });
+    if (!tema) throw new NotFoundException('Tema ne postoji');
+    return tema;
   }
 }
