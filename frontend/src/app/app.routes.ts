@@ -26,6 +26,12 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {
+        path: 'nalog',
+        data: { naslov: 'Moj nalog' },
+        loadComponent: () =>
+          import('./features/profil/profil-nalog/profil-nalog.component').then((m) => m.ProfilNalogComponent),
+      },
+      {
         path: 'dashboard',
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
