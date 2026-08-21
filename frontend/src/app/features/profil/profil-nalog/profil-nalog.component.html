@@ -1,0 +1,127 @@
+<section class="stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Moj nalog</h1>
+      <p class="podnaslov">Pregled i uređivanje ličnih podataka</p>
+    </div>
+  </header>
+
+  @if (greska()) {
+    <p class="poruka-greske">{{ greska() }}</p>
+  }
+
+  @if (ucitavanje()) {
+    <p class="stanje-ucitavanja">Učitavanje profila...</p>
+  } @else if (korisnik(); as k) {
+    <div class="karta nalog-karta">
+      @if (!rezimUredjivanja) {
+        <div class="podaci-red">
+          <div class="stat">
+            <span class="stat-oznaka">Ime i prezime</span>
+            <span class="stat-vrednost">{{ k.ime }} {{ k.prezime }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-oznaka">Korisničko ime</span>
+            <span class="stat-vrednost">{{ k.username }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-oznaka">Email</span>
+            <span class="stat-vrednost">{{ k.email }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-oznaka">Datum rođenja</span>
+            <span class="stat-vrednost">{{ k.datumRodjenja ? (k.datumRodjenja | date: 'dd.MM.yyyy') : '—' }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-oznaka">Broj telefona</span>
+            <span class="stat-vrednost">{{ k.brojTelefona || '—' }}</span>
+          </div>
+        </div>
+
+        @if (uspehProfila) {
+          <p class="poruka-uspeha">{{ uspehProfila }}</p>
+        }
+
+        <div class="akcije-forme">
+          <button type="button" class="dugme dugme-primarni" (click)="otvoriUredjivanje()">Uredi profil</button>
+          <button type="button" class="dugme dugme-sekundarni" (click)="otvoriPromenuLozinke()">Promeni lozinku</button>
+        </div>
+      } @else {
+        <form [formGroup]="formaProfil" (ngSubmit)="sacuvajProfil()" class="forma">
+          <div class="polje-red">
+            <div class="polje">
+              <label for="ime">Ime</label>
+              <input id="ime" type="text" formControlName="ime" />
+            </div>
+            <div class="polje">
+              <label for="prezime">Prezime</label>
+              <input id="prezime" type="text" formControlName="prezime" />
+            </div>
+          </div>
+
+          <div class="polje-red">
+            <div class="polje">
+              <label for="email">Email</label>
+              <input id="email" type="email" formControlName="email" />
+            </div>
+            <div class="polje">
+              <label for="datumRodjenja">Datum rođenja</label>
+              <input id="datumRodjenja" type="date" formControlName="datumRodjenja" />
+            </div>
+          </div>
+
+          <div class="polje">
+            <label for="brojTelefona">Broj telefona</label>
+            <input id="brojTelefona" type="text" formControlName="brojTelefona" placeholder="Opciono" />
+          </div>
+
+          @if (greskaProfila) {
+            <p class="napomena-upozorenje">{{ greskaProfila }}</p>
+          }
+
+          <div class="akcije-forme">
+            <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeProfila">
+              {{ slanjeProfila ? 'Čuvanje...' : 'Sačuvaj izmene' }}
+            </button>
+            <button type="button" class="dugme dugme-sekundarni" (click)="otkaziUredjivanje()">Otkaži</button>
+          </div>
+        </form>
+      }
+    </div>
+
+    @if (rezimLozinke) {
+      <div class="karta nalog-karta">
+        <h3>Promena lozinke</h3>
+        <form [formGroup]="formaLozinka" (ngSubmit)="sacuvajLozinku()" class="forma">
+          <div class="polje">
+            <label for="trenutnaLozinka">Trenutna lozinka</label>
+            <input id="trenutnaLozinka" type="password" formControlName="trenutnaLozinka" />
+          </div>
+          <div class="polje-red">
+            <div class="polje">
+              <label for="novaLozinka">Nova lozinka</label>
+              <input id="novaLozinka" type="password" formControlName="novaLozinka" />
+            </div>
+            <div class="polje">
+              <label for="potvrdaLozinke">Potvrda nove lozinke</label>
+              <input id="potvrdaLozinke" type="password" formControlName="potvrdaLozinke" />
+            </div>
+          </div>
+
+          @if (greskaLozinke) {
+            <p class="napomena-upozorenje">{{ greskaLozinke }}</p>
+          }
+
+          <div class="akcije-forme">
+            <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeLozinke">
+              {{ slanjeLozinke ? 'Čuvanje...' : 'Sačuvaj lozinku' }}
+            </button>
+            <button type="button" class="dugme dugme-sekundarni" (click)="otkaziPromenuLozinke()">Otkaži</button>
+          </div>
+        </form>
+      </div>
+    } @else if (uspehLozinke) {
+      <p class="poruka-uspeha">{{ uspehLozinke }}</p>
+    }
+  }
+</section>
