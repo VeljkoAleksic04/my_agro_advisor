@@ -12,3 +12,5 @@ Thumbs.db
 .vscode/
 .idea/
 frontend/.angular/
+commits.sh
+kommit_log.txt
