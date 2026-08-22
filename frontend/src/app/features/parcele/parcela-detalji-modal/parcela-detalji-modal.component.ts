@@ -82,8 +82,23 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
     // njen modal sa detaljima umesto da ostane da prikazuje zastarelo stanje.
     effect(() => {
       const lista = this.biljke();
-      if (this.biljkaZaModal && !lista.some((b) => b.id === this.biljkaZaModal!.id)) {
+      if (!this.biljkaZaModal) return;
+
+      // `biljkaZaModal` je ranije ostajala na objektu koji je prosleđen
+      // prilikom klika na karticu. Kada backend uspešno evidentira
+      // navodnjavanje ili tretman, NgRx store dobije novu verziju biljke,
+      // ali je Input modal-a i dalje pokazivao na staru referencu. Zato se
+      // ovde otvoreni modal odmah sinhronizuje sa najnovijim objektom iz
+      // store-a, bez zatvaranja/reotvaranja kartice i bez refresh-a stranice.
+      const azuriranaBiljka = lista.find((b) => b.id === this.biljkaZaModal!.id);
+
+      if (!azuriranaBiljka) {
         this.biljkaZaModal = null;
+        return;
+      }
+
+      if (azuriranaBiljka !== this.biljkaZaModal) {
+        this.biljkaZaModal = azuriranaBiljka;
       }
     });
   }

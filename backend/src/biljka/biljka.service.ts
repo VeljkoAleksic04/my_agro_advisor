@@ -11,6 +11,7 @@ import { UpdateBiljkaDto } from './dto/update-biljka.dto';
 import { BiljkaAkcijaTip, IzvrsiAkcijuDto } from './dto/izvrsi-akciju.dto';
 import { jeMesecUPeriodu, preporukaZaVrstu } from './periodi.util';
 import { podrazumevaniPrinosKg } from './prinosi.util';
+import { NavodnjavanjeService } from '../navodnjavanje/navodnjavanje.service';
 
 /** Biljka u ovim statusima se smatra "zavrsenom" - vise ne zauzima povrsinu
  *  na parceli i ne prikazuje se kao aktivna kultura (berba/propadanje su
@@ -19,7 +20,10 @@ const ZAVRSENI_STATUSI: StatusBiljke[] = [StatusBiljke.OBRANA, StatusBiljke.PROP
 
 @Injectable()
 export class BiljkaService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly navodnjavanjeService: NavodnjavanjeService,
+  ) {}
 
   private async proveriVlasnistvoParcele(parcelaId: number, korisnikId: number) {
     const parcela = await this.prisma.parcela.findUnique({ where: { id: parcelaId } });
@@ -185,7 +189,9 @@ export class BiljkaService {
         vrsta: dto.vrsta,
         povrsina: dto.povrsina,
         preporucenaTemperaturaC: dto.preporucenaTemperaturaC,
-        preporucenoDjubrivoId: dto.preporucenoDjubrivoId,
+        preporucenoDjubrivo: dto.preporucenoDjubrivoId
+          ? { connect: { id: dto.preporucenoDjubrivoId } }
+          : { disconnect: true },
         ...(dto.parcelaId !== undefined ? { parcela: { connect: { id: dto.parcelaId } } } : {}),
       };
       return await this.prisma.biljka.update({ where: { id }, data });
@@ -246,13 +252,23 @@ export class BiljkaService {
     }
 
     if (dto.akcija === 'ZALIJ') {
-      return this.prisma.biljka.update({
+      // Evidentiraj i akciju na biljci i zapis u istoriji navodnjavanja.
+      // Oba se izvršavaju pre odgovora, pa frontend odmah dobija konzistentno stanje.
+      const azuriranaBiljka = await this.prisma.biljka.update({
         where: { id: biljka.id },
         data: {
           poslednjeZalivanje: sada,
           status: biljka.status === StatusBiljke.POSADJENA ? StatusBiljke.RASTE : biljka.status,
         },
       });
+
+      await this.navodnjavanjeService.create(korisnikId, {
+        parcelaId: biljka.parcelaId,
+        datumNavodnjavanja: sada.toISOString(),
+        napomena: `Navodnjavanje biljke ${biljka.naziv}`,
+      });
+
+      return azuriranaBiljka;
     }
 
     // TRETIRAJ
