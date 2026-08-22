@@ -21,24 +21,35 @@ import type { Parcela } from '../../../core/models/domain.models';
 export class ParceleListaComponent implements OnInit {
   private readonly store = inject(Store);
 
-  protected readonly ucitavanje = toSignal(this.store.select(selectUcitavanje), { initialValue: false });
-  protected readonly greska = toSignal(this.store.select(selectGreska), { initialValue: null });
-  protected readonly ukupnaPovrsina = toSignal(this.store.select(selectUkupnaPovrsina), { initialValue: 0 });
+  protected readonly ucitavanje = toSignal(this.store.select(selectUcitavanje), {
+    initialValue: false,
+  });
+
+  protected readonly greska = toSignal(this.store.select(selectGreska), {
+    initialValue: null,
+  });
+
+  protected readonly ukupnaPovrsina = toSignal(this.store.select(selectUkupnaPovrsina), {
+    initialValue: 0,
+  });
 
   private readonly pojamUnet$ = new Subject<string>();
   private readonly pretragaObrisana$ = new Subject<void>();
 
-  // Demonstracija RxJS kombinacionih operatora: `merge` spaja dva odvojena izvora
-  // (unos u polje za pretragu i klik na "Obriši pretragu") u jedan tok stringova,
-  // a `combineLatest` taj tok kombinuje sa listom parcela iz store-a kad god se
-  // bilo koji od njih promeni.
   protected readonly filtriraneParcele = toSignal(
     combineLatest([
-      merge(this.pojamUnet$, this.pretragaObrisana$.pipe(map(() => ''))).pipe(startWith('')),
+      merge(
+        this.pojamUnet$,
+        this.pretragaObrisana$.pipe(map(() => '')),
+      ).pipe(startWith('')),
       this.store.select(selectSveParcele),
     ]).pipe(
       map(([pojam, parcele]: [string, Parcela[]]) =>
-        parcele.filter((parcela) => parcela.naziv.toLowerCase().includes(pojam.trim().toLowerCase())),
+        parcele.filter((parcela) =>
+          parcela.naziv
+            .toLowerCase()
+            .includes(pojam.trim().toLowerCase()),
+        ),
       ),
     ),
     { initialValue: [] as Parcela[] },
@@ -51,7 +62,11 @@ export class ParceleListaComponent implements OnInit {
     this.store.dispatch(ParceleActions.ucitajParcele());
   }
 
-  /** Broj kultura zasađenih na parceli — prikazuje se kao bedž na kartici (backend GET /parcele vraca _count.biljke). */
+  /**
+   * Broj kultura zasađenih na parceli.
+   * Vrednost dolazi direktno iz NgRx store-a, pa će se
+   * automatski osvežiti kada se promeni parcela u store-u.
+   */
   brojKultura(parcela: Parcela): number {
     return parcela._count?.biljke ?? 0;
   }
