@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePorukaForumaDto } from './dto/create-poruka-foruma.dto';
+import { ObavestenjeService } from '../obavestenje/obavestenje.service';
 
 @Injectable()
 export class PorukaForumaService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly obavestenjeService: ObavestenjeService,
+  ) {}
 
   async create(korisnikId: number, dto: CreatePorukaForumaDto) {
     const tema = await this.prisma.temaForuma.findUnique({ where: { id: dto.temaId } });
@@ -17,13 +21,37 @@ export class PorukaForumaService {
       }
     }
 
-    return this.prisma.porukaForuma.create({
+    const poruka = await this.prisma.porukaForuma.create({
       data: { ...dto, autorId: korisnikId },
       include: {
         autor: { select: { id: true, ime: true, prezime: true, username: true } },
         _count: { select: { reakcije: true, odgovori: true } },
       },
     });
+
+    // Ako je odgovor na postojeći komentar, obaveštavamo autora tog komentara.
+    // Ako je top-level komentar, obaveštavamo vlasnika teme. Autor samom sebi
+    // ne dobija obaveštenje.
+    const primalacId = dto.parentId
+      ? (await this.prisma.porukaForuma.findUnique({
+          where: { id: dto.parentId },
+          select: { autorId: true },
+        }))?.autorId
+      : tema.farmerId;
+
+    if (primalacId && primalacId !== korisnikId) {
+      await this.obavestenjeService.kreiraj({
+        korisnikId: primalacId,
+        tip: 'ODGOVOR_NA_FORUM',
+        poruka: dto.parentId
+          ? `${poruka.autor.username} je odgovorio na vaš komentar na forumu.`
+          : `${poruka.autor.username} je odgovorio na vašu temu na forumu.`,
+        temaId: tema.id,
+        porukaId: poruka.id,
+      });
+    }
+
+    return poruka;
   }
 
   findAllZaTemu(temaId: number) {

@@ -197,11 +197,22 @@ export class ForumComponent implements OnInit {
       sadrzaj: this.formaPoruke.getRawValue().sadrzaj,
       ...(parentId ? { parentId } : {}),
     }).subscribe({
-      next: () => {
+      next: (novaPoruka) => {
         this.slanjePoruke.set(false);
         this.odgovorNa.set(null);
         this.formaPoruke.reset({ sadrzaj: '' });
-        this.ucitajPoruke(tema.id);
+
+        // Odgovor se odmah dodaje u lokalno stanje. Nema čekanja na refresh
+        // stranice niti na ponovno učitavanje cele teme.
+        this.poruke.update((trenutne) => [...trenutne, novaPoruka]);
+
+        this.izabranaTema.update((trenutna) => trenutna ? {
+          ...trenutna,
+          _count: {
+            ...(trenutna._count ?? { reakcije: 0 }),
+            poruke: (trenutna._count?.poruke ?? 0) + 1,
+          },
+        } : trenutna);
       },
       error: (greska) => {
         this.slanjePoruke.set(false);
