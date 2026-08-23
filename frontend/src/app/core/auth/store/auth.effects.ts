@@ -58,7 +58,7 @@ export class AuthEffects {
         ofType(AuthActions.prijavaUspesna, AuthActions.registracijaUspesna),
         tap(({ token }) => {
           this.tokenStorage.sacuvajToken(token);
-          this.router.navigateByUrl('/parcele');
+          this.router.navigateByUrl('/profil/dashboard');
         }),
       ),
     { dispatch: false },

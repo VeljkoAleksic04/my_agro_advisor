@@ -1,0 +1,46 @@
+<div class="obavestenja">
+  <button
+    type="button"
+    class="dugme-ikonica zvonce"
+    title="Obaveštenja"
+    aria-label="Obaveštenja"
+    (click)="toggle()"
+  >
+    🔔
+    @if (brojNeprocitanih() > 0) {
+      <span class="bedz">{{ brojNeprocitanih() > 99 ? '99+' : brojNeprocitanih() }}</span>
+    }
+  </button>
+
+  @if (otvoreno()) {
+    <div class="panel-obavestenja">
+      <div class="panel-zaglavlje">
+        <strong>Obaveštenja</strong>
+        @if (brojNeprocitanih() > 0) {
+          <button type="button" class="procitaj-sva" (click)="procitajSva()">Označi sve kao pročitano</button>
+        }
+      </div>
+
+      @if (obavestenja().length === 0) {
+        <p class="prazno">Nemate novih obaveštenja.</p>
+      } @else {
+        <div class="lista">
+          @for (obavestenje of obavestenja(); track obavestenje.id) {
+            <button
+              type="button"
+              class="obavestenje"
+              [class.neprocitano]="!obavestenje.procitano"
+              (click)="procitaj(obavestenje)"
+            >
+              <span class="tacka"></span>
+              <span class="tekst">
+                <span class="poruka">{{ obavestenje.poruka }}</span>
+                <span class="vreme">{{ vreme(obavestenje.datumKreiranja) }}</span>
+              </span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

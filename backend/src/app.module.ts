@@ -13,6 +13,7 @@ import { TemaForumaModule } from './tema-foruma/tema-foruma.module';
 import { PorukaForumaModule } from './poruka-foruma/poruka-foruma.module';
 import { IstorijaModule } from './istorija/istorija.module';
 import { StatistikaModule } from './statistika/statistika.module';
+import { ObavestenjeModule } from './obavestenje/obavestenje.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { StatistikaModule } from './statistika/statistika.module';
     PorukaForumaModule,
     IstorijaModule,
     StatistikaModule,
+    ObavestenjeModule,
   ],
 })
 export class AppModule {}

@@ -131,6 +131,7 @@ model Poljoprivrednik {
   reakcijeNaTemu   ReakcijaNaTemu[]
   reakcijeNaPoruku ReakcijaNaPoruku[]
   porukeForuma     PorukaForuma[]
+  obavestenja      Obavestenje[]
 
   @@map("poljoprivrednici")
 }
@@ -329,4 +330,21 @@ model ReakcijaNaPoruku {
 
   @@unique([idMessage, idFarmera])
   @@map("reakcije_na_poruku")
+}
+
+
+model Obavestenje {
+  id             Int              @id @default(autoincrement())
+  korisnikId     Int
+  korisnik       Poljoprivrednik @relation(fields: [korisnikId], references: [id], onDelete: Cascade)
+  tip            String
+  poruka         String
+  temaId         Int?
+  porukaId       Int?
+  procitano      Boolean          @default(false)
+  datumKreiranja DateTime         @default(now())
+
+  @@index([korisnikId, procitano])
+  @@index([korisnikId, datumKreiranja])
+  @@map("obavestenja")
 }

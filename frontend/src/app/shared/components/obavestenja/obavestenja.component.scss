@@ -1,0 +1,117 @@
+.obavestenja {
+  position: relative;
+}
+
+.zvonce {
+  position: relative;
+}
+
+.bedz {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.2rem;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1rem;
+  text-align: center;
+}
+
+.panel-obavestenja {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  width: min(390px, calc(100vw - 2rem));
+  max-height: 430px;
+  overflow: auto;
+  background: var(--boja-povrsina);
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.9rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  color: var(--boja-tekst);
+  z-index: 100;
+}
+
+.panel-zaglavlje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--boja-ivica);
+}
+
+.procitaj-sva {
+  border: 0;
+  background: none;
+  color: var(--boja-primarna);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.prazno {
+  padding: 1.5rem;
+  color: var(--boja-tekst-suptilan);
+  text-align: center;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.obavestenje {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--boja-ivica);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.obavestenje:hover {
+  background: var(--boja-povrsina-hover);
+}
+
+.obavestenje.neprocitano {
+  background: var(--boja-primarna-blaga);
+}
+
+.tacka {
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+  background: transparent;
+  flex: 0 0 auto;
+}
+
+.neprocitano .tacka {
+  background: var(--boja-primarna);
+}
+
+.tekst {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.poruka {
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.vreme {
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.72rem;
+}
