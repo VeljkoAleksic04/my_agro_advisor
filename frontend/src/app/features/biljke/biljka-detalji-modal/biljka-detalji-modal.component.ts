@@ -55,11 +55,27 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
   protected slanjeTretmana = false;
   protected greskaTretmana: string | null = null;
 
-  protected get pesticidi() {
-    return this.preparati().filter((p) => p.tipPreparata === TipPreparata.PESTICID);
+  protected get tipPreporucenogPreparata(): TipPreparata {
+    return this.biljka?.preporucenoDjubrivoId ? TipPreparata.DJUBRIVO : TipPreparata.PESTICID;
+  }
+
+  protected get preparatiZaTretman() {
+    const tip = this.formaTretman.controls.tipPreparata.value;
+    return this.preparati().filter((p) => p.tipPreparata === tip);
+  }
+
+  protected get nazivTipaTretmana(): string {
+    return this.formaTretman.controls.tipPreparata.value === TipPreparata.DJUBRIVO ? 'Đubrivo' : 'Pesticid';
+  }
+
+  protected promeniTipPreparata(): void {
+    const tip = this.formaTretman.controls.tipPreparata.value;
+    const preporucenoId = tip === TipPreparata.DJUBRIVO ? this.biljka?.preporucenoDjubrivoId ?? 0 : 0;
+    this.formaTretman.controls.preparatId.setValue(preporucenoId);
   }
 
   protected readonly formaTretman = this.fb.group({
+    tipPreparata: [TipPreparata.PESTICID, [Validators.required]],
     preparatId: [0, [Validators.required, Validators.min(1)]],
     doza: ['', [Validators.required]],
   });
@@ -73,6 +89,12 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
       this.panel = null;
       this.greskaTretmana = null;
       this.formaBerba.reset({ prinosKg: null });
+      const tip = this.biljka?.preporucenoDjubrivoId ? TipPreparata.DJUBRIVO : TipPreparata.PESTICID;
+      this.formaTretman.reset({
+        tipPreparata: tip,
+        preparatId: tip === TipPreparata.DJUBRIVO ? this.biljka?.preporucenoDjubrivoId ?? 0 : 0,
+        doza: '',
+      });
       // Ocisti staru "van perioda" proveru kad se otvori DRUGA biljka, da
       // eventualna poruka/dugme "Forsiraj berbu" sa prethodno otvorene
       // biljke ne ostane (i pogresno) vidljivo za novu.
@@ -129,7 +151,13 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
           this.store.dispatch(BiljkeActions.izvrsiAkciju({ id: biljka.id, payload: { akcija: 'TRETIRAJ' } }));
           this.slanjeTretmana = false;
           this.panel = null;
-          this.formaTretman.reset({ preparatId: 0, doza: '' });
+          this.formaTretman.reset({
+            tipPreparata: this.tipPreporucenogPreparata,
+            preparatId: this.tipPreporucenogPreparata === TipPreparata.DJUBRIVO
+              ? this.biljka?.preporucenoDjubrivoId ?? 0
+              : 0,
+            doza: '',
+          });
         },
         error: (greska) => {
           this.slanjeTretmana = false;
