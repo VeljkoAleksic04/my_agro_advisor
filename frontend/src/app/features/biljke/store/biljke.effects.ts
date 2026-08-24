@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, concatMap, map, of, switchMap } from 'rxjs';
 import { BiljkeActions } from './biljke.actions';
+import { ParceleActions } from '../../parcele/store/parcele.actions';
 import { BiljkeApiService } from '../biljke-api.service';
 
 @Injectable()
@@ -50,7 +51,10 @@ export class BiljkeEffects {
       ofType(BiljkeActions.dodajBiljku),
       switchMap(({ dto }) =>
         this.api.kreiraj(dto).pipe(
-          map((biljka) => BiljkeActions.dodajBiljkuUspesno({ biljka })),
+          concatMap((biljka) => of(
+            BiljkeActions.dodajBiljkuUspesno({ biljka }),
+            ParceleActions.ucitajParcele(),
+          )),
           catchError((greska) => {
             const telo = greska?.error;
             return of(
@@ -71,7 +75,10 @@ export class BiljkeEffects {
       ofType(BiljkeActions.obrisiBiljku),
       switchMap(({ id }) =>
         this.api.obrisi(id).pipe(
-          map(() => BiljkeActions.obrisiBiljkuUspesno({ id })),
+          concatMap(() => of(
+            BiljkeActions.obrisiBiljkuUspesno({ id }),
+            ParceleActions.ucitajParcele(),
+          )),
           catchError((greska) =>
             of(
               BiljkeActions.obrisiBiljkuNeuspesno({
@@ -94,7 +101,12 @@ export class BiljkeEffects {
       ofType(BiljkeActions.izvrsiAkciju),
       switchMap(({ id, payload }) =>
         this.api.izvrsiAkciju(id, payload).pipe(
-          map((biljka) => BiljkeActions.izvrsiAkcijuUspesno({ biljka })),
+          concatMap((biljka) => {
+            const uspesno = BiljkeActions.izvrsiAkcijuUspesno({ biljka });
+            return biljka.status === 'OBRANA' || biljka.status === 'PROPALA'
+              ? of(uspesno, ParceleActions.ucitajParcele())
+              : of(uspesno);
+          }),
           catchError((greska) => {
             const telo = greska?.error;
             const kod = telo?.kod as string | undefined;
