@@ -132,8 +132,24 @@ model Poljoprivrednik {
   reakcijeNaPoruku ReakcijaNaPoruku[]
   porukeForuma     PorukaForuma[]
   obavestenja      Obavestenje[]
+  kalendarskiDogadjaji KalendarDogadjaj[]
 
   @@map("poljoprivrednici")
+}
+
+
+model KalendarDogadjaj {
+  id            Int             @id @default(autoincrement())
+  farmerId      Int
+  farmer        Poljoprivrednik @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  naslov        String
+  opis          String?
+  datumPocetka DateTime        @db.Date
+  datumKraja   DateTime        @db.Date
+  kreiranDana  DateTime        @default(now())
+
+  @@index([farmerId, datumPocetka, datumKraja])
+  @@map("kalendar_dogadjaji")
 }
 
 model Parcela {

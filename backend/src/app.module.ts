@@ -14,6 +14,7 @@ import { PorukaForumaModule } from './poruka-foruma/poruka-foruma.module';
 import { IstorijaModule } from './istorija/istorija.module';
 import { StatistikaModule } from './statistika/statistika.module';
 import { ObavestenjeModule } from './obavestenje/obavestenje.module';
+import { KalendarModule } from './kalendar/kalendar.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ObavestenjeModule } from './obavestenje/obavestenje.module';
     IstorijaModule,
     StatistikaModule,
     ObavestenjeModule,
+    KalendarModule,
   ],
 })
 export class AppModule {}
