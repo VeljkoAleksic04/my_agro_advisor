@@ -96,32 +96,78 @@
   letter-spacing: 0.03em;
 }
 
-// ---- Kalendar (demo) ----------------------------------------------------
+// ---- Kalendar ------------------------------------------------------------
 
 .karta-kalendar {
   h3 {
-    margin: 0 0 0.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    margin: 0;
     color: var(--boja-tekst);
   }
 }
 
-.oznaka-demo {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--boja-primarna-tamnija);
-  background: var(--boja-primarna-blaga);
-  border-radius: 999px;
-  padding: 0.15rem 0.5rem;
+.kalendar-zaglavlje {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .kalendar-mesec {
-  margin: 0 0 0.75rem;
+  margin: 0.2rem 0 0;
   color: var(--boja-tekst-suptilan);
   text-transform: capitalize;
+}
+
+.kalendar-navigacija {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.kalendar-strelica,
+.kalendar-danas {
+  border: 1px solid var(--boja-ivica);
+  background: var(--boja-povrsina-hover);
+  color: var(--boja-tekst);
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+
+.kalendar-strelica {
+  width: 32px;
+  height: 32px;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.kalendar-danas {
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.kalendar-akcije {
+  margin: 0.75rem 0;
+}
+
+.kalendar-forma {
+  margin-bottom: 0.9rem;
+  padding: 0.85rem;
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.6rem;
+  background: var(--boja-povrsina-hover);
+}
+
+.kalendar-forma-red {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.kalendar-forma textarea,
+.kalendar-forma input {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .kalendar-mreza {
@@ -140,6 +186,8 @@
 
 .kalendar-dan {
   aspect-ratio: 1;
+  min-width: 0;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,6 +195,7 @@
   font-size: 0.8rem;
   color: var(--boja-tekst);
   background: var(--boja-povrsina-hover);
+  border: 1px solid transparent;
 
   &--prazan {
     background: transparent;
@@ -154,32 +203,66 @@
 
   &--danas {
     outline: 2px solid var(--boja-primarna);
-    font-weight: 700;
+    font-weight: 800;
   }
 
-  &--dogadjaj {
-    background: var(--boja-primarna-blaga);
-    color: var(--boja-primarna-tamnija);
-    font-weight: 700;
-    cursor: help;
+  &--setva {
+    background: rgba(212, 175, 55, 0.18);
+    border-color: rgba(212, 175, 55, 0.45);
+  }
+
+  &--berba {
+    background: rgba(46, 125, 50, 0.2);
+    border-color: rgba(46, 125, 50, 0.45);
+  }
+
+  &--setva.kalendar-dan--berba {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0 50%, rgba(46, 125, 50, 0.2) 50% 100%);
+  }
+
+  &--rucni {
+    border-style: dashed;
+    border-color: var(--boja-primarna);
   }
 }
 
-.kalendar-legenda {
+.kalendar-rucna-tacka {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--boja-primarna);
+}
+
+.kalendar-legenda,
+.kalendar-stavke {
   list-style: none;
   margin: 0.9rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--boja-tekst-suptilan);
+}
 
-  li {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
+.kalendar-stavke {
+  margin-top: 0.65rem;
+}
+
+.kalendar-stavka {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  line-height: 1.35;
+}
+
+.kalendar-legenda li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .tacka-dogadjaja {
@@ -188,6 +271,28 @@
   border-radius: 50%;
   background: var(--boja-primarna);
   flex: 0 0 auto;
+}
+
+.tacka-setva {
+  background: #d4af37;
+}
+
+.tacka-berba {
+  background: #2e7d32;
+}
+
+.tacka-rucni {
+  background: var(--boja-primarna);
+}
+
+@media (max-width: 600px) {
+  .kalendar-zaglavlje {
+    flex-direction: column;
+  }
+
+  .kalendar-forma-red {
+    grid-template-columns: 1fr;
+  }
 }
 
 // ---- Kružni prinosi -------------------------------------------------------

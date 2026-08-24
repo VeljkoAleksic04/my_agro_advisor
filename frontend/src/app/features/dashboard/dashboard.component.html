@@ -42,33 +42,107 @@
       <span class="broj-parcela-oznaka">{{ brojParcela() === 1 ? 'parcela' : 'parcela ukupno' }}</span>
     </article>
 
-    <!-- Kalendar predviđenih vremena setve (demo) -->
+    <!-- Kalendar preporučenih perioda + ručno planiranih događaja -->
     <article class="karta karta-kalendar">
-      <h3>Kalendar setve <span class="oznaka-demo">demo</span></h3>
-      <p class="kalendar-mesec">{{ nazivMeseca }}</p>
+      <div class="kalendar-zaglavlje">
+        <div>
+          <h3>Kalendar</h3>
+          <p class="kalendar-mesec">{{ nazivMeseca() }}</p>
+        </div>
+        <div class="kalendar-navigacija">
+          <button type="button" class="kalendar-strelica" (click)="promeniMesec(-1)" aria-label="Prethodni mesec">‹</button>
+          <button type="button" class="kalendar-danas" (click)="idiNaDanas()">Danas</button>
+          <button type="button" class="kalendar-strelica" (click)="promeniMesec(1)" aria-label="Sledeći mesec">›</button>
+        </div>
+      </div>
+
+      <div class="kalendar-akcije">
+        <button type="button" class="dugme dugme-sekundarni dugme-malo" (click)="otvoriFormuDogadjaja()">
+          + Novi događaj
+        </button>
+      </div>
+
+      @if (prikaziFormuDogadjaja) {
+        <form [formGroup]="formaDogadjaj" (ngSubmit)="sacuvajDogadjaj()" class="kalendar-forma">
+          <div class="polje">
+            <label for="kalendarNaslov">Naziv događaja</label>
+            <input id="kalendarNaslov" type="text" formControlName="naslov" placeholder="npr. Nabavka semena" />
+          </div>
+          <div class="kalendar-forma-red">
+            <div class="polje">
+              <label for="kalendarPocetak">Od</label>
+              <input id="kalendarPocetak" type="date" formControlName="datumPocetka" />
+            </div>
+            <div class="polje">
+              <label for="kalendarKraj">Do</label>
+              <input id="kalendarKraj" type="date" formControlName="datumKraja" />
+            </div>
+          </div>
+          <div class="polje">
+            <label for="kalendarOpis">Opis</label>
+            <textarea id="kalendarOpis" rows="2" formControlName="opis" placeholder="Opciono"></textarea>
+          </div>
+          @if (greskaDogadjaja) {
+            <p class="napomena-upozorenje">{{ greskaDogadjaja }}</p>
+          }
+          <div class="akcije-forme">
+            <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeDogadjaja">Sačuvaj događaj</button>
+            <button type="button" class="dugme dugme-sekundarni" (click)="otkaziFormuDogadjaja()">Otkaži</button>
+          </div>
+        </form>
+      }
+
       <div class="kalendar-mreza">
         @for (dan of daniUNedelji; track dan) {
           <span class="kalendar-header-dan">{{ dan }}</span>
         }
-        @for (prazno of praznaPolja; track $index) {
+        @for (prazno of praznaPolja(); track $index) {
           <span class="kalendar-dan kalendar-dan--prazan"></span>
         }
-        @for (dan of danaUMesecu; track dan) {
+        @for (dan of danaUMesecu(); track dan) {
           <span
             class="kalendar-dan"
-            [class.kalendar-dan--danas]="dan === danasnjiDan"
-            [class.kalendar-dan--dogadjaj]="dogadjajZaDan(dan)"
-            [title]="dogadjajZaDan(dan)?.naziv ?? ''"
+            [class.kalendar-dan--danas]="jeDanas(dan)"
+            [class.kalendar-dan--setva]="imaSetvu(dan)"
+            [class.kalendar-dan--berba]="imaBerbu(dan)"
+            [class.kalendar-dan--rucni]="imaRucniDogadjaj(dan)"
+            [title]="naslovDana(dan)"
           >
             {{ dan }}
+            @if (imaRucniDogadjaj(dan)) {
+              <span class="kalendar-rucna-tacka"></span>
+            }
           </span>
         }
       </div>
+
       <ul class="kalendar-legenda">
-        @for (dogadjaj of demoDogadjaji; track dogadjaj.dan) {
-          <li><span class="tacka-dogadjaja"></span>{{ dogadjaj.dan }}. — {{ dogadjaj.naziv }}</li>
-        }
+        <li><span class="tacka-dogadjaja tacka-setva"></span>Preporučeni period setve/sadnje</li>
+        <li><span class="tacka-dogadjaja tacka-berba"></span>Preporučeni period žetve/ubiranja</li>
+        <li><span class="tacka-dogadjaja tacka-rucni"></span>Ručno planiran događaj</li>
       </ul>
+
+      @if (predvidjeniDogadjajiZaMesec().length > 0) {
+        <div class="kalendar-stavke">
+          @for (dogadjaj of predvidjeniDogadjajiZaMesec(); track dogadjaj.tip + '-' + dogadjaj.biljka.id) {
+            <div class="kalendar-stavka">
+              <span class="tacka-dogadjaja" [class.tacka-setva]="dogadjaj.tip === 'SETVA'" [class.tacka-berba]="dogadjaj.tip === 'BERBA'"></span>
+              <span><strong>{{ dogadjaj.tip === 'SETVA' ? 'Setva/sadnja' : 'Žetva/berba' }}:</strong> {{ dogadjaj.naziv }} — {{ formatirajPeriod(dogadjaj.pocetak, dogadjaj.kraj) }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (rucniDogadjajiZaMesec().length > 0) {
+        <div class="kalendar-stavke">
+          @for (dogadjaj of rucniDogadjajiZaMesec(); track dogadjaj.id) {
+            <div class="kalendar-stavka">
+              <span class="tacka-dogadjaja tacka-rucni"></span>
+              <span><strong>{{ dogadjaj.naslov }}</strong> — {{ formatirajPeriod(dogadjaj.datumPocetka, dogadjaj.datumKraja) }}</span>
+            </div>
+          }
+        </div>
+      }
     </article>
 
     <!-- Kružni prikazi zasejane površine ove godine (po kategoriji biljaka) -->
