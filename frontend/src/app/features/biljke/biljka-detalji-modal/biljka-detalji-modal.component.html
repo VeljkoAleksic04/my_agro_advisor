@@ -28,17 +28,24 @@
       @if (panel === 'TRETMAN') {
         <form [formGroup]="formaTretman" (ngSubmit)="posaljiTretman()" class="forma forma-akcije">
           <div class="polje">
-            <label for="preparatId">Preparat</label>
+            <label for="tipTretmana">Tip preparata</label>
+            <select id="tipTretmana" formControlName="tipPreparata" (change)="promeniTipPreparata()">
+              <option [value]="TipPreparata.PESTICID">Pesticid</option>
+              <option [value]="TipPreparata.DJUBRIVO">Đubrivo</option>
+            </select>
+          </div>
+          <div class="polje">
+            <label for="preparatId">{{ nazivTipaTretmana }}</label>
             <select id="preparatId" formControlName="preparatId">
-              <option [value]="0" disabled>Izaberite preparat</option>
-              @for (preparat of pesticidi; track preparat.id) {
+              <option [value]="0" disabled>Izaberite {{ nazivTipaTretmana.toLowerCase() }}</option>
+              @for (preparat of preparatiZaTretman; track preparat.id) {
                 <option [value]="preparat.id">{{ preparat.naziv }} ({{ preparat.proizvodjac }})</option>
               }
             </select>
-            @if (pesticidi.length === 0) {
-              <span class="greska-polja">Nema dostupnih preparata za tretman.</span>
+            @if (preparatiZaTretman.length === 0) {
+              <span class="greska-polja">Nema dostupnih {{ nazivTipaTretmana.toLowerCase() }}.</span>
             }
-            <button type="button" class="dugme-link" (click)="otvoriNoviPreparat()">+ Novi preparat</button>
+            <button type="button" class="dugme-link" (click)="otvoriNoviPreparat()">+ Novi {{ nazivTipaTretmana.toLowerCase() }}</button>
           </div>
           <div class="polje">
             <label for="doza">Doza</label>
@@ -105,7 +112,7 @@
 
 <app-preparat-forma-modal
   [otvoren]="novPreparatOtvoren"
-  [podrazumevaniTip]="TipPreparata.PESTICID"
+  [podrazumevaniTip]="formaTretman.controls.tipPreparata.value"
   (zatvoreno)="novPreparatOtvoren = false"
   (kreiran)="preparatKreiran($event)"
 />
