@@ -52,6 +52,7 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
   protected panel: PanelAkcije = null;
   protected potvrdaBrisanjaOtvorena = false;
   protected novPreparatOtvoren = false;
+  protected preparatZaBrisanje: Preparat | null = null;
   protected slanjeTretmana = false;
   protected greskaTretmana: string | null = null;
 
@@ -181,6 +182,24 @@ export class BiljkaDetaljiModalComponent implements OnChanges {
   preparatKreiran(noviPreparat: Preparat): void {
     this.novPreparatOtvoren = false;
     this.formaTretman.patchValue({ preparatId: noviPreparat.id });
+  }
+
+  zatraziBrisanjePreparata(): void {
+    const preparatId = this.formaTretman.controls.preparatId.value;
+    const preparat = this.preparati().find((stavka) => stavka.id === preparatId);
+    if (preparat) this.preparatZaBrisanje = preparat;
+  }
+
+  potvrdiBrisanjePreparata(): void {
+    const preparat = this.preparatZaBrisanje;
+    if (!preparat) return;
+    this.preparatApi.obrisi(preparat.id).subscribe({
+      next: () => {
+        this.preparatZaBrisanje = null;
+        this.formaTretman.controls.preparatId.setValue(0);
+      },
+      error: (greska) => this.greskaTretmana = greska?.error?.message ?? 'Preparat nije moguće obrisati.',
+    });
   }
 
   zatraziBrisanje(): void {
