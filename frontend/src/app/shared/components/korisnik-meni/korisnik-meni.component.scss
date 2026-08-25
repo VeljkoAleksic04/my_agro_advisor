@@ -19,6 +19,13 @@
     color: var(--boja-primarna-tamnija);
   }
 
+  .avatar-slika {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+
   &:hover {
     background: #fff;
   }

@@ -1,7 +1,11 @@
 <div class="korisnik-meni">
   <button type="button" class="dugme-avatar" (click)="preklopi()" [title]="korisnik ? 'Nalog' : 'Prijava / Registracija'">
     @if (korisnik) {
-      <span class="avatar-inicijal">{{ korisnik.username.charAt(0).toUpperCase() }}</span>
+      @if (korisnik.slika) {
+        <img [src]="korisnik.slika" alt="Profilna slika" class="avatar-slika" />
+      } @else {
+        <span class="avatar-inicijal">{{ korisnik.username.charAt(0).toUpperCase() }}</span>
+      }
     } @else {
       👤
     }
@@ -20,4 +24,3 @@
     </div>
   }
 </div>
-0

@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 export interface KorisnikMeniPodaci {
   username: string;
+  slika?: string | null;
 }
 
 /**
