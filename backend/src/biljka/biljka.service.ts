@@ -18,6 +18,13 @@ import { NavodnjavanjeService } from '../navodnjavanje/navodnjavanje.service';
  *  konacni ishodi ciklusa gajenja). */
 const ZAVRSENI_STATUSI: StatusBiljke[] = [StatusBiljke.OBRANA, StatusBiljke.PROPALA];
 
+/** Površina biljke se trajno čuva u arima, nezavisno od jedinice parcele. */
+const ARI_PO_JEDINICI: Record<JedinicaPovrsine, number> = {
+  [JedinicaPovrsine.HA]: 100,
+  [JedinicaPovrsine.A]: 1,
+  [JedinicaPovrsine.M2]: 0.01,
+};
+
 @Injectable()
 export class BiljkaService {
   constructor(
@@ -86,16 +93,12 @@ export class BiljkaService {
       (b) => b.id !== izuzmiBiljkuId && !ZAVRSENI_STATUSI.includes(b.status),
     );
 
-    const zauzeto = parcela.jedinicaMere === JedinicaPovrsine.HA ?
-      aktivneBiljke.reduce((zbir, b) => zbir + b.povrsina*100, 0) :
-      aktivneBiljke.reduce((zbir, b) => zbir + b.povrsina, 0);
-      
-    const slobodno = parcela.jedinicaMere === JedinicaPovrsine.HA ? 
-      parcela.povrsina*100 - zauzeto : parcela.povrsina - zauzeto;
+    const zauzeto = aktivneBiljke.reduce((zbir, b) => zbir + b.povrsina, 0);
+    const slobodno = parcela.povrsina * ARI_PO_JEDINICI[parcela.jedinicaMere] - zauzeto;
 
     if (zeljenaPovrsina > slobodno) {
       throw new ConflictException({
-        message: `Nema dovoljno slobodne povrsine na parceli. Slobodno: ${slobodno}, zatrazeno: ${zeljenaPovrsina}.`,
+        message: `Nema dovoljno slobodne povrsine na parceli. Slobodno: ${slobodno} a, zatrazeno: ${zeljenaPovrsina} a.`,
         kod: 'NEDOVOLJNO_POVRSINE',
         slobodnaPovrsina: slobodno,
       });
