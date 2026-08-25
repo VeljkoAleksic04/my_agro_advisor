@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePreparatDto } from './dto/create-preparat.dto';
 import { UpdatePreparatDto } from './dto/update-preparat.dto';
@@ -79,6 +80,13 @@ export class PreparatService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.preparat.delete({ where: { id } });
+    try {
+      return await this.prisma.preparat.delete({ where: { id } });
+    } catch (greska) {
+      if (greska instanceof Prisma.PrismaClientKnownRequestError && greska.code === 'P2003') {
+        throw new ConflictException('Preparat nije moguće obrisati jer je već korišćen u evidentiranom tretmanu.');
+      }
+      throw greska;
+    }
   }
 }
