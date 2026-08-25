@@ -36,3 +36,30 @@
   font-size: 0.9rem;
   margin: 0.5rem 0;
 }
+.profilna-slika-nalog {
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--boja-primarna-blaga);
+  color: var(--boja-primarna-tamnija);
+  display: grid;
+  place-items: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.pregled-profilne-slike {
+  width: 4rem;
+  height: 4rem;
+  margin-top: 0.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
