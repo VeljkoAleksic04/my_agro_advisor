@@ -33,4 +33,13 @@ export class PreparatApiService {
       }),
     );
   }
+
+  obrisi(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => {
+        const trenutni = this.preparatiKes$.value ?? [];
+        this.preparatiKes$.next(trenutni.filter((preparat) => preparat.id !== id));
+      }),
+    );
+  }
 }
