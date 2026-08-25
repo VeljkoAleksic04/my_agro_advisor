@@ -14,6 +14,8 @@ import { PreparatApiService } from '../../preparat/preparat-api.service';
 import { PreparatFormaModalComponent } from '../../preparat/preparat-forma-modal/preparat-forma-modal.component';
 import { TretmanApiService } from '../../tretman/tretman-api.service';
 
+const ARI_PO_JEDINICI = { A: 1, HA: 100, M2: 0.01 } as const;
+
 /**
  * Modal sa detaljima parcele (opšte informacije + opis + biljke na njoj).
  * Dugme za brisanje i dugme za đubrenje parcele se nalaze isključivo ovde —
@@ -58,6 +60,7 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
 
   protected prikaziFormuBiljke = false;
   protected novPreparatOtvoren = false;
+  protected preparatZaBrisanje: Preparat | null = null;
   protected potvrdaBrisanjaOtvorena = false;
   protected biljkaZaModal: Biljka | null = null;
   protected slanjeDjubriva = false;
@@ -117,6 +120,24 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
     this.formaDjubrenje.patchValue({ preparatId: noviPreparat.id });
   }
 
+  zatraziBrisanjePreparata(): void {
+    const preparatId = this.formaDjubrenje.controls.preparatId.value;
+    const preparat = this.djubriva.find((stavka) => stavka.id === preparatId);
+    if (preparat) this.preparatZaBrisanje = preparat;
+  }
+
+  potvrdiBrisanjePreparata(): void {
+    const preparat = this.preparatZaBrisanje;
+    if (!preparat) return;
+    this.preparatApi.obrisi(preparat.id).subscribe({
+      next: () => {
+        this.preparatZaBrisanje = null;
+        this.formaDjubrenje.controls.preparatId.setValue(0);
+      },
+      error: (greska) => this.greskaDjubriva = greska?.error?.message ?? 'Đubrivo nije moguće obrisati.',
+    });
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['parcela'] && this.parcela) {
       this.prikaziFormuBiljke = false;
@@ -129,12 +150,7 @@ export class ParcelaDetaljiModalComponent implements OnChanges {
   get slobodnaPovrsina(): number {
     if (!this.parcela) return 0;
     const zauzeto = this.biljke().reduce((zbir, b) => zbir + b.povrsina, 0);
-    return Math.max(0, Math.floor(this.parcela.povrsina - zauzeto));
-  }
-
-  get jedinicaPovrsine(): JedinicaPovrsine {
-    if(!this.parcela) return JedinicaPovrsine.A;
-    return this.parcela.jedinicaMere;
+    return Math.max(0, Math.floor(this.parcela.povrsina * ARI_PO_JEDINICI[this.parcela.jedinicaMere] - zauzeto));
   }
 
   zatvori(): void {

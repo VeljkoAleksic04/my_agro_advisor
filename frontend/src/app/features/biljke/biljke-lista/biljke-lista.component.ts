@@ -12,6 +12,8 @@ import type { NovaBiljka } from '../biljke-api.service';
 import { NAZIVI_VRSTA_BILJAKA } from '../../../core/models/domain.models';
 import { PotvrdaModalComponent } from '../../../shared/components/potvrda-modal/potvrda-modal.component';
 
+const ARI_PO_JEDINICI = { A: 1, HA: 100, M2: 0.01 } as const;
+
 @Component({
   selector: 'app-biljke-lista',
   standalone: true,
@@ -69,7 +71,7 @@ export class BiljkeListaComponent implements OnInit {
     const parcela = this.sveParcele().find((p) => p.id === this.odabranaParcelaId);
     if (!parcela) return 0;
     const zauzeto = this.biljke().reduce((zbir, b) => zbir + b.povrsina, 0);
-    return Math.max(0, Math.floor(parcela.povrsina - zauzeto));
+    return Math.max(0, Math.floor(parcela.povrsina * ARI_PO_JEDINICI[parcela.jedinicaMere] - zauzeto));
   }
 
   zatraziBrisanje(id: number): void {
