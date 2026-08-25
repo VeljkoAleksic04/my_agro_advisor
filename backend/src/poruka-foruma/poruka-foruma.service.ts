@@ -71,7 +71,42 @@ export class PorukaForumaService {
     if (poruka.autorId !== korisnikId) {
       throw new ForbiddenException('Ne mozete obrisati tudju poruku');
     }
-    return this.prisma.porukaForuma.delete({ where: { id } });
+
+    // Relacija odgovora ne dozvoljava brisanje roditelja dok postoje njegovi
+    // odgovori. Brišemo ceo podniz odgovora, od najdubljeg ka korenu, kako
+    // bi korisnik mogao da obriše i komentar na koji je neko već odgovorio.
+    const porukeTeme = await this.prisma.porukaForuma.findMany({
+      where: { temaId: poruka.temaId },
+      select: { id: true, parentId: true },
+    });
+    const zaBrisanje = new Set<number>([id]);
+    let pronadjenNovi: boolean;
+    do {
+      pronadjenNovi = false;
+      for (const stavka of porukeTeme) {
+        if (stavka.parentId && zaBrisanje.has(stavka.parentId) && !zaBrisanje.has(stavka.id)) {
+          zaBrisanje.add(stavka.id);
+          pronadjenNovi = true;
+        }
+      }
+    } while (pronadjenNovi);
+
+    const preostaleZaBrisanje = new Set(zaBrisanje);
+    await this.prisma.$transaction(async (tx) => {
+      // U svakom prolazu brišemo samo "listove" stabla. Tako relacija
+      // parent/odgovor ostaje validna i kada komentar ima više nivoa odgovora.
+      while (preostaleZaBrisanje.size > 0) {
+        const roditelji = new Set(
+          porukeTeme
+            .filter((stavka) => stavka.parentId && preostaleZaBrisanje.has(stavka.parentId))
+            .map((stavka) => stavka.parentId!),
+        );
+        const listovi = [...preostaleZaBrisanje].filter((porukaId) => !roditelji.has(porukaId));
+        await tx.porukaForuma.deleteMany({ where: { id: { in: listovi } } });
+        listovi.forEach((porukaId) => preostaleZaBrisanje.delete(porukaId));
+      }
+    });
+    return { uspesno: true };
   }
 
   async promeniReakciju(id: number, korisnikId: number) {
