@@ -10,6 +10,12 @@ export interface NovaBiljkaForma {
   povrsina: number;
 }
 
+const ARI_PO_JEDINICI: Record<JedinicaPovrsine, number> = {
+  [JedinicaPovrsine.HA]: 100,
+  [JedinicaPovrsine.A]: 1,
+  [JedinicaPovrsine.M2]: 0.01,
+};
+
 /**
  * Forma za dodavanje nove biljne kulture na parcelu.
  * Korisnik unosi SAMO naziv, biljnu kulturu (vrstu) i površinu koju kultura
@@ -46,7 +52,8 @@ export class BiljkaFormaComponent implements OnChanges {
     naziv: ['', [Validators.required, Validators.minLength(2)]],
     vrsta: [VrstaBiljke.PARADAJZ, [Validators.required]],
     celaPovrsina: [false],
-    povrsina: [1, [Validators.required, Validators.min(1)]],
+    povrsina: [1, [Validators.required, Validators.min(0.01)]],
+    jedinicaMere: [JedinicaPovrsine.A, [Validators.required]],
   });
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -77,6 +84,11 @@ export class BiljkaFormaComponent implements OnChanges {
     return !jeDatumUPeriodu(danasIso, this.preporukaZaOdabranuVrstu.setva);
   }
 
+  /** Pretvara korisnički unos u are, jedinicu u kojoj se čuva površina biljke. */
+  private uAre(povrsina: number, jedinica: JedinicaPovrsine): number {
+    return Math.round(povrsina * ARI_PO_JEDINICI[jedinica]);
+  }
+
   posalji(): void {
     if (this.forma.invalid) {
       this.forma.markAllAsTouched();
@@ -84,7 +96,9 @@ export class BiljkaFormaComponent implements OnChanges {
     }
 
     const vrednosti = this.forma.getRawValue();
-    const zeljenaPovrsina = vrednosti.celaPovrsina ? Math.floor(this.slobodnaPovrsina) : vrednosti.povrsina;
+    const zeljenaPovrsina = vrednosti.celaPovrsina
+      ? Math.floor(this.slobodnaPovrsina)
+      : this.uAre(vrednosti.povrsina, vrednosti.jedinicaMere);
 
     if (zeljenaPovrsina <= 0 || zeljenaPovrsina > this.slobodnaPovrsina) {
       this.nedovoljnoPovrsineOtvoreno = true;
@@ -94,7 +108,7 @@ export class BiljkaFormaComponent implements OnChanges {
     this.sacuvano.emit({
       naziv: vrednosti.naziv,
       vrsta: vrednosti.vrsta,
-      povrsina: Math.round(zeljenaPovrsina),
+      povrsina: zeljenaPovrsina,
     });
   }
 
