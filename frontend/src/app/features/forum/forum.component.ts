@@ -9,6 +9,10 @@ import { AuthActions } from '../../core/auth/store/auth.actions';
 import { selectKorisnik } from '../../core/auth/store/auth.reducer';
 import { ThemeService } from '../../shared/services/theme.service';
 import { KorisnikMeniComponent } from '../../shared/components/korisnik-meni/korisnik-meni.component';
+import { ObavestenjaComponent } from '../../shared/components/obavestenja/obavestenja.component';
+import { ForumIndikatorComponent } from '../../shared/components/forum-indikator/forum-indikator.component';
+import { ForumIndikatorService } from '../../shared/services/forum-indikator.service';
+import { PotvrdaModalComponent } from '../../shared/components/potvrda-modal/potvrda-modal.component';
 import {
   ForumApiService,
   ForumAutor,
@@ -24,7 +28,7 @@ interface ForumKomentar extends ForumPoruka {
 @Component({
   selector: 'app-forum',
   standalone: true,
-  imports: [DatePipe, NgTemplateOutlet, RouterLink, ReactiveFormsModule, KorisnikMeniComponent],
+  imports: [DatePipe, NgTemplateOutlet, RouterLink, ReactiveFormsModule, KorisnikMeniComponent, ObavestenjaComponent, ForumIndikatorComponent, PotvrdaModalComponent],
   templateUrl: './forum.component.html',
   styleUrl: './forum.component.scss',
 })
@@ -35,6 +39,7 @@ export class ForumComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder).nonNullable;
   protected readonly temaServis = inject(ThemeService);
+  private readonly forumIndikator = inject(ForumIndikatorService);
 
   protected readonly korisnik = toSignal(this.store.select(selectKorisnik), { initialValue: null });
   protected readonly teme = signal<ForumTema[]>([]);
@@ -49,6 +54,8 @@ export class ForumComponent implements OnInit {
   protected readonly reagovanjeNaTemu = signal(false);
   protected readonly reagovanjeNaPoruku = signal<number | null>(null);
   protected readonly temaId = signal<number | null>(null);
+  protected potvrdaBrisanjaTemeOtvorena = false;
+  protected porukaZaBrisanje: ForumPoruka | null = null;
 
   protected readonly formaTeme = this.fb.group({
     naslov: ['', [Validators.required, Validators.minLength(3)]],
@@ -88,6 +95,7 @@ export class ForumComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(AuthActions.ucitajSacuvanuSesiju());
+    this.forumIndikator.oznaciKaoVidjeno();
 
     this.route.paramMap
       .pipe(switchMap((params) => {
@@ -256,21 +264,31 @@ export class ForumComponent implements OnInit {
     });
   }
 
-  obrisiTemu(): void {
+  zatraziBrisanjeTeme(): void {
     const tema = this.izabranaTema();
     if (!tema || tema.farmerId !== this.korisnik()?.id) return;
-    if (!confirm('Da li ste sigurni da želite da obrišete ovu temu?')) return;
+    this.potvrdaBrisanjaTemeOtvorena = true;
+  }
 
+  potvrdiBrisanjeTeme(): void {
+    const tema = this.izabranaTema();
+    if (!tema || tema.farmerId !== this.korisnik()?.id) return;
+    this.potvrdaBrisanjaTemeOtvorena = false;
     this.forumApi.obrisiTemu(tema.id).subscribe({
       next: () => this.nazadNaForum(),
       error: (greska) => this.greska.set(greska?.error?.message ?? 'Greška pri brisanju teme.'),
     });
   }
 
-  obrisiPoruku(poruka: ForumPoruka): void {
+  zatraziBrisanjePoruke(poruka: ForumPoruka): void {
     if (poruka.autorId !== this.korisnik()?.id) return;
-    if (!confirm('Da li ste sigurni da želite da obrišete ovaj komentar?')) return;
+    this.porukaZaBrisanje = poruka;
+  }
 
+  potvrdiBrisanjePoruke(): void {
+    const poruka = this.porukaZaBrisanje;
+    if (!poruka || poruka.autorId !== this.korisnik()?.id) return;
+    this.porukaZaBrisanje = null;
     this.forumApi.obrisiPoruku(poruka.id).subscribe({
       next: () => {
         const tema = this.izabranaTema();
@@ -278,6 +296,10 @@ export class ForumComponent implements OnInit {
       },
       error: (greska) => this.greska.set(greska?.error?.message ?? 'Greška pri brisanju komentara.'),
     });
+  }
+
+  otkaziBrisanjePoruke(): void {
+    this.porukaZaBrisanje = null;
   }
 
   autorIme(autor: ForumAutor): string {

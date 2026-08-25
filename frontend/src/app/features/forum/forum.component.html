@@ -6,8 +6,8 @@
       <button type="button" class="dugme-tema" (click)="promeniTemu()">
         {{ temaServis.tema() === 'tamna' ? 'Light theme' : 'Dark theme' }}
       </button>
-      <a routerLink="/forum" class="dugme-ikonica aktivna-ikona" title="Forum" aria-label="Forum">💬</a>
-      <button type="button" class="dugme-ikonica" title="Obaveštenja (uskoro)" aria-label="Obaveštenja">🔔</button>
+      <app-forum-indikator />
+      <app-obavestenja />
       @if (korisnik(); as k) {
         <span class="korisnik-oznaka">{{ k.username }}</span>
       }
@@ -116,7 +116,7 @@
             <div class="tema-akcije">
               <span>💬 {{ poruke().length }} komentara</span>
               @if (tema.farmerId === korisnik()?.id) {
-                <button type="button" class="tekst-dugme opasnost" (click)="obrisiTemu(); $event.stopPropagation()">Obriši objavu</button>
+                <button type="button" class="tekst-dugme opasnost" (click)="zatraziBrisanjeTeme(); $event.stopPropagation()">Obriši objavu</button>
               }
             </div>
           </div>
@@ -178,7 +178,7 @@
           </button>
           <button type="button" (click)="zapocniOdgovor(komentar)">↩ Odgovori</button>
           @if (komentar.autorId === korisnik()?.id) {
-            <button type="button" class="opasnost" (click)="obrisiPoruku(komentar)">Obriši</button>
+            <button type="button" class="opasnost" (click)="zatraziBrisanjePoruke(komentar)">Obriši</button>
           }
         </div>
       </div>
@@ -189,3 +189,21 @@
     }
   </article>
 </ng-template>
+
+<app-potvrda-modal
+  [otvoren]="potvrdaBrisanjaTemeOtvorena"
+  naslov="Brisanje objave"
+  poruka="Da li ste sigurni da želite da obrišete ovu temu i sve njene komentare?"
+  tekstPotvrde="Obriši"
+  (potvrdjeno)="potvrdiBrisanjeTeme()"
+  (otkazano)="potvrdaBrisanjaTemeOtvorena = false"
+/>
+
+<app-potvrda-modal
+  [otvoren]="porukaZaBrisanje !== null"
+  naslov="Brisanje komentara"
+  poruka="Da li ste sigurni da želite da obrišete ovaj komentar i njegove odgovore?"
+  tekstPotvrde="Obriši"
+  (potvrdjeno)="potvrdiBrisanjePoruke()"
+  (otkazano)="otkaziBrisanjePoruke()"
+/>
