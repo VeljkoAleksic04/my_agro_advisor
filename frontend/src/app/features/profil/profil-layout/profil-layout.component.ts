@@ -7,11 +7,12 @@ import { selectKorisnik } from '../../../core/auth/store/auth.reducer';
 import { ThemeService } from '../../../shared/services/theme.service';
 import { KorisnikMeniComponent } from '../../../shared/components/korisnik-meni/korisnik-meni.component';
 import { ObavestenjaComponent } from '../../../shared/components/obavestenja/obavestenja.component';
+import { ForumIndikatorComponent } from '../../../shared/components/forum-indikator/forum-indikator.component';
 
 @Component({
   selector: 'app-profil-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, KorisnikMeniComponent, ObavestenjaComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, KorisnikMeniComponent, ObavestenjaComponent, ForumIndikatorComponent],
   templateUrl: './profil-layout.component.html',
   styleUrl: './profil-layout.component.scss',
 })

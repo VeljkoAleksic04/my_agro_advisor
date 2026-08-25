@@ -6,12 +6,7 @@
       <button type="button" class="dugme-tema" (click)="promeniTemu()">
         {{ temaServis.tema() === 'tamna' ? 'Light theme' : 'Dark theme' }}
       </button>
-      <a
-        routerLink="/forum"
-        class="dugme-ikonica"
-        title="Forum"
-        aria-label="Forum"
-      >💬</a>
+      <app-forum-indikator />
       <app-obavestenja />
       @if (korisnik(); as k) {
         <span class="korisnik-oznaka">{{ k.username }}</span>
