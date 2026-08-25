@@ -15,3 +15,6 @@ frontend/.angular/
 commits.sh
 kommit_log.txt
 ngrok.yml
+commit_process.log
+*.png
+!frontend/public/notification.png
