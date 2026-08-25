@@ -6,9 +6,9 @@
     aria-label="Obaveštenja"
     (click)="toggle()"
   >
-    🔔
+    <img src="/notification.png" alt="" class="ikona-obavestenja" />
     @if (brojNeprocitanih() > 0) {
-      <span class="bedz">{{ brojNeprocitanih() > 99 ? '99+' : brojNeprocitanih() }}</span>
+      <span class="indikator-obavestenja" aria-label="Imate nepročitana obaveštenja"></span>
     }
   </button>
 

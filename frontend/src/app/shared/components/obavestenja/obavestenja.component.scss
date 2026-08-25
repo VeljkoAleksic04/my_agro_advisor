@@ -4,22 +4,37 @@
 
 .zvonce {
   position: relative;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: transparent;
+  }
 }
 
-.bedz {
+.ikona-obavestenja {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+}
+
+.indikator-obavestenja {
   position: absolute;
-  top: -0.25rem;
-  right: -0.25rem;
-  min-width: 1rem;
-  height: 1rem;
-  padding: 0 0.2rem;
-  border-radius: 999px;
-  background: #dc2626;
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 800;
-  line-height: 1rem;
-  text-align: center;
+  top: 0.1rem;
+  right: 0.1rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid var(--boja-primarna-tamnija);
+  border-radius: 50%;
+  background: #ef4444;
 }
 
 .panel-obavestenja {
