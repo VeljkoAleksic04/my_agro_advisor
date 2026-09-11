@@ -39,10 +39,26 @@ export class KalendarApiService {
 
   kreiraj(dto: NoviKalendarDogadjaj): Observable<KalendarDogadjaj> {
     return this.http.post<KalendarDogadjaj>(this.baseUrl, dto).pipe(
-      tap((novi) => {
-        const trenutni = this.dogadjaji$.value ?? [];
-        this.dogadjaji$.next([...trenutni, novi].sort((a, b) => a.datumPocetka.localeCompare(b.datumPocetka)));
+      tap((novi) => this.postaviSortirano([...(this.dogadjaji$.value ?? []), novi])),
+    );
+  }
+
+  azuriraj(id: number, dto: Partial<NoviKalendarDogadjaj>): Observable<KalendarDogadjaj> {
+    return this.http.patch<KalendarDogadjaj>(`${this.baseUrl}/${id}`, dto).pipe(
+      tap((izmenjeni) => {
+        const trenutni = (this.dogadjaji$.value ?? []).map((d) => d.id === id ? izmenjeni : d);
+        this.postaviSortirano(trenutni);
       }),
     );
+  }
+
+  obrisi(id: number): Observable<{ poruka: string }> {
+    return this.http.delete<{ poruka: string }>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => this.dogadjaji$.next((this.dogadjaji$.value ?? []).filter((d) => d.id !== id))),
+    );
+  }
+
+  private postaviSortirano(lista: KalendarDogadjaj[]): void {
+    this.dogadjaji$.next([...lista].sort((a, b) => a.datumPocetka.localeCompare(b.datumPocetka) || a.id - b.id));
   }
 }

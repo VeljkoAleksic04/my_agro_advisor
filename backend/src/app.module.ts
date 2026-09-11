@@ -15,6 +15,7 @@ import { IstorijaModule } from './istorija/istorija.module';
 import { StatistikaModule } from './statistika/statistika.module';
 import { ObavestenjeModule } from './obavestenje/obavestenje.module';
 import { KalendarModule } from './kalendar/kalendar.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { KalendarModule } from './kalendar/kalendar.module';
     StatistikaModule,
     ObavestenjeModule,
     KalendarModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
