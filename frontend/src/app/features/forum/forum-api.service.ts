@@ -8,6 +8,7 @@ export interface ForumAutor {
   ime?: string | null;
   prezime?: string | null;
   username: string;
+  slika?: string | null;
 }
 
 export interface ForumTema {

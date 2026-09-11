@@ -75,7 +75,14 @@
                   <div class="objava-meta">
                     <span class="subreddit">r/AgroForum</span>
                     <span>•</span>
-                    <span>u/{{ tema.farmer.username }}</span>
+                    <span class="forum-autor">
+                      @if (tema.farmer.slika) {
+                        <img [src]="tema.farmer.slika" alt="Profilna slika" class="forum-avatar forum-avatar--mali" />
+                      } @else {
+                        <span class="forum-avatar forum-avatar--mali forum-avatar--inicijal">{{ inicijal(tema.farmer) }}</span>
+                      }
+                      <span>u/{{ tema.farmer.username }}</span>
+                    </span>
                     <span>•</span>
                     <span>{{ tema.datumKreiranja | date: 'dd.MM.yyyy. HH:mm' }}</span>
                   </div>
@@ -106,7 +113,14 @@
             <div class="objava-meta">
               <span class="subreddit">r/AgroForum</span>
               <span>•</span>
-              <span>u/{{ tema.farmer.username }}</span>
+              <span class="forum-autor">
+                @if (tema.farmer.slika) {
+                  <img [src]="tema.farmer.slika" alt="Profilna slika" class="forum-avatar forum-avatar--mali" />
+                } @else {
+                  <span class="forum-avatar forum-avatar--mali forum-avatar--inicijal">{{ inicijal(tema.farmer) }}</span>
+                }
+                <span>u/{{ tema.farmer.username }}</span>
+              </span>
               <span>•</span>
               <span>{{ tema.datumKreiranja | date: 'dd.MM.yyyy. HH:mm' }}</span>
             </div>
@@ -164,7 +178,11 @@
 <ng-template #komentarTemplate let-komentar>
   <article class="komentar" [style.margin-left.rem]="komentar.nivo * 2.2">
     <div class="komentar-linija">
-      <div class="avatar">{{ inicijal(komentar.autor) }}</div>
+      @if (komentar.autor.slika) {
+        <img [src]="komentar.autor.slika" alt="Profilna slika" class="avatar" />
+      } @else {
+        <div class="avatar">{{ inicijal(komentar.autor) }}</div>
+      }
       <div class="komentar-glavno">
         <div class="komentar-meta">
           <strong>u/{{ komentar.autor.username }}</strong>

@@ -168,6 +168,33 @@
   font-weight: 700;
 }
 
+.forum-autor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.forum-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--boja-primarna-blaga);
+  color: var(--boja-primarna-tamnija);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.forum-avatar--mali {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 1.35rem;
+}
+
+.forum-avatar--inicijal {
+  font-size: 0.65rem;
+}
+
 .objava h2 {
   margin: 0.45rem 0;
   font-size: 1.15rem;
