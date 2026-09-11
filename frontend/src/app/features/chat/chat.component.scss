@@ -1,0 +1,186 @@
+.chat-okvir {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 620px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.chat-korisnici {
+  border-right: 1px solid var(--boja-ivica);
+  background: var(--boja-povrsina-hover);
+}
+
+.chat-korisnici-zaglavlje,
+.chat-razgovor-zaglavlje {
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--boja-ivica);
+}
+
+.chat-korisnici-zaglavlje strong {
+  color: var(--boja-tekst);
+}
+
+.chat-korisnik {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--boja-ivica);
+  background: transparent;
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  color: var(--boja-tekst);
+}
+
+.chat-korisnik:hover,
+.chat-korisnik--aktivan {
+  background: var(--boja-povrsina);
+}
+
+.chat-korisnik img,
+.chat-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex: 0 0 42px;
+}
+
+.chat-korisnik img {
+  object-fit: cover;
+}
+
+.chat-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--boja-primarna-blaga);
+  color: var(--boja-primarna-tamnija);
+  font-weight: 800;
+}
+
+.chat-korisnik-podaci {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.chat-korisnik-podaci strong,
+.chat-korisnik-podaci small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-korisnik-podaci small,
+.chat-razgovor-zaglavlje small,
+.chat-tipkanje,
+.chat-prazno {
+  color: var(--boja-tekst-suptilan);
+}
+
+.chat-razgovor {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 620px;
+}
+
+.chat-razgovor-zaglavlje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-razgovor-zaglavlje div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.chat-tipkanje {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.chat-poruke {
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: var(--boja-povrsina);
+}
+
+.chat-poruka {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.chat-poruka--moja {
+  justify-content: flex-end;
+}
+
+.chat-poruka-sadrzaj {
+  max-width: min(75%, 560px);
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.8rem 0.8rem 0.8rem 0.15rem;
+  background: var(--boja-povrsina-hover);
+  border: 1px solid var(--boja-ivica);
+  color: var(--boja-tekst);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chat-poruka--moja .chat-poruka-sadrzaj {
+  border-radius: 0.8rem 0.8rem 0.15rem 0.8rem;
+  background: var(--boja-primarna-blaga);
+}
+
+.chat-poruka-sadrzaj small {
+  align-self: flex-end;
+  color: var(--boja-tekst-suptilan);
+  font-size: 0.68rem;
+}
+
+.chat-forma {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  border-top: 1px solid var(--boja-ivica);
+}
+
+.chat-forma input {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-prazan {
+  padding: 1rem;
+  text-align: center;
+}
+
+.chat-prazan--veliki {
+  margin: auto;
+}
+
+@media (max-width: 700px) {
+  .chat-okvir {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-korisnici {
+    border-right: 0;
+    border-bottom: 1px solid var(--boja-ivica);
+    max-height: 240px;
+    overflow-y: auto;
+  }
+
+  .chat-razgovor {
+    min-height: 500px;
+  }
+}

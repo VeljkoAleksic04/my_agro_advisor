@@ -1,0 +1,91 @@
+<section class="stranica chat-stranica">
+  <header class="stranica-header">
+    <div>
+      <h1>Chat</h1>
+      <p class="podnaslov">Razgovarajte privatno i u realnom vremenu sa drugim korisnicima.</p>
+    </div>
+  </header>
+
+  <div class="chat-okvir karta">
+    <aside class="chat-korisnici">
+      <div class="chat-korisnici-zaglavlje">
+        <strong>Korisnici</strong>
+      </div>
+
+      @if (ucitavanjeKorisnika()) {
+        <p class="chat-prazno">Učitavanje...</p>
+      } @else if (korisnici().length === 0) {
+        <p class="chat-prazno">Nema drugih korisnika.</p>
+      } @else {
+        @for (k of korisnici(); track k.id) {
+          <button
+            type="button"
+            class="chat-korisnik"
+            [class.chat-korisnik--aktivan]="izabraniKorisnik()?.id === k.id"
+            (click)="izaberiKorisnika(k)"
+          >
+            @if (k.slika) {
+              <img [src]="k.slika" alt="" />
+            } @else {
+              <span class="chat-avatar">{{ inicijal(k) }}</span>
+            }
+            <span class="chat-korisnik-podaci">
+              <strong>{{ k.ime }} {{ k.prezime }}</strong>
+              <small>@{{ k.username }}</small>
+            </span>
+          </button>
+        }
+      }
+    </aside>
+
+    <section class="chat-razgovor">
+      @if (izabraniKorisnik(); as k) {
+        <header class="chat-razgovor-zaglavlje">
+          <div>
+            <strong>{{ k.ime }} {{ k.prezime }}</strong>
+            <small>@{{ k.username }}</small>
+          </div>
+          @if (tipka()) {
+            <span class="chat-tipkanje">piše...</span>
+          }
+        </header>
+
+        <div class="chat-poruke">
+          @if (ucitavanjePoruka()) {
+            <p class="chat-prazno">Učitavanje poruka...</p>
+          } @else if (poruke().length === 0) {
+            <p class="chat-prazno">Još nema poruka. Započnite razgovor!</p>
+          } @else {
+            @for (poruka of poruke(); track poruka.id) {
+              <div class="chat-poruka" [class.chat-poruka--moja]="jeMoja(poruka)">
+                <div class="chat-poruka-sadrzaj">
+                  <span>{{ poruka.sadrzaj }}</span>
+                  <small>{{ vreme(poruka.datumSlanja) }}</small>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <form class="chat-forma" (ngSubmit)="posalji()">
+          <input
+            type="text"
+            name="novaPoruka"
+            [(ngModel)]="novaPoruka"
+            (ngModelChange)="promenaTeksta()"
+            maxlength="2000"
+            placeholder="Napišite poruku..."
+            autocomplete="off"
+          />
+          <button type="submit" class="dugme dugme-primarni" [disabled]="!novaPoruka.trim()">Pošalji</button>
+        </form>
+      } @else {
+        <div class="chat-prazan chat-prazan--veliki">Izaberite korisnika sa kojim želite da razgovarate.</div>
+      }
+    </section>
+  </div>
+
+  @if (greska(); as porukaGreske) {
+    <p class="napomena-upozorenje">{{ porukaGreske }}</p>
+  }
+</section>

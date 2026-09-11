@@ -1,0 +1,6 @@
+<a routerLink="/forum" class="forum-ikona" title="Forum" aria-label="Forum" (click)="oznaciKaoVidjeno()">
+  💬
+  @if (imaNovihTema()) {
+    <span class="indikator-novo" aria-label="Postoji nova tema"></span>
+  }
+</a>

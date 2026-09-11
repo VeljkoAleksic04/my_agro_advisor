@@ -24,7 +24,7 @@ export class PorukaForumaService {
     const poruka = await this.prisma.porukaForuma.create({
       data: { ...dto, autorId: korisnikId },
       include: {
-        autor: { select: { id: true, ime: true, prezime: true, username: true } },
+        autor: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
         _count: { select: { reakcije: true, odgovori: true } },
       },
     });
@@ -58,7 +58,7 @@ export class PorukaForumaService {
     return this.prisma.porukaForuma.findMany({
       where: { temaId },
       include: {
-        autor: { select: { id: true, ime: true, prezime: true, username: true } },
+        autor: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
         _count: { select: { reakcije: true, odgovori: true } },
       },
       orderBy: { datumKreiranja: 'asc' },

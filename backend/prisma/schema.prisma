@@ -133,6 +133,8 @@ model Poljoprivrednik {
   porukeForuma     PorukaForuma[]
   obavestenja      Obavestenje[]
   kalendarskiDogadjaji KalendarDogadjaj[]
+  poslateChatPoruke ChatPoruka[] @relation("PoslateChatPoruke")
+  primljeneChatPoruke ChatPoruka[] @relation("PrimljeneChatPoruke")
 
   @@map("poljoprivrednici")
 }
@@ -363,4 +365,21 @@ model Obavestenje {
   @@index([korisnikId, procitano])
   @@index([korisnikId, datumKreiranja])
   @@map("obavestenja")
+}
+
+
+model ChatPoruka {
+  id          Int      @id @default(autoincrement())
+  posiljalacId Int
+  primalacId  Int
+  sadrzaj     String
+  datumSlanja DateTime @default(now())
+  procitano   Boolean  @default(false)
+
+  posiljalac Poljoprivrednik @relation("PoslateChatPoruke", fields: [posiljalacId], references: [id], onDelete: Cascade)
+  primalac   Poljoprivrednik @relation("PrimljeneChatPoruke", fields: [primalacId], references: [id], onDelete: Cascade)
+
+  @@index([posiljalacId, primalacId, datumSlanja])
+  @@index([primalacId, posiljalacId, datumSlanja])
+  @@map("chat_poruke")
 }
