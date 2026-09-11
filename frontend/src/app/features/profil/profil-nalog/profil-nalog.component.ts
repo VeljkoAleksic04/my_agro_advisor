@@ -38,7 +38,6 @@ export class ProfilNalogComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     datumRodjenja: ['', [Validators.required]],
     brojTelefona: [''],
-    slika: [''],
   });
 
   protected readonly formaLozinka = this.fb.group({
@@ -76,7 +75,6 @@ export class ProfilNalogComponent implements OnInit {
       // timestamp - odsecamo na prvih 10 karaktera.
       datumRodjenja: korisnik.datumRodjenja ? korisnik.datumRodjenja.slice(0, 10) : '',
       brojTelefona: korisnik.brojTelefona ?? '',
-      slika: korisnik.slika ?? '',
     });
   }
 
@@ -117,16 +115,30 @@ export class ProfilNalogComponent implements OnInit {
   }
 
   odaberiProfilnuSliku(dogadjaj: Event): void {
-    const fajl = (dogadjaj.target as HTMLInputElement).files?.[0];
+    const unos = dogadjaj.target as HTMLInputElement;
+    const fajl = unos.files?.[0];
     if (!fajl) return;
+
     if (!fajl.type.startsWith('image/') || fajl.size > 2 * 1024 * 1024) {
       this.greskaProfila = 'Izaberite sliku do 2 MB (JPG, PNG, WebP ili sličan format).';
+      unos.value = '';
       return;
     }
 
-    const citac = new FileReader();
-    citac.onload = () => this.formaProfil.controls.slika.setValue(String(citac.result));
-    citac.readAsDataURL(fajl);
+    this.greskaProfila = null;
+    this.uspehProfila = null;
+    this.profilApi.azurirajProfilnuSliku(fajl).subscribe({
+      next: (korisnik) => {
+        this.korisnik.set(korisnik);
+        this.store.dispatch(AuthActions.ucitajSacuvanuSesijuUspesno({ korisnik }));
+        this.uspehProfila = 'Profilna slika je uspešno promenjena.';
+        unos.value = '';
+      },
+      error: (greska) => {
+        this.greskaProfila = greska?.error?.message ?? 'Greška pri promeni profilne slike.';
+        unos.value = '';
+      },
+    });
   }
 
   otvoriPromenuLozinke(): void {

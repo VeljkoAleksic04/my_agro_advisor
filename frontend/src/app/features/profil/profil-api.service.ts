@@ -10,7 +10,6 @@ export interface UpdateProfilZahtev {
   email?: string;
   datumRodjenja?: string;
   brojTelefona?: string;
-  slika?: string;
 }
 
 export interface PromeniLozinkuZahtev {
@@ -29,6 +28,12 @@ export class ProfilApiService {
 
   azuriraj(zahtev: UpdateProfilZahtev): Observable<Korisnik> {
     return this.http.patch<Korisnik>(this.baseUrl, zahtev);
+  }
+
+  azurirajProfilnuSliku(fajl: File): Observable<Korisnik> {
+    const podaci = new FormData();
+    podaci.append('slika', fajl);
+    return this.http.post<Korisnik>(`${this.baseUrl}/slika`, podaci);
   }
 
   promeniLozinku(zahtev: PromeniLozinkuZahtev): Observable<{ poruka: string }> {
