@@ -11,7 +11,7 @@ export class TemaForumaService {
     return this.prisma.temaForuma.create({
       data: { ...dto, farmerId: korisnikId },
       include: {
-        farmer: { select: { id: true, ime: true, prezime: true, username: true } },
+        farmer: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
         _count: { select: { poruke: true, reakcije: true } },
       },
     });
@@ -20,7 +20,7 @@ export class TemaForumaService {
   findAll() {
     return this.prisma.temaForuma.findMany({
       include: {
-        farmer: { select: { id: true, ime: true, prezime: true, username: true } },
+        farmer: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
         _count: { select: { poruke: true, reakcije: true } },
       },
       orderBy: { datumKreiranja: 'desc' },
@@ -31,10 +31,10 @@ export class TemaForumaService {
     const tema = await this.prisma.temaForuma.findUnique({
       where: { id },
       include: {
-        farmer: { select: { id: true, ime: true, prezime: true, username: true } },
+        farmer: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
         poruke: {
           include: {
-            autor: { select: { id: true, ime: true, prezime: true, username: true } },
+            autor: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
             _count: { select: { reakcije: true, odgovori: true } },
           },
           orderBy: { datumKreiranja: 'asc' },
