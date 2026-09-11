@@ -15,13 +15,15 @@
   } @else if (korisnik(); as k) {
     <div class="karta nalog-karta">
       @if (!rezimUredjivanja) {
-        <div class="profilna-slika-nalog">
+        <label class="profilna-slika-nalog klikabilna" title="Promeni profilnu sliku">
           @if (k.slika) {
             <img [src]="k.slika" alt="Profilna slika" />
           } @else {
             <span>{{ k.username.charAt(0).toUpperCase() }}</span>
           }
-        </div>
+          <span class="profilna-slika-prekrivac">Promeni</span>
+          <input type="file" accept="image/*" (change)="odaberiProfilnuSliku($event)" />
+        </label>
         <div class="podaci-red">
           <div class="stat">
             <span class="stat-oznaka">Ime i prezime</span>
@@ -80,14 +82,6 @@
           <div class="polje">
             <label for="brojTelefona">Broj telefona</label>
             <input id="brojTelefona" type="text" formControlName="brojTelefona" placeholder="Opciono" />
-          </div>
-
-          <div class="polje">
-            <label for="profilnaSlika">Profilna slika</label>
-            <input id="profilnaSlika" type="file" accept="image/*" (change)="odaberiProfilnuSliku($event)" />
-            @if (formaProfil.controls.slika.value) {
-              <img class="pregled-profilne-slike" [src]="formaProfil.controls.slika.value" alt="Pregled profilne slike" />
-            }
           </div>
 
           @if (greskaProfila) {

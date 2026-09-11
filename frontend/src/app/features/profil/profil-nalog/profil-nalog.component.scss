@@ -37,6 +37,7 @@
   margin: 0.5rem 0;
 }
 .profilna-slika-nalog {
+  position: relative;
   width: 5rem;
   height: 5rem;
   margin-bottom: 1rem;
@@ -48,18 +49,38 @@
   place-items: center;
   font-size: 1.75rem;
   font-weight: 700;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+
+  &:hover .profilna-slika-prekrivac {
+    opacity: 1;
+  }
 }
 
-.pregled-profilne-slike {
-  width: 4rem;
-  height: 4rem;
-  margin-top: 0.5rem;
+.profilna-slika-prekrivac {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   border-radius: 50%;
-  object-fit: cover;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.15s ease;
 }
+
