@@ -158,6 +158,11 @@
   background: var(--boja-povrsina-hover);
 }
 
+.kalendar-forma h4 {
+  margin: 0 0 0.75rem;
+  color: var(--boja-tekst);
+}
+
 .kalendar-forma-red {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -290,7 +295,12 @@
     flex-direction: column;
   }
 
-  .kalendar-forma-red {
+  .kalendar-forma h4 {
+  margin: 0 0 0.75rem;
+  color: var(--boja-tekst);
+}
+
+.kalendar-forma-red {
     grid-template-columns: 1fr;
   }
 }
@@ -367,5 +377,53 @@
   .dugme-uredi-profil {
     width: 100%;
     text-align: center;
+  }
+}
+
+
+.kalendar-stavka-sadrzaj {
+  flex: 1;
+  min-width: 0;
+}
+
+.kalendar-stavka-sadrzaj small {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--boja-tekst-suptilan);
+}
+
+.kalendar-stavka-akcije {
+  display: flex;
+  gap: 0.45rem;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.kalendar-akcija-tekst {
+  border: 0;
+  background: transparent;
+  color: var(--boja-primarna);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.1rem;
+}
+
+.kalendar-akcija-tekst:hover {
+  text-decoration: underline;
+}
+
+.kalendar-akcija-brisanje {
+  color: var(--boja-opasnost, #c62828);
+}
+
+@media (max-width: 600px) {
+  .kalendar-stavka {
+    flex-wrap: wrap;
+  }
+
+  .kalendar-stavka-akcije {
+    width: 100%;
+    margin-left: 1.3rem;
   }
 }

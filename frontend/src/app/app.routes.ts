@@ -78,6 +78,13 @@ export const routes: Routes = [
           ),
       },
 
+      {
+        path: 'chat',
+        data: { naslov: 'Chat' },
+        loadComponent: () =>
+          import('./features/chat/chat.component').then((m) => m.ChatComponent),
+      },
+
     ],
   },
   { path: '**', redirectTo: '' },

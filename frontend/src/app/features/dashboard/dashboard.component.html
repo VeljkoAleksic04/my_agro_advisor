@@ -64,6 +64,7 @@
 
       @if (prikaziFormuDogadjaja) {
         <form [formGroup]="formaDogadjaj" (ngSubmit)="sacuvajDogadjaj()" class="kalendar-forma">
+          <h4>{{ dogadjajZaIzmenu === null ? 'Novi događaj' : 'Izmena događaja' }}</h4>
           <div class="polje">
             <label for="kalendarNaslov">Naziv događaja</label>
             <input id="kalendarNaslov" type="text" formControlName="naslov" placeholder="npr. Nabavka semena" />
@@ -86,7 +87,7 @@
             <p class="napomena-upozorenje">{{ greskaDogadjaja }}</p>
           }
           <div class="akcije-forme">
-            <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeDogadjaja">Sačuvaj događaj</button>
+            <button type="submit" class="dugme dugme-primarni" [disabled]="slanjeDogadjaja">{{ dogadjajZaIzmenu === null ? 'Sačuvaj događaj' : 'Sačuvaj izmene' }}</button>
             <button type="button" class="dugme dugme-sekundarni" (click)="otkaziFormuDogadjaja()">Otkaži</button>
           </div>
         </form>
@@ -138,7 +139,16 @@
           @for (dogadjaj of rucniDogadjajiZaMesec(); track dogadjaj.id) {
             <div class="kalendar-stavka">
               <span class="tacka-dogadjaja tacka-rucni"></span>
-              <span><strong>{{ dogadjaj.naslov }}</strong> — {{ formatirajPeriod(dogadjaj.datumPocetka, dogadjaj.datumKraja) }}</span>
+              <span class="kalendar-stavka-sadrzaj">
+                <span><strong>{{ dogadjaj.naslov }}</strong> — {{ formatirajPeriod(dogadjaj.datumPocetka, dogadjaj.datumKraja) }}</span>
+                @if (dogadjaj.opis) {
+                  <small>{{ dogadjaj.opis }}</small>
+                }
+              </span>
+              <span class="kalendar-stavka-akcije">
+                <button type="button" class="kalendar-akcija-tekst" (click)="otvoriIzmenuDogadjaja(dogadjaj)">Izmeni</button>
+                <button type="button" class="kalendar-akcija-tekst kalendar-akcija-brisanje" (click)="obrisiDogadjaj(dogadjaj)">Obriši</button>
+              </span>
             </div>
           }
         </div>

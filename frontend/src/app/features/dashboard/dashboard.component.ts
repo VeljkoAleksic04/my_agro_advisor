@@ -78,6 +78,7 @@ export class DashboardComponent implements OnInit {
   protected readonly danas = new Date();
   protected readonly prikazaniMesec = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   protected prikaziFormuDogadjaja = false;
+  protected dogadjajZaIzmenu: number | null = null;
   protected slanjeDogadjaja = false;
   protected greskaDogadjaja: string | null = null;
 
@@ -209,13 +210,37 @@ export class DashboardComponent implements OnInit {
 
   otvoriFormuDogadjaja(): void {
     const danas = this.danasnjiDatum();
+    this.dogadjajZaIzmenu = null;
     this.formaDogadjaj.reset({ naslov: '', datumPocetka: danas, datumKraja: danas, opis: '' });
     this.greskaDogadjaja = null;
     this.prikaziFormuDogadjaja = true;
   }
 
+  otvoriIzmenuDogadjaja(dogadjaj: KalendarDogadjaj): void {
+    this.dogadjajZaIzmenu = dogadjaj.id;
+    this.formaDogadjaj.reset({
+      naslov: dogadjaj.naslov,
+      datumPocetka: dogadjaj.datumPocetka.slice(0, 10),
+      datumKraja: dogadjaj.datumKraja.slice(0, 10),
+      opis: dogadjaj.opis ?? '',
+    });
+    this.greskaDogadjaja = null;
+    this.prikaziFormuDogadjaja = true;
+  }
+
+  obrisiDogadjaj(dogadjaj: KalendarDogadjaj): void {
+    if (!window.confirm(`Obrisati događaj „${dogadjaj.naslov}“?`)) return;
+    this.greskaDogadjaja = null;
+    this.kalendarApi.obrisi(dogadjaj.id).subscribe({
+      error: (greska) => {
+        this.greskaDogadjaja = greska?.error?.message ?? 'Greška pri brisanju događaja.';
+      },
+    });
+  }
+
   otkaziFormuDogadjaja(): void {
     this.prikaziFormuDogadjaja = false;
+    this.dogadjajZaIzmenu = null;
     this.greskaDogadjaja = null;
   }
 
@@ -229,19 +254,25 @@ export class DashboardComponent implements OnInit {
     this.slanjeDogadjaja = true;
     this.greskaDogadjaja = null;
 
-    this.kalendarApi.kreiraj({
+    const zahtev = {
       naslov: v.naslov,
       datumPocetka: v.datumPocetka,
       datumKraja: v.datumKraja,
       opis: v.opis || undefined,
-    }).subscribe({
+    };
+
+    const operacija = this.dogadjajZaIzmenu === null
+      ? this.kalendarApi.kreiraj(zahtev)
+      : this.kalendarApi.azuriraj(this.dogadjajZaIzmenu, zahtev);
+
+    operacija.subscribe({
       next: () => {
         this.slanjeDogadjaja = false;
-        this.prikaziFormuDogadjaja = false;
+        this.otkaziFormuDogadjaja();
       },
       error: (greska) => {
         this.slanjeDogadjaja = false;
-        this.greskaDogadjaja = greska?.error?.message ?? 'Greška pri dodavanju događaja.';
+        this.greskaDogadjaja = greska?.error?.message ?? 'Greška pri čuvanju događaja.';
       },
     });
   }
