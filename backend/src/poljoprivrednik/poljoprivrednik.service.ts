@@ -57,11 +57,21 @@ export class PoljoprivrednikService {
         email: dto.email,
         datumRodjenja: dto.datumRodjenja ? new Date(dto.datumRodjenja) : undefined,
         brojTelefona: dto.brojTelefona,
-        slika: dto.slika,
       },
       select: PROFIL_SELEKCIJA,
     });
     return korisnik;
+  }
+
+
+  async azurirajProfilnuSliku(korisnikId: number, fajl: Express.Multer.File) {
+    const slika = `data:${fajl.mimetype};base64,${fajl.buffer.toString('base64')}`;
+
+    return this.prisma.poljoprivrednik.update({
+      where: { id: korisnikId },
+      data: { slika },
+      select: PROFIL_SELEKCIJA,
+    });
   }
 
   async promeniLozinku(korisnikId: number, dto: PromeniLozinkuDto) {
