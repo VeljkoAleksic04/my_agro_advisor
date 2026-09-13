@@ -13,6 +13,7 @@ export interface Korisnik {
   datumRodjenja?: string;
   brojTelefona?: string | null;
   slika?: string | null;
+  opis?: string | null;
 }
 
 export enum JedinicaPovrsine {

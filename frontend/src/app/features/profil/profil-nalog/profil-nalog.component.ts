@@ -38,6 +38,7 @@ export class ProfilNalogComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     datumRodjenja: ['', [Validators.required]],
     brojTelefona: [''],
+    opis: ['', [Validators.maxLength(1000)]],
   });
 
   protected readonly formaLozinka = this.fb.group({
@@ -75,6 +76,7 @@ export class ProfilNalogComponent implements OnInit {
       // timestamp - odsecamo na prvih 10 karaktera.
       datumRodjenja: korisnik.datumRodjenja ? korisnik.datumRodjenja.slice(0, 10) : '',
       brojTelefona: korisnik.brojTelefona ?? '',
+      opis: korisnik.opis ?? '',
     });
   }
 

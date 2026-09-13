@@ -84,6 +84,11 @@
             <input id="brojTelefona" type="text" formControlName="brojTelefona" placeholder="Opciono" />
           </div>
 
+          <div class="polje">
+            <label for="opis">Opis</label>
+            <textarea id="opis" rows="4" formControlName="opis" maxlength="1000" placeholder="Napišite nešto o sebi..."></textarea>
+          </div>
+
           @if (greskaProfila) {
             <p class="napomena-upozorenje">{{ greskaProfila }}</p>
           }
