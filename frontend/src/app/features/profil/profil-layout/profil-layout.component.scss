@@ -137,3 +137,22 @@
   flex: 1;
   min-width: 0;
 }
+
+.chat-link { 
+  
+}
+.chat-broj { 
+  min-width: 1.35rem; 
+  height: 1.35rem; 
+  padding: 0 .35rem; 
+  border-radius: 100%; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: #ef4444; 
+  color: #fff; 
+  font-size: .72rem; 
+  font-weight: 800; 
+  margin-left: 2.7rem;
+  position: fixed;
+}

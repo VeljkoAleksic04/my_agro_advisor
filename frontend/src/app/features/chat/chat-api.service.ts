@@ -25,6 +25,14 @@ export class ChatApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/chat`;
 
+  kontaktiraj(korisnikId: number): Observable<{ uspesno: boolean }> {
+    return this.http.post<{ uspesno: boolean }>(`${this.baseUrl}/kontakt/${korisnikId}`, {});
+  }
+
+  brojNeprocitanih(): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/neprocitane`);
+  }
+
   korisnici(): Observable<ChatKorisnik[]> {
     return this.http.get<ChatKorisnik[]>(`${this.baseUrl}/korisnici`);
   }
