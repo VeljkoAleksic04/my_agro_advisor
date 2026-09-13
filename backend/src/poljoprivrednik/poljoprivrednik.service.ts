@@ -16,6 +16,7 @@ const PROFIL_SELEKCIJA = {
   username: true,
   brojTelefona: true,
   slika: true,
+  opis: true,
   uloga: true,
   ukupnoPoena: true,
   kreiranDana: true,
@@ -57,12 +58,22 @@ export class PoljoprivrednikService {
         email: dto.email,
         datumRodjenja: dto.datumRodjenja ? new Date(dto.datumRodjenja) : undefined,
         brojTelefona: dto.brojTelefona,
+        opis: dto.opis,
       },
       select: PROFIL_SELEKCIJA,
     });
     return korisnik;
   }
 
+
+  async pregledJavnogProfila(korisnikId: number) {
+    const korisnik = await this.prisma.poljoprivrednik.findUnique({
+      where: { id: korisnikId },
+      select: { id: true, username: true, ime: true, prezime: true, slika: true, opis: true, ukupnoPoena: true },
+    });
+    if (!korisnik) throw new NotFoundException('Korisnik ne postoji');
+    return korisnik;
+  }
 
   async azurirajProfilnuSliku(korisnikId: number, fajl: Express.Multer.File) {
     const slika = `data:${fajl.mimetype};base64,${fajl.buffer.toString('base64')}`;

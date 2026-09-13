@@ -22,4 +22,8 @@ export class UpdateProfilDto {
   @IsOptional()
   @IsString()
   brojTelefona?: string;
+
+  @IsOptional()
+  @IsString()
+  opis?: string;
 }
