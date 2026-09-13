@@ -8,6 +8,8 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -20,6 +22,11 @@ import { PromeniLozinkuDto } from './dto/promeni-lozinku.dto';
 @Controller('profil')
 export class PoljoprivrednikController {
   constructor(private readonly poljoprivrednikService: PoljoprivrednikService) {}
+
+  @Get('korisnik/:id')
+  pregledJavnog(@Param('id', ParseIntPipe) id: number) {
+    return this.poljoprivrednikService.pregledJavnogProfila(id);
+  }
 
   @Get()
   pregled(@CurrentUser() korisnik: any) {
