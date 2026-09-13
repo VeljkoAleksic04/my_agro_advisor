@@ -17,8 +17,18 @@ export class TemaForumaService {
     });
   }
 
-  findAll() {
+  findAll(pretraga?: string) {
+    const tekstPretrage = pretraga?.trim();
+
     return this.prisma.temaForuma.findMany({
+      where: tekstPretrage
+        ? {
+            OR: [
+              { naslov: { contains: tekstPretrage, mode: 'insensitive' } },
+              { farmer: { username: { contains: tekstPretrage, mode: 'insensitive' } } },
+            ],
+          }
+        : undefined,
       include: {
         farmer: { select: { id: true, ime: true, prezime: true, username: true, slika: true } },
         _count: { select: { poruke: true, reakcije: true } },

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Query,
   Param,
   ParseIntPipe,
   Patch,
@@ -26,8 +27,8 @@ export class TemaForumaController {
   }
 
   @Get()
-  findAll() {
-    return this.temaForumaService.findAll();
+  findAll(@Query('pretraga') pretraga?: string) {
+    return this.temaForumaService.findAll(pretraga);
   }
 
   @Get(':id')
