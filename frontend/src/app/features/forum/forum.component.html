@@ -30,6 +30,39 @@
           <button type="button" class="dugme dugme-primarni" (click)="otvoriFormuTeme()">Nova objava</button>
         </header>
 
+        <div class="forum-pretraga" aria-label="Pretraga tema foruma">
+          <div class="forum-pretraga-polje">
+            <label for="pretraga-naslov">Naslov teme</label>
+            <input
+              id="pretraga-naslov"
+              type="text"
+              [value]="pretragaNaslovUnos()"
+              (input)="pretragaNaslovUnos.set($any($event.target).value)"
+              (keydown.enter)="pretraziTeme()"
+              placeholder="Pretraži po naslovu..."
+            />
+          </div>
+
+          <div class="forum-pretraga-polje">
+            <label for="pretraga-autor">Username autora</label>
+            <input
+              id="pretraga-autor"
+              type="text"
+              [value]="pretragaAutorUnos()"
+              (input)="pretragaAutorUnos.set($any($event.target).value)"
+              (keydown.enter)="pretraziTeme()"
+              placeholder="Pretraži po username-u..."
+            />
+          </div>
+
+          <div class="forum-pretraga-akcije">
+            <button type="button" class="dugme dugme-primarni" (click)="pretraziTeme()">Pretraži</button>
+            @if (aktivnaPretragaNaslov() || aktivnaPretragaAutor()) {
+              <button type="button" class="dugme dugme-sekundarni" (click)="obrisiPretragu()">Poništi</button>
+            }
+          </div>
+        </div>
+
         @if (prikaziFormuTeme()) {
           <form class="forum-karta nova-tema" [formGroup]="formaTeme" (ngSubmit)="kreirajTemu()">
             <div class="nova-tema-zaglavlje">
@@ -61,9 +94,15 @@
             <h2>Forum je još prazan</h2>
             <p>Budite prvi koji će pokrenuti razgovor.</p>
           </div>
+        } @else if (filtriraneTeme().length === 0) {
+          <div class="forum-prazno forum-karta">
+            <div class="prazno-ikona">🔎</div>
+            <h2>Nema rezultata pretrage</h2>
+            <p>Pokušajte sa drugim naslovom teme ili username-om autora.</p>
+          </div>
         } @else {
           <div class="objave">
-            @for (tema of teme(); track tema.id) {
+            @for (tema of filtriraneTeme(); track tema.id) {
               <article class="objava forum-karta" (click)="otvoriTemu(tema)">
                 <div class="glasanje" aria-hidden="true">
                   <span>▲</span>
@@ -75,7 +114,7 @@
                   <div class="objava-meta">
                     <span class="subreddit">r/AgroForum</span>
                     <span>•</span>
-                    <span class="forum-autor">
+                    <span class="forum-autor forum-autor--klik" (click)="otvoriProfil(tema.farmer.id); $event.stopPropagation()">
                       @if (tema.farmer.slika) {
                         <img [src]="tema.farmer.slika" alt="Profilna slika" class="forum-avatar forum-avatar--mali" />
                       } @else {
@@ -113,7 +152,7 @@
             <div class="objava-meta">
               <span class="subreddit">r/AgroForum</span>
               <span>•</span>
-              <span class="forum-autor">
+              <span class="forum-autor forum-autor--klik" (click)="otvoriProfil(tema.farmer.id); $event.stopPropagation()">
                 @if (tema.farmer.slika) {
                   <img [src]="tema.farmer.slika" alt="Profilna slika" class="forum-avatar forum-avatar--mali" />
                 } @else {
@@ -185,7 +224,7 @@
       }
       <div class="komentar-glavno">
         <div class="komentar-meta">
-          <strong>u/{{ komentar.autor.username }}</strong>
+          <strong class="forum-autor-link" (click)="otvoriProfil(komentar.autor.id); $event.stopPropagation()">u/{{ komentar.autor.username }}</strong>
           <span>•</span>
           <span>{{ komentar.datumKreiranja | date: 'dd.MM.yyyy. HH:mm' }}</span>
         </div>
@@ -225,3 +264,22 @@
   (potvrdjeno)="potvrdiBrisanjePoruke()"
   (otkazano)="otkaziBrisanjePoruke()"
 />
+
+
+@if (profilZaPrikaz; as profil) {
+  <div class="profil-modal-pozadina" (click)="zatvoriProfil()">
+    <section class="profil-modal forum-karta" (click)="$event.stopPropagation()">
+      <button type="button" class="profil-modal-zatvori" (click)="zatvoriProfil()">×</button>
+      <div class="profil-modal-zaglavlje">
+        @if (profil.slika) { <img [src]="profil.slika" alt="Profilna slika" /> }
+        @else { <div class="forum-avatar profil-modal-avatar">{{ profil.username.charAt(0).toUpperCase() }}</div> }
+        <div><h2>{{ profil.ime }} {{ profil.prezime }}</h2><p>@{{ profil.username }}</p></div>
+      </div>
+      <p class="profil-modal-opis">{{ profil.opis || 'Korisnik još nije dodao opis.' }}</p>
+      <div class="profil-modal-poeni">Poeni: <strong>{{ profil.ukupnoPoena }}</strong></div>
+      @if (profil.id !== korisnik()?.id) {
+        <button type="button" class="dugme dugme-primarni" (click)="kontaktirajIzProfila()">✉ Lično kontaktiraj</button>
+      }
+    </section>
+  </div>
+}

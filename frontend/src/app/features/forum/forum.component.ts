@@ -43,7 +43,21 @@ export class ForumComponent implements OnInit {
 
   protected readonly korisnik = toSignal(this.store.select(selectKorisnik), { initialValue: null });
   protected readonly teme = signal<ForumTema[]>([]);
+  protected readonly pretragaNaslovUnos = signal('');
+  protected readonly pretragaAutorUnos = signal('');
+  protected readonly aktivnaPretragaNaslov = signal('');
+  protected readonly aktivnaPretragaAutor = signal('');
   protected readonly poruke = signal<ForumPoruka[]>([]);
+  protected readonly filtriraneTeme = computed(() => {
+    const naslov = this.aktivnaPretragaNaslov().trim().toLocaleLowerCase();
+    const autor = this.aktivnaPretragaAutor().trim().toLocaleLowerCase();
+
+    return this.teme().filter((tema) => {
+      const naslovOdgovara = !naslov || tema.naslov.toLocaleLowerCase().includes(naslov);
+      const autorOdgovara = !autor || tema.farmer.username.toLocaleLowerCase().includes(autor);
+      return naslovOdgovara && autorOdgovara;
+    });
+  });
   protected readonly izabranaTema = signal<ForumTema | null>(null);
   protected readonly ucitavanje = signal(true);
   protected readonly greska = signal<string | null>(null);
@@ -56,6 +70,8 @@ export class ForumComponent implements OnInit {
   protected readonly temaId = signal<number | null>(null);
   protected potvrdaBrisanjaTemeOtvorena = false;
   protected porukaZaBrisanje: ForumPoruka | null = null;
+  protected profilZaPrikaz: { id: number; username: string; ime: string; prezime: string; slika: string | null; opis: string | null; ukupnoPoena: number } | null = null;
+  protected kontaktUslpesan = false;
 
   protected readonly formaTeme = this.fb.group({
     naslov: ['', [Validators.required, Validators.minLength(3)]],
@@ -144,6 +160,18 @@ export class ForumComponent implements OnInit {
       next: (poruke) => this.poruke.set(poruke),
       error: () => this.greska.set('Neuspešno učitavanje komentara.'),
     });
+  }
+
+  pretraziTeme(): void {
+    this.aktivnaPretragaNaslov.set(this.pretragaNaslovUnos());
+    this.aktivnaPretragaAutor.set(this.pretragaAutorUnos());
+  }
+
+  obrisiPretragu(): void {
+    this.pretragaNaslovUnos.set('');
+    this.pretragaAutorUnos.set('');
+    this.aktivnaPretragaNaslov.set('');
+    this.aktivnaPretragaAutor.set('');
   }
 
   otvoriFormuTeme(): void {
@@ -300,6 +328,24 @@ export class ForumComponent implements OnInit {
 
   otkaziBrisanjePoruke(): void {
     this.porukaZaBrisanje = null;
+  }
+
+  otvoriProfil(autorId: number): void {
+    this.forumApi.profilKorisnika(autorId).subscribe({
+      next: (profil) => this.profilZaPrikaz = profil,
+      error: () => this.greska.set('Nije moguće učitati profil korisnika.'),
+    });
+  }
+
+  zatvoriProfil(): void { this.profilZaPrikaz = null; this.kontaktUslpesan = false; }
+
+  kontaktirajIzProfila(): void {
+    const profil = this.profilZaPrikaz;
+    if (!profil || profil.id === this.korisnik()?.id) return;
+    this.forumApi.kontaktiraj(profil.id).subscribe({
+      next: () => { this.kontaktUslpesan = true; this.router.navigate(['/profil/chat']); },
+      error: (greska) => this.greska.set(greska?.error?.message ?? 'Nije moguće započeti kontakt.'),
+    });
   }
 
   autorIme(autor: ForumAutor): string {

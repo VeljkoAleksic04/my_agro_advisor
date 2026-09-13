@@ -104,6 +104,50 @@
   box-shadow: var(--senka);
 }
 
+.forum-pretraga {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem;
+  background: var(--boja-povrsina);
+  border: 1px solid var(--boja-ivica);
+  border-radius: 0.65rem;
+}
+
+.forum-pretraga-polje {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    color: var(--boja-tekst-suptilan);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--boja-ivica);
+    border-radius: 0.45rem;
+    background: var(--boja-pozadina);
+    color: var(--boja-tekst);
+    outline: none;
+
+    &:focus {
+      border-color: var(--boja-primarna);
+    }
+  }
+}
+
+.forum-pretraga-akcije {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .objave {
   display: flex;
   flex-direction: column;
@@ -532,5 +576,27 @@
   .tema-sadrzaj,
   .objava-sadrzaj {
     padding: 0.8rem;
+  }
+}
+
+.forum-autor--klik, .forum-autor-link { cursor: pointer; }
+.forum-autor--klik:hover, .forum-autor-link:hover { text-decoration: underline; color: var(--boja-primarna); }
+.profil-modal-pozadina { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.48); display: grid; place-items: center; padding: 1rem; }
+.profil-modal { width: min(460px, 100%); padding: 1.5rem; position: relative; }
+.profil-modal-zatvori { position: absolute; right: .8rem; top: .6rem; border: 0; background: transparent; font-size: 1.6rem; cursor: pointer; color: var(--boja-tekst); }
+.profil-modal-zaglavlje { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.profil-modal-zaglavlje img, .profil-modal-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.profil-modal-zaglavlje h2 { margin: 0; }
+.profil-modal-zaglavlje p { margin: .2rem 0 0; color: var(--boja-tekst-suptilan); }
+.profil-modal-opis { min-height: 4rem; line-height: 1.5; color: var(--boja-tekst-suptilan); white-space: pre-wrap; }
+.profil-modal-poeni { margin-bottom: 1rem; }
+
+@media (max-width: 760px) {
+  .forum-pretraga {
+    grid-template-columns: 1fr;
+  }
+
+  .forum-pretraga-akcije {
+    justify-content: flex-start;
   }
 }

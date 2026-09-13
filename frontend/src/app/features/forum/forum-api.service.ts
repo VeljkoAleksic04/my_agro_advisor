@@ -50,8 +50,10 @@ export class ForumApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
 
-  ucitajTeme(): Observable<ForumTema[]> {
-    return this.http.get<ForumTema[]>(`${this.baseUrl}/teme-foruma`);
+  ucitajTeme(pretraga = ''): Observable<ForumTema[]> {
+    const tekst = pretraga.trim();
+    const params = tekst ? new HttpParams().set('pretraga', tekst) : undefined;
+    return this.http.get<ForumTema[]>(`${this.baseUrl}/teme-foruma`, { params });
   }
 
   ucitajTemu(id: number): Observable<ForumTema> {
@@ -61,6 +63,14 @@ export class ForumApiService {
   ucitajPoruke(temaId: number): Observable<ForumPoruka[]> {
     const params = new HttpParams().set('temaId', temaId);
     return this.http.get<ForumPoruka[]>(`${this.baseUrl}/poruke-foruma`, { params });
+  }
+
+  profilKorisnika(id: number): Observable<{ id: number; username: string; ime: string; prezime: string; slika: string | null; opis: string | null; ukupnoPoena: number }> {
+    return this.http.get<{ id: number; username: string; ime: string; prezime: string; slika: string | null; opis: string | null; ukupnoPoena: number }>(`${this.baseUrl.replace('/teme-foruma', '')}/profil/korisnik/${id}`);
+  }
+
+  kontaktiraj(korisnikId: number): Observable<{ uspesno: boolean }> {
+    return this.http.post<{ uspesno: boolean }>(`${this.baseUrl.replace('/teme-foruma', '')}/chat/kontakt/${korisnikId}`, {});
   }
 
   kreirajTemu(zahtev: KreirajTemuZahtev): Observable<ForumTema> {
