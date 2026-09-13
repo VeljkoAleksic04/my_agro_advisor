@@ -118,7 +118,8 @@ model Poljoprivrednik {
   username         String   @unique
   password         String
   brojTelefona     String?
-  slika            String? 
+  slika            String?
+  opis             String?
   parcele          Parcela[]
   sadnje           Sadnja[]
   kreiranDana      DateTime @default(now())
@@ -135,6 +136,8 @@ model Poljoprivrednik {
   kalendarskiDogadjaji KalendarDogadjaj[]
   poslateChatPoruke ChatPoruka[] @relation("PoslateChatPoruke")
   primljeneChatPoruke ChatPoruka[] @relation("PrimljeneChatPoruke")
+  chatKontakti1      ChatKontakt[] @relation("ChatKontakt1")
+  chatKontakti2      ChatKontakt[] @relation("ChatKontakt2")
 
   @@map("poljoprivrednici")
 }
@@ -367,6 +370,20 @@ model Obavestenje {
   @@map("obavestenja")
 }
 
+
+model ChatKontakt {
+  id           Int            @id @default(autoincrement())
+  korisnik1Id  Int
+  korisnik2Id  Int
+  korisnik1    Poljoprivrednik @relation("ChatKontakt1", fields: [korisnik1Id], references: [id], onDelete: Cascade)
+  korisnik2    Poljoprivrednik @relation("ChatKontakt2", fields: [korisnik2Id], references: [id], onDelete: Cascade)
+  kreiranDana  DateTime       @default(now())
+
+  @@unique([korisnik1Id, korisnik2Id])
+  @@index([korisnik1Id])
+  @@index([korisnik2Id])
+  @@map("chat_kontakti")
+}
 
 model ChatPoruka {
   id          Int      @id @default(autoincrement())
