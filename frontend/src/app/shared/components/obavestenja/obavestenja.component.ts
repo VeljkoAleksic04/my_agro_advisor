@@ -39,7 +39,11 @@ export class ObavestenjaComponent implements OnInit, OnDestroy {
   }
 
   toggle(): void {
-    this.otvoreno.update((v) => !v);
+    const otvori = !this.otvoreno();
+    this.otvoreno.set(otvori);
+    if (otvori && this.brojNeprocitanih() > 0) {
+      this.procitajSva();
+    }
   }
 
   procitaj(obavestenje: Obavestenje): void {
