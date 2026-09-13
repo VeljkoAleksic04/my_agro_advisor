@@ -134,6 +134,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  text-align: left;
 }
 
 .chat-poruka--moja .chat-poruka-sadrzaj {
@@ -142,7 +143,7 @@
 }
 
 .chat-poruka-sadrzaj small {
-  align-self: flex-end;
+  align-self: center;
   color: var(--boja-tekst-suptilan);
   font-size: 0.68rem;
 }

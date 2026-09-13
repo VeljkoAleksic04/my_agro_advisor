@@ -60,7 +60,7 @@
               <div class="chat-poruka" [class.chat-poruka--moja]="jeMoja(poruka)">
                 <div class="chat-poruka-sadrzaj">
                   <span>{{ poruka.sadrzaj }}</span>
-                  <small>{{ vreme(poruka.datumSlanja) }}</small>
+                  <small>{{ vreme(poruka.datumSlanja) }} · {{ status(poruka) }}</small>
                 </div>
               </div>
             }

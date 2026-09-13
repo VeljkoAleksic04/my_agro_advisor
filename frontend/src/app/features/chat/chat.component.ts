@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ChatApiService, ChatKorisnik, ChatPoruka } from './chat-api.service';
 import { environment } from '../../../environments/environment';
+import { ChatNotifikacijaService } from '../../shared/services/chat-notifikacija.service';
 import { io, Socket } from 'socket.io-client';
 
 @Component({
@@ -19,6 +20,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly chatApi = inject(ChatApiService);
   private readonly tokenStorage = inject(TokenStorageService);
   private readonly store = inject(Store);
+  private readonly notifikacije = inject(ChatNotifikacijaService);
 
   protected readonly korisnik = toSignal(this.store.select(selectKorisnik), { initialValue: null });
   protected readonly korisnici = signal<ChatKorisnik[]>([]);
@@ -33,6 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private socket: Socket | null = null;
 
   ngOnInit(): void {
+    this.notifikacije.pokreni();
     this.ucitajKorisnike();
     this.poveziSocket();
   }
@@ -51,7 +54,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       next: (poruke) => {
         this.poruke.set(poruke);
         this.ucitavanjePoruka.set(false);
-        this.chatApi.oznaciProcitano(korisnik.id).subscribe();
+        this.chatApi.oznaciProcitano(korisnik.id).subscribe(() => this.notifikacije.osvezi());
         setTimeout(() => this.scrollujDole());
       },
       error: () => {
@@ -91,6 +94,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     return poruka.posiljalacId === this.korisnik()?.id;
   }
 
+  status(poruka: ChatPoruka): string {
+    if (this.jeMoja(poruka)) return 'Poslata';
+    return poruka.procitano ? 'Pročitana' : 'Primljena';
+  }
+
   inicijal(korisnik: ChatKorisnik): string {
     return (korisnik.ime?.charAt(0) || korisnik.username.charAt(0)).toUpperCase();
   }
@@ -104,7 +112,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       next: (lista) => {
         this.korisnici.set(lista);
         this.ucitavanjeKorisnika.set(false);
-        if (lista.length > 0) this.izaberiKorisnika(lista[0]);
+
       },
       error: () => {
         this.ucitavanjeKorisnika.set(false);
